@@ -1,0 +1,11 @@
+.pio/
+.vscode/
+__pycache__/
+*.pyc
+.env
+secrets.yaml
+*.bin
+*.hex
+*.elf
+*.map
+.DS_Store
