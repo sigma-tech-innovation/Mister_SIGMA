@@ -2,6 +2,11 @@ import subprocess
 
 def run(args):
 
+    if args and args[0] == "pull":
+        print("Running: git pull origin develop")
+        subprocess.run(["git", "pull", "origin", "develop"])
+        return
+
     print("===================================")
     print("         Σ SIGMA SYNC")
     print("===================================")
