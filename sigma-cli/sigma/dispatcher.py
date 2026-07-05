@@ -1,4 +1,4 @@
-from sigma.commands import version, doctor, registry, workspace, node, status, help, log, sync, projects
+from sigma.commands import version, doctor, registry, workspace, node, status, help, log, sync, projects, packages
 
 def dispatch(cmd, args):
     if cmd == "version":
@@ -46,6 +46,9 @@ def dispatch(cmd, args):
 
     elif cmd == "projects":
         projects.run(args)
+
+    elif cmd == "packages":
+        packages.run(args)
 
     else:
         print("Unknown command")
