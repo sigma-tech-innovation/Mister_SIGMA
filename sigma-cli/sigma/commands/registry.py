@@ -1,10 +1,8 @@
 import json
-from pathlib import Path
-
-REGISTRY = Path("sigma-core/registry/registry.json")
+from sigma.config import REGISTRY_PATH
 
 def load():
-    return json.loads(REGISTRY.read_text(encoding="utf-8"))
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
 
 def list_registry():
     data = load()
