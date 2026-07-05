@@ -18,6 +18,32 @@
       "name": "PC Windows Ayoub",
       "type": "windows",
       "status": "active"
+    },
+    {
+      "id": "SIG-NODE-3B880B85A99F",
+      "hostname": "localhost",
+      "system": "Android",
+      "release": "16",
+      "machine": "aarch64",
+      "python": "3.13.13",
+      "uuid": "0x3b880b85a99f",
+      "workspace": "/data/data/com.termux/files/home/SIGMA/28_Mister_SIGMA/Source/Mister_SIGMA",
+      "name": "localhost",
+      "type": "node",
+      "status": "active"
+    },
+    {
+      "id": "SIG-NODE-A102D3D0BA7E",
+      "name": "localhost",
+      "type": "node",
+      "status": "active",
+      "hostname": "localhost",
+      "system": "Android",
+      "release": "16",
+      "machine": "aarch64",
+      "python": "3.13.13",
+      "uuid": "0xa102d3d0ba7e",
+      "workspace": "/data/data/com.termux/files/home/SIGMA/28_Mister_SIGMA/Source/Mister_SIGMA"
     }
   ]
 }
