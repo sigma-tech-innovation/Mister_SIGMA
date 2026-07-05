@@ -1,12 +1,13 @@
 import json
 from sigma.config import REGISTRY_PATH
 
+REQUIRED_FIELDS = ["id", "name", "type", "status"]
+
 def load():
     return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
 
 def list_registry():
     data = load()
-
     print(f"Σ Sigma Registry v{data['version']}")
 
     for obj in data["objects"]:
@@ -27,3 +28,20 @@ def show_registry(object_id):
             return
 
     print("Object not found")
+
+def validate_registry():
+    data = load()
+    errors = 0
+
+    print("Σ Sigma Registry Validation")
+
+    for obj in data["objects"]:
+        for field in REQUIRED_FIELDS:
+            if field not in obj or obj[field] == "":
+                print(f"ERROR: {obj.get('id','UNKNOWN')} missing {field}")
+                errors += 1
+
+    if errors == 0:
+        print("Registry status: OK")
+    else:
+        print(f"Registry status: {errors} error(s)")

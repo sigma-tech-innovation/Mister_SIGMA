@@ -20,6 +20,9 @@ def dispatch(cmd, args):
 
             registry.show_registry(args[1])
 
+        elif args[0] == "validate":
+            registry.validate_registry()
+
         else:
             print("Unknown registry command")
 
