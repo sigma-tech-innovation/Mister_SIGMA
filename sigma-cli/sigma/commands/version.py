@@ -1,4 +1,4 @@
-VERSION = "0.4.0"
+from sigma.config import SIGMA_VERSION
 
 def run():
-    print(f"Sigma CLI v{VERSION}")
+    print(f"Sigma CLI v{SIGMA_VERSION}")
