@@ -1,0 +1,31 @@
+import importlib.util
+from pathlib import Path
+
+spec = importlib.util.spec_from_file_location(
+    "base_manager",
+    Path.cwd() / "sigma-core/managers/base_manager.py"
+)
+
+base = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(base)
+
+class ReleaseManager(base.BaseManager):
+
+    def list(self):
+        for rel in self.database.load("releases"):
+            print(
+                f'{rel["id"]} | {rel["version"]} | {rel["status"]}'
+            )
+
+    def next_id(self):
+        db = self.database.load("releases")
+
+        if not db:
+            return "REL-0001"
+
+        last = max(
+            int(x["id"].split("-")[1])
+            for x in db
+        )
+
+        return f"REL-{last+1:04d}"
