@@ -1,35 +1,16 @@
+from pathlib import Path
+
+ROOT = Path.cwd()
+
 def run(args):
-    print("""
-===================================
-           Σ SIGMA CLI
-===================================
 
-Core
-----
-version
-doctor
-status
-help
+    cmd_dir = ROOT / "sigma-cli/sigma/commands"
 
-Registry
---------
-registry list
-registry show <ID>
-registry validate
+    print("========== SIGMA CLI HELP ==========")
+    print()
 
-Node
-----
-node
-node register
+    for p in sorted(cmd_dir.glob("*.py")):
+        if p.name == "__init__.py":
+            continue
 
-Workspace
----------
-workspace show
-workspace init
-
-Logs
-----
-log <message>
-
-===================================
-""")
+        print(f"sigma {p.stem}")
