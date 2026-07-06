@@ -1,26 +1,18 @@
-import importlib.util
+import platform
+import sys
 from pathlib import Path
 
 ROOT = Path.cwd()
 
-spec = importlib.util.spec_from_file_location(
-    "engine",
-    ROOT / "sigma-core/engine.py"
-)
-
-engine_module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(engine_module)
-
 def run(args):
 
-    e = engine_module.engine
-
-    print("===================================")
-    print("          Σ SIGMA INFO")
-    print("===================================")
-
-    print("Root       :", e.root)
-    print("Database   :", e.db)
-    print("Projects   :", e.projects_dir)
-    print("Time       :", e.now())
-    print("API        :", e.api.exists())
+    print("=========== SIGMA INFO ===========")
+    print("Python      :", sys.version.split()[0])
+    print("Platform    :", platform.system())
+    print("Release     :", platform.release())
+    print("Machine     :", platform.machine())
+    print("Root        :", ROOT)
+    print("Git         :", (ROOT/".git").exists())
+    print("Workspace   :", (ROOT/".sigma-workspace").exists())
+    print("Database    :", (ROOT/"sigma-db").exists())
+    print("Projects    :", (ROOT/"sigma-projects").exists())
