@@ -1,23 +1,19 @@
-from pathlib import Path
-import json
-
 class ProjectManager:
 
-    def __init__(self, engine):
+    def __init__(self, engine, database):
         self.engine = engine
+        self.database = database
 
     def list(self):
         for p in sorted(self.engine.projects.iterdir()):
             if p.is_dir():
                 print("-", p.name)
 
-    def database(self):
-        return self.engine.load_json(
-            self.engine.db / "projects.json"
-        )
+    def db(self):
+        return self.database.load("projects")
 
     def next_id(self):
-        db = self.database()
+        db = self.db()
 
         if not db:
             return "PRJ-0001"
