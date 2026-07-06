@@ -4,5 +4,10 @@
         "name": "Mister_SIGMA",
         "type": "core",
         "status": "active"
+    },
+    {
+        "id": "PRJ-0002",
+        "name": "TP_ESP32",
+        "status": "active"
     }
 ]
