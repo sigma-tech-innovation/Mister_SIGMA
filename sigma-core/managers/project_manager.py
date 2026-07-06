@@ -4,7 +4,8 @@ class ProjectManager:
         self.engine = engine
 
     def list(self):
-        for p in sorted(self.engine.projects.iterdir()):
+
+        for p in sorted(self.engine.projects_dir.iterdir()):
             if p.is_dir():
                 print("-", p.name)
 
@@ -12,6 +13,7 @@ class ProjectManager:
         return self.engine.database.load("projects")
 
     def next_id(self):
+
         db = self.db()
 
         if not db:
