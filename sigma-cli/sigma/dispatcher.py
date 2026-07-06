@@ -1,4 +1,4 @@
-from sigma.commands import version, doctor, registry, workspace, node, status, help, log, sync, projects, packages, database, templates, releases, roadmap, engine, info, stats, health, tree
+from sigma.commands import version, doctor, registry, workspace, node, status, help, log, sync, projects, packages, database, templates, releases, roadmap, engine, info, stats, health, tree, list
 
 def dispatch(cmd, args):
     if cmd == "version":
@@ -76,6 +76,9 @@ def dispatch(cmd, args):
 
     elif cmd == "tree":
         tree.run(args)
+
+    elif cmd == "list":
+        list.run(args)
 
     else:
         print("Unknown command")
