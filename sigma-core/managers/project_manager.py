@@ -1,8 +1,7 @@
 class ProjectManager:
 
-    def __init__(self, engine, database):
+    def __init__(self, engine):
         self.engine = engine
-        self.database = database
 
     def list(self):
         for p in sorted(self.engine.projects.iterdir()):
@@ -10,7 +9,7 @@ class ProjectManager:
                 print("-", p.name)
 
     def db(self):
-        return self.database.load("projects")
+        return self.engine.database.load("projects")
 
     def next_id(self):
         db = self.db()
