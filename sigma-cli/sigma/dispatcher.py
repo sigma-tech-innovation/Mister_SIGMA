@@ -1,4 +1,4 @@
-from sigma.commands import version, doctor, registry, workspace, node, status, help, log, sync, projects, packages, database, templates, releases, roadmap, engine, info, stats, health, tree, list, search, show, count, export, backup
+from sigma.commands import version, doctor, registry, workspace, node, status, help, log, sync, projects, packages, database, templates, releases, roadmap, engine, info, stats, health, tree, list, search, show, count, export, backup, restore
 
 def dispatch(cmd, args):
     if cmd == "version":
@@ -94,6 +94,9 @@ def dispatch(cmd, args):
 
     elif cmd == "backup":
         backup.run(args)
+
+    elif cmd == "restore":
+        restore.run(args)
 
     else:
         print("Unknown command")
