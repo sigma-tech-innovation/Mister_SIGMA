@@ -5,32 +5,40 @@ import importlib.util
 
 ROOT = Path.cwd()
 
-def load_module(name, path):
-    spec = importlib.util.spec_from_file_location(name, path)
+def load(name, relative):
+    spec = importlib.util.spec_from_file_location(
+        name,
+        ROOT / relative
+    )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
 
-DatabaseModule = load_module(
-    "database_manager",
-    ROOT / "sigma-core/managers/database_manager.py"
-)
-
-ProjectModule = load_module(
-    "project_manager",
-    ROOT / "sigma-core/managers/project_manager.py"
-)
+Database = load("database","sigma-core/managers/database_manager.py")
+Project  = load("project","sigma-core/managers/project_manager.py")
+Node     = load("node","sigma-core/managers/node_manager.py")
+Package  = load("package","sigma-core/managers/package_manager.py")
+Registry = load("registry","sigma-core/managers/registry_manager.py")
+Template = load("template","sigma-core/managers/template_manager.py")
+Release  = load("release","sigma-core/managers/release_manager.py")
+Api       = load("api","sigma-core/managers/api_manager.py")
 
 class SigmaEngine:
 
     def __init__(self):
 
         self.root = ROOT
-        self.db = self.root / "sigma-db"
-        self.projects_dir = self.root / "sigma-projects"
+        self.db = ROOT / "sigma-db"
+        self.projects_dir = ROOT / "sigma-projects"
 
-        self.database = DatabaseModule.DatabaseManager(self)
-        self.projects = ProjectModule.ProjectManager(self)
+        self.database = Database.DatabaseManager(self)
+        self.projects = Project.ProjectManager(self)
+        self.nodes = Node.NodeManager(self)
+        self.packages = Package.PackageManager(self)
+        self.registry = Registry.RegistryManager(self)
+        self.templates = Template.TemplateManager(self)
+        self.releases = Release.ReleaseManager(self)
+        self.api = Api.ApiManager(self)
 
     def load_json(self, path):
 
