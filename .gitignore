@@ -11,3 +11,4 @@ secrets.yaml
 .DS_Store
 .sigma-workspace/
 sigma_export.json
+backups/sigma-db-*
