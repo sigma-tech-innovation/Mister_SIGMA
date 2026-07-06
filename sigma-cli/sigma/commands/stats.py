@@ -15,21 +15,23 @@ def run(args):
 
     e = engine_module.engine
 
-    print("===================================")
-    print("         Σ SIGMA STATS")
-    print("===================================")
+    names = [
+        "projects",
+        "nodes",
+        "packages",
+        "registry",
+        "templates",
+        "releases"
+    ]
 
-    print("Databases :", len(e.database.list()))
-    print("Projects  :", len(e.database.load("projects")))
-    print("Nodes     :", len(e.database.load("nodes")))
-    print("Packages  :", len(e.database.load("packages")))
-    print("Registry  :", len(e.database.load("registry")))
-    print("Templates :", len(e.database.load("templates")))
-    print("Releases  :", len(e.database.load("releases")))
+    total = 0
 
-    print()
+    print("========== SIGMA STATS ==========")
 
-    print("Project folders :", len([
-        p for p in e.projects_dir.iterdir()
-        if p.is_dir()
-    ]))
+    for name in names:
+        n = len(e.database.load(name))
+        total += n
+        print(f"{name:12} {n}")
+
+    print("------------------------------")
+    print(f"{'TOTAL':12} {total}")
