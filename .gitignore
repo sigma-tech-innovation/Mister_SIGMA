@@ -10,3 +10,4 @@ secrets.yaml
 *.map
 .DS_Store
 .sigma-workspace/
+sigma_export.json
