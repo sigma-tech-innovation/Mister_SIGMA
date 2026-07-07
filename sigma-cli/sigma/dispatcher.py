@@ -1,4 +1,4 @@
-from sigma.commands import version, doctor, registry, workspace, node, status, help, log, sync, projects, packages, database, templates, releases, roadmap, engine, info, stats, health, tree, list, search, show, count, export, backup, restore, importdb, history, about, config, reset, init, verify, commands, summary, branch, remote, last, gitstatus, gitlog
+from sigma.commands import version, doctor, registry, workspace, node, status, help, log, sync, projects, packages, database, templates, releases, roadmap, engine, info, stats, health, tree, list, search, show, count, export, backup, restore, importdb, history, about, config, reset, init, verify, commands, summary, branch, remote, last, gitstatus, gitlog, gitbranches
 
 def dispatch(cmd, args):
     if cmd == "version":
@@ -139,6 +139,9 @@ def dispatch(cmd, args):
 
     elif cmd == "gitlog":
         gitlog.run(args)
+
+    elif cmd == "gitbranches":
+        gitbranches.run(args)
 
     else:
         print("Unknown command")
