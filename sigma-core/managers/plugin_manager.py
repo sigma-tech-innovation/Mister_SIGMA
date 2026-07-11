@@ -13,5 +13,12 @@ class PluginManager(base.BaseManager):
     def db(self):
         return self.database.load("plugins")
 
-    def list(self):
-        return self.db()
+    def save(self, data):
+        self.database.save("plugins", data)
+
+    def update(self, name, version):
+        db = self.db()
+        for p in db:
+            if p["name"] == name:
+                p["version"] = version
+        self.save(db)
