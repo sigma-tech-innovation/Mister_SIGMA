@@ -1,6 +1,5 @@
-import json
-from pathlib import Path
 import importlib.util
+from pathlib import Path
 
 spec=importlib.util.spec_from_file_location(
     "base_manager",
@@ -11,9 +10,12 @@ spec.loader.exec_module(base)
 
 class PluginManager(base.BaseManager):
 
-    def info(self,name):
-        db=self.database.load("plugins")
-        for p in db:
-            if p["name"]==name:
-                return p
-        return None
+    def db(self):
+        return self.database.load("plugins")
+
+    def save(self,data):
+        self.database.save("plugins",data)
+
+    def delete(self,name):
+        db=[p for p in self.db() if p["name"]!=name]
+        self.save(db)
