@@ -13,12 +13,8 @@ class PluginManager(base.BaseManager):
     def db(self):
         return self.database.load("plugins")
 
-    def save(self,data):
-        self.database.save("plugins",data)
-
-    def disable(self,name):
-        db=self.db()
-        for p in db:
+    def get(self,name):
+        for p in self.db():
             if p["name"]==name:
-                p["status"]="disabled"
-        self.save(db)
+                return p
+        return None
