@@ -10,13 +10,14 @@ spec.loader.exec_module(base)
 
 class PluginManager(base.BaseManager):
 
-    def load(self, name):
-        path = Path("sigma-plugins") / name / "__init__.py"
+    def discover(self):
+        root = Path("sigma-plugins")
 
-        if not path.exists():
-            return None
+        if not root.exists():
+            return []
 
-        spec = importlib.util.spec_from_file_location(name, path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        return module
+        return sorted(
+            p.name
+            for p in root.iterdir()
+            if p.is_dir() and (p / "__init__.py").exists()
+        )
