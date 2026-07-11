@@ -16,9 +16,9 @@ class PluginManager(base.BaseManager):
     def save(self, data):
         self.database.save("plugins", data)
 
-    def update(self, name, version):
+    def rename(self, old_name, new_name):
         db = self.db()
         for p in db:
-            if p["name"] == name:
-                p["version"] = version
+            if p["name"] == old_name:
+                p["name"] = new_name
         self.save(db)

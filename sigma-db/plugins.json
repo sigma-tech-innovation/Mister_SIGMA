@@ -1,7 +1,7 @@
 [
     {
         "id": "PLG-0001",
-        "name": "core",
+        "name": "core-engine",
         "status": "disabled",
         "version": "1.1.0"
     }
