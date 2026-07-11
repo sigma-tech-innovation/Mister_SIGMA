@@ -1,11 +1,11 @@
 import importlib.util
 from pathlib import Path
 
-spec=importlib.util.spec_from_file_location(
+spec = importlib.util.spec_from_file_location(
     "base_manager",
-    Path.cwd()/"sigma-core/managers/base_manager.py"
+    Path.cwd() / "sigma-core/managers/base_manager.py"
 )
-base=importlib.util.module_from_spec(spec)
+base = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(base)
 
 class PluginManager(base.BaseManager):
@@ -13,9 +13,12 @@ class PluginManager(base.BaseManager):
     def db(self):
         return self.database.load("plugins")
 
-    def save(self,data):
-        self.database.save("plugins",data)
+    def save(self, data):
+        self.database.save("plugins", data)
 
-    def remove(self,name):
-        db=[p for p in self.db() if p["name"]!=name]
+    def enable(self, name):
+        db = self.db()
+        for p in db:
+            if p["name"] == name:
+                p["status"] = "active"
         self.save(db)
