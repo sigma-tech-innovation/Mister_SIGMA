@@ -1,6 +1,6 @@
-import importlib
-import importlib.util
+import json
 from pathlib import Path
+import importlib.util
 
 spec=importlib.util.spec_from_file_location(
     "base_manager",
@@ -11,5 +11,9 @@ spec.loader.exec_module(base)
 
 class PluginManager(base.BaseManager):
 
-    def reload(self,module):
-        return importlib.reload(module)
+    def info(self,name):
+        db=self.database.load("plugins")
+        for p in db:
+            if p["name"]==name:
+                return p
+        return None
