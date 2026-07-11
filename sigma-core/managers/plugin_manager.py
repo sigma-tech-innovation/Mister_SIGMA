@@ -14,21 +14,25 @@ class PluginManager(base.BaseManager):
     def db(self):
         return self.database.load("plugins")
 
+    def save(self,data):
+        self.database.save("plugins",data)
+
     def list(self):
-        for plugin in self.db():
-            print(
-                f'{plugin["id"]} | {plugin["name"]} | {plugin["version"]} | {plugin["status"]}'
-            )
+        for p in self.db():
+            print(f'{p["id"]} | {p["name"]} | {p["version"]} | {p["status"]}')
 
     def next_id(self):
-        db = self.db()
-
+        db=self.db()
         if not db:
             return "PLG-0001"
+        return f'PLG-{max(int(x["id"].split("-")[1]) for x in db)+1:04d}'
 
-        last = max(
-            int(x["id"].split("-")[1])
-            for x in db
-        )
-
-        return f"PLG-{last+1:04d}"
+    def add(self,name,version="1.0.0"):
+        db=self.db()
+        db.append({
+            "id":self.next_id(),
+            "name":name,
+            "version":version,
+            "status":"active"
+        })
+        self.save(db)
