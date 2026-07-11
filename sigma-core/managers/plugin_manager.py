@@ -13,8 +13,5 @@ class PluginManager(base.BaseManager):
     def db(self):
         return self.database.load("plugins")
 
-    def get(self,name):
-        for p in self.db():
-            if p["name"]==name:
-                return p
-        return None
+    def exists(self,name):
+        return any(p["name"]==name for p in self.db())
