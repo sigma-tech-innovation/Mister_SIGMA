@@ -5,19 +5,18 @@ spec = importlib.util.spec_from_file_location(
     "base_manager",
     Path.cwd() / "sigma-core/managers/base_manager.py"
 )
-
 base = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(base)
 
-
 class PluginManager(base.BaseManager):
 
-    def db(self):
-        return self.database.load("plugins")
+    def load(self, name):
+        path = Path("sigma-plugins") / name / "__init__.py"
 
-    def search(self, text):
-        text = text.lower()
-        return [
-            p for p in self.db()
-            if text in p["name"].lower()
-        ]
+        if not path.exists():
+            return None
+
+        spec = importlib.util.spec_from_file_location(name, path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
