@@ -1,4 +1,4 @@
-import sys
+import importlib
 import importlib.util
 from pathlib import Path
 
@@ -11,8 +11,5 @@ spec.loader.exec_module(base)
 
 class PluginManager(base.BaseManager):
 
-    def unload(self,name):
-        if name in sys.modules:
-            del sys.modules[name]
-            return True
-        return False
+    def reload(self,module):
+        return importlib.reload(module)
