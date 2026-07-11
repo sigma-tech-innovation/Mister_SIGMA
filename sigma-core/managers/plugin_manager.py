@@ -16,12 +16,9 @@ class PluginManager(base.BaseManager):
     def save(self,data):
         self.database.save("plugins",data)
 
-    def create(self,pid,name,version,status="enabled"):
+    def enable(self,name):
         db=self.db()
-        db.append({
-            "id":pid,
-            "name":name,
-            "version":version,
-            "status":status
-        })
+        for p in db:
+            if p["name"]==name:
+                p["status"]="enabled"
         self.save(db)
