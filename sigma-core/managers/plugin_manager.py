@@ -127,3 +127,7 @@ class PluginManager(base.BaseManager):
             p for p in self.list()
             if p.get("status") == "disabled"
         ]
+
+
+    def uninstall(self, name):
+        return self.delete(name)
