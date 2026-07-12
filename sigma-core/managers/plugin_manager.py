@@ -131,3 +131,8 @@ class PluginManager(base.BaseManager):
 
     def uninstall(self, name):
         return self.delete(name)
+
+
+    def save(self):
+        self.database.save("plugins", self.list())
+        return True
