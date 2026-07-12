@@ -1,4 +1,4 @@
-import json
+import shutil
 import importlib.util
 from pathlib import Path
 
@@ -11,6 +11,5 @@ spec.loader.exec_module(base)
 
 class PluginManager(base.BaseManager):
 
-    def import_file(self, filename):
-        data = json.loads(Path(filename).read_text(encoding="utf-8"))
-        self.database.save("plugins", data)
+    def backup(self, filename):
+        shutil.copy2("sigma-db/plugins.json", filename)
