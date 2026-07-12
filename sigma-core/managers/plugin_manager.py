@@ -11,9 +11,6 @@ spec.loader.exec_module(base)
 
 class PluginManager(base.BaseManager):
 
-    def export(self, filename):
-        data = self.database.load("plugins")
-        Path(filename).write_text(
-            json.dumps(data, indent=2),
-            encoding="utf-8"
-        )
+    def import_file(self, filename):
+        data = json.loads(Path(filename).read_text(encoding="utf-8"))
+        self.database.save("plugins", data)
