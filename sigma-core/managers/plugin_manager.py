@@ -1,4 +1,3 @@
-import shutil
 import importlib.util
 from pathlib import Path
 
@@ -11,5 +10,10 @@ spec.loader.exec_module(base)
 
 class PluginManager(base.BaseManager):
 
-    def restore(self, filename):
-        shutil.copy2(filename, "sigma-db/plugins.json")
+    def validate(self, name):
+        plugins = self.database.load("plugins")
+        return any(
+            p.get("name") == name and
+            p.get("status") in ("enabled", "disabled")
+            for p in plugins
+        )
