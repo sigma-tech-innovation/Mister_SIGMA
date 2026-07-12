@@ -11,5 +11,5 @@ spec.loader.exec_module(base)
 
 class PluginManager(base.BaseManager):
 
-    def backup(self, filename):
-        shutil.copy2("sigma-db/plugins.json", filename)
+    def restore(self, filename):
+        shutil.copy2(filename, "sigma-db/plugins.json")
