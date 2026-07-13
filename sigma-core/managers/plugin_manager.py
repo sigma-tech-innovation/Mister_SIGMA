@@ -206,3 +206,10 @@ class PluginManager(base.BaseManager):
             if plugin.get("id") == plugin_id:
                 return self.enable(plugin.get("name"))
         return False
+
+
+    def disable_by_id(self, plugin_id):
+        for plugin in self.list():
+            if plugin.get("id") == plugin_id:
+                return self.disable(plugin.get("name"))
+        return False
