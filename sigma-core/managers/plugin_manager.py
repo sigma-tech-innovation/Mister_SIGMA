@@ -144,3 +144,10 @@ class PluginManager(base.BaseManager):
 
     def unload(self, name):
         return self.disable(name)
+
+
+    def status(self, name):
+        plugin = self.get(name)
+        if plugin is None:
+            return None
+        return plugin.get("status")
