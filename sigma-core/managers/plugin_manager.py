@@ -136,3 +136,7 @@ class PluginManager(base.BaseManager):
     def save(self):
         self.database.save("plugins", self.list())
         return True
+
+
+    def load(self):
+        return self.database.load("plugins")
