@@ -53,7 +53,13 @@ class SigmaEngine:
 
     def manager(self, name):
 
-        return self.managers[name]
+        try:
+            return self.managers[name]
+        except KeyError:
+            available = ", ".join(sorted(self.managers.keys()))
+            raise KeyError(
+                f"Unknown manager '{name}'. Available managers: {available}"
+            )
 
     def load_json(self, path):
 
