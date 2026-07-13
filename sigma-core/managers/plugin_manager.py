@@ -213,3 +213,18 @@ class PluginManager(base.BaseManager):
             if plugin.get("id") == plugin_id:
                 return self.disable(plugin.get("name"))
         return False
+
+
+    def discover(self):
+        from pathlib import Path
+
+        plugins_dir = Path("sigma-plugins")
+
+        if not plugins_dir.exists():
+            return []
+
+        return sorted(
+            p.name
+            for p in plugins_dir.iterdir()
+            if p.is_dir() and (p / "__init__.py").exists()
+        )
