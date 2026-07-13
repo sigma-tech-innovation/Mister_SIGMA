@@ -191,3 +191,11 @@ class PluginManager(base.BaseManager):
             name = plugin.get("name")
             results[name] = self.enable(name)
         return results
+
+
+    def disable_all(self):
+        results = {}
+        for plugin in self.list():
+            name = plugin.get("name")
+            results[name] = self.disable(name)
+        return results
