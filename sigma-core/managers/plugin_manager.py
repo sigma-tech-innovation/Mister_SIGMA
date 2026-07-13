@@ -140,3 +140,7 @@ class PluginManager(base.BaseManager):
 
     def load(self):
         return self.database.load("plugins")
+
+
+    def unload(self, name):
+        return self.disable(name)
