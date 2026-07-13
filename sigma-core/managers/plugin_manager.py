@@ -172,3 +172,11 @@ class PluginManager(base.BaseManager):
         if plugin is None:
             return False
         return self.validate(name)
+
+
+    def reload_all(self):
+        results = {}
+        for plugin in self.list():
+            name = plugin.get("name")
+            results[name] = self.reload(name)
+        return results
