@@ -151,3 +151,10 @@ class PluginManager(base.BaseManager):
         if plugin is None:
             return None
         return plugin.get("status")
+
+
+    def version(self, name):
+        plugin = self.get(name)
+        if plugin is None:
+            return None
+        return plugin.get("version")
