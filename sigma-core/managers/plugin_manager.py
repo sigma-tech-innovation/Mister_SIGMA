@@ -165,3 +165,10 @@ class PluginManager(base.BaseManager):
         if plugin is None:
             return None
         return plugin.get("id")
+
+
+    def reload(self, name):
+        plugin = self.get(name)
+        if plugin is None:
+            return False
+        return self.validate(name)
