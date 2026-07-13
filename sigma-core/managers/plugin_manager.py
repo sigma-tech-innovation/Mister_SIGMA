@@ -45,25 +45,28 @@ class PluginManager(base.BaseManager):
         self.install(plugin)
 
     def delete(self, name):
-        plugins = [
-            p for p in self.list()
-            if p.get("name") != name
-        ]
-        self.database.save("plugins", plugins)
+        plugins = self.list()
+        new_plugins = [p for p in plugins if p.get("name") != name]
+        self.database.save("plugins", new_plugins)
+        return len(new_plugins) != len(plugins)
 
     def enable(self, name):
         plugins = self.list()
         for p in plugins:
             if p.get("name") == name:
                 p["status"] = "enabled"
-        self.database.save("plugins", plugins)
+                self.database.save("plugins", plugins)
+                return True
+        return False
 
     def disable(self, name):
         plugins = self.list()
         for p in plugins:
             if p.get("name") == name:
                 p["status"] = "disabled"
-        self.database.save("plugins", plugins)
+                self.database.save("plugins", plugins)
+                return True
+        return False
 
     def export_file(self, filename):
         Path(filename).write_text(
@@ -179,4 +182,12 @@ class PluginManager(base.BaseManager):
         for plugin in self.list():
             name = plugin.get("name")
             results[name] = self.reload(name)
+        return results
+
+
+    def enable_all(self):
+        results = {}
+        for plugin in self.list():
+            name = plugin.get("name")
+            results[name] = self.enable(name)
         return results
