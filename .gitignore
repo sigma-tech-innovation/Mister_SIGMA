@@ -12,3 +12,4 @@ secrets.yaml
 .sigma-workspace/
 sigma_export.json
 backups/sigma-db-*
+backups/
