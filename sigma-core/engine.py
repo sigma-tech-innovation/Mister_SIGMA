@@ -40,6 +40,21 @@ class SigmaEngine:
         self.releases = Release.ReleaseManager(self)
         self.api = Api.ApiManager(self)
 
+        self.managers = {
+            "database": self.database,
+            "projects": self.projects,
+            "nodes": self.nodes,
+            "packages": self.packages,
+            "registry": self.registry,
+            "templates": self.templates,
+            "releases": self.releases,
+            "api": self.api,
+        }
+
+    def manager(self, name):
+
+        return self.managers[name]
+
     def load_json(self, path):
 
         p = Path(path)
