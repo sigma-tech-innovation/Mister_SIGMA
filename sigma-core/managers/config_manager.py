@@ -1,3 +1,4 @@
+import uuid
 from pathlib import Path
 
 
@@ -25,3 +26,19 @@ class ConfigManager:
         cfg = self.load()
         cfg[key] = value
         self.save(cfg)
+
+
+    def ensure_identity(self):
+        cfg = self.load()
+
+        changed = False
+
+        for key in ("machine_id", "user_id", "node_id"):
+            if key not in cfg:
+                cfg[key] = str(uuid.uuid4())
+                changed = True
+
+        if changed:
+            self.save(cfg)
+
+        return cfg
