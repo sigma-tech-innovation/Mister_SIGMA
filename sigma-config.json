@@ -8,5 +8,12 @@
     "device_type": "android",
     "environment": "development",
     "hostname": "Admin-Sigma-Phone",
-    "owner": "Ayoub"
+    "owner": "Ayoub",
+    "profile": "default",
+    "role": "administrator",
+    "team": "Sigma",
+    "sync_enabled": true,
+    "registry_url": "https://github.com/sigma-tech-innovation/Mister_SIGMA",
+    "api_endpoint": "",
+    "last_sync": ""
 }
