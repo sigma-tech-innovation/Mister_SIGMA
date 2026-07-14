@@ -65,7 +65,7 @@ class DatabaseManagerTests(unittest.TestCase):
     def test_available_backends(self):
         self.assertEqual(
             self.manager.available_backends(),
-            ["json", "sqlite"]
+            ["json", "postgresql", "sqlite"]
         )
 
     def test_exists_delete_and_list(self):
@@ -242,6 +242,100 @@ class DatabaseManagerTests(unittest.TestCase):
         )
         self.assertEqual(
             self.manager.load("projects"),
+            []
+        )
+
+
+    def test_postgresql_backend_registration(self):
+        backend = self.manager.set_backend(
+            "postgresql"
+        )
+
+        self.assertEqual(
+            type(backend).__name__,
+            "PostgreSQLBackend"
+        )
+        self.assertIsNone(
+            backend.database_url
+        )
+        self.assertFalse(
+            backend.driver_available()
+        )
+
+    def test_postgresql_url_from_config(self):
+        self.engine.config = SimpleNamespace(
+            get=lambda key, default=None: (
+                "postgresql://sigma/database"
+                if key == "database_url"
+                else default
+            )
+        )
+
+        manager = database.DatabaseManager(
+            self.engine
+        )
+
+        backend = manager.set_backend(
+            "postgresql"
+        )
+
+        self.assertEqual(
+            backend.database_url,
+            "postgresql://sigma/database"
+        )
+
+
+    def test_backend_selected_from_config(self):
+        self.engine.config = SimpleNamespace(
+            get=lambda key, default=None: (
+                "sqlite"
+                if key == "database_backend"
+                else default
+            )
+        )
+
+        manager = database.DatabaseManager(
+            self.engine
+        )
+
+        self.assertEqual(
+            manager.backend_key,
+            "sqlite"
+        )
+        self.assertEqual(
+            manager.backend_name(),
+            "SQLiteBackend"
+        )
+
+    def test_postgresql_validation_without_driver(self):
+        backend = self.manager.set_backend(
+            "postgresql"
+        )
+
+        result = self.manager.validate()
+
+        self.assertFalse(result["valid"])
+        self.assertFalse(result["ready"])
+        self.assertIn(
+            "PostgreSQL database URL is missing",
+            result["errors"]
+        )
+        self.assertIn(
+            "PostgreSQL driver is unavailable",
+            result["errors"]
+        )
+        self.assertIs(
+            backend,
+            self.manager.backend
+        )
+
+    def test_json_validation_ready(self):
+        result = self.manager.validate()
+
+        self.assertTrue(result["valid"])
+        self.assertTrue(result["ready"])
+        self.assertEqual(
+            result["errors"],
             []
         )
 

@@ -30,22 +30,29 @@ sqlite_backend = load_module(
     "sigma-core/managers/database_backends/sqlite_backend.py"
 )
 
+postgres_backend = load_module(
+    "database_postgres_backend",
+    "sigma-core/managers/database_backends/postgres_backend.py"
+)
+
 DatabaseBackend = base_backend.DatabaseBackend
 JsonBackend = json_backend.JsonBackend
 SQLiteBackend = sqlite_backend.SQLiteBackend
+PostgreSQLBackend = postgres_backend.PostgreSQLBackend
 
 
 class DatabaseManager:
 
     BACKENDS = {
         "json": JsonBackend,
+        "postgresql": PostgreSQLBackend,
         "sqlite": SQLiteBackend,
     }
 
     def __init__(self, engine):
         self.engine = engine
         self.root = self.resolve_root(engine)
-        self.backend_key = "json"
+        self.backend_key = self.configured_backend()
         self.backend = self.create_backend(
             self.backend_key
         )
@@ -71,12 +78,60 @@ class DatabaseManager:
             "Unable to locate database root"
         )
 
+    def configured_backend(self):
+        config = getattr(
+            self.engine,
+            "config",
+            None
+        )
+
+        if config is None:
+            return "json"
+
+        getter = getattr(config, "get", None)
+
+        if getter is None:
+            return "json"
+
+        name = getter(
+            "database_backend",
+            "json"
+        )
+
+        return str(name or "json").strip().lower()
+
+    def database_url(self):
+        config = getattr(
+            self.engine,
+            "config",
+            None
+        )
+
+        if config is None:
+            return None
+
+        getter = getattr(config, "get", None)
+
+        if getter is None:
+            return None
+
+        return getter(
+            "database_url",
+            None
+        )
+
     def create_backend(self, name):
         backend_class = self.BACKENDS.get(name)
 
         if backend_class is None:
             raise ValueError(
                 f"Unknown database backend: {name}"
+            )
+
+        if name == "postgresql":
+            return backend_class(
+                root=self.root,
+                database_url=self.database_url(),
             )
 
         return backend_class(self.root)
@@ -160,14 +215,30 @@ class DatabaseManager:
 
     def validate(self):
         errors = []
+        ready = True
 
         if self.backend_key not in self.BACKENDS:
             errors.append(
                 "Unknown active backend"
             )
+            ready = False
+
+        if self.backend_key == "postgresql":
+            if not self.backend.database_url:
+                errors.append(
+                    "PostgreSQL database URL is missing"
+                )
+                ready = False
+
+            if not self.backend.driver_available():
+                errors.append(
+                    "PostgreSQL driver is unavailable"
+                )
+                ready = False
 
         return {
             "valid": not errors,
+            "ready": ready,
             "backend": self.backend_name(),
             "backend_key": self.backend_key,
             "available_backends": (
