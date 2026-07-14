@@ -23,11 +23,11 @@ class ProjectManager(base.BaseManager):
 
         return [p.name for p in projects if p.is_dir()]
 
-    def db(self):
+    def records(self):
         return self.database.load("projects")
 
     def next_id(self):
-        db = self.db()
+        db = self.records()
 
         if not db:
             return "PRJ-0001"
@@ -40,7 +40,7 @@ class ProjectManager(base.BaseManager):
         return f"PRJ-{last+1:04d}"
 
     def get(self, project_id):
-        for project in self.db():
+        for project in self.records():
             if project.get("id") == project_id:
                 return project
         return None
@@ -49,7 +49,7 @@ class ProjectManager(base.BaseManager):
         return self.get(project_id) is not None
 
     def create(self, project):
-        db = self.db()
+        db = self.records()
 
         if "id" not in project:
             project["id"] = self.next_id()
@@ -59,7 +59,7 @@ class ProjectManager(base.BaseManager):
         return project
 
     def update(self, project_id, **fields):
-        db = self.db()
+        db = self.records()
 
         for project in db:
             if project.get("id") == project_id:
@@ -70,7 +70,7 @@ class ProjectManager(base.BaseManager):
         return None
 
     def delete(self, project_id):
-        db = self.db()
+        db = self.records()
         new_db = [p for p in db if p.get("id") != project_id]
 
         if len(new_db) == len(db):
@@ -80,4 +80,4 @@ class ProjectManager(base.BaseManager):
         return True
 
     def count(self):
-        return len(self.db())
+        return len(self.records())

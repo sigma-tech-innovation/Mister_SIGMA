@@ -11,8 +11,11 @@ spec.loader.exec_module(base)
 
 class PackageManager(base.BaseManager):
 
+    def records(self):
+        return self.database.load("packages")
+
     def list(self):
-        packages = self.database.load("packages")
+        packages = self.records()
 
         for pkg in packages:
             print(
@@ -22,7 +25,7 @@ class PackageManager(base.BaseManager):
         return packages
 
     def next_id(self):
-        db = self.database.load("packages")
+        db = self.records()
 
         if not db:
             return "PKG-0001"
@@ -35,7 +38,7 @@ class PackageManager(base.BaseManager):
         return f"PKG-{last+1:04d}"
 
     def get(self, package_id):
-        for package in self.database.load("packages"):
+        for package in self.records():
             if package.get("id") == package_id:
                 return package
         return None
@@ -44,7 +47,7 @@ class PackageManager(base.BaseManager):
         return self.get(package_id) is not None
 
     def create(self, package):
-        db = self.database.load("packages")
+        db = self.records()
 
         if "id" not in package:
             package["id"] = self.next_id()
@@ -54,7 +57,7 @@ class PackageManager(base.BaseManager):
         return package
 
     def update(self, package_id, **fields):
-        db = self.database.load("packages")
+        db = self.records()
 
         for package in db:
             if package.get("id") == package_id:
@@ -65,7 +68,7 @@ class PackageManager(base.BaseManager):
         return None
 
     def delete(self, package_id):
-        db = self.database.load("packages")
+        db = self.records()
         new_db = [p for p in db if p.get("id") != package_id]
 
         if len(new_db) == len(db):
@@ -75,4 +78,4 @@ class PackageManager(base.BaseManager):
         return True
 
     def count(self):
-        return len(self.database.load("packages"))
+        return len(self.records())

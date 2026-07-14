@@ -11,8 +11,11 @@ spec.loader.exec_module(base)
 
 class TemplateManager(base.BaseManager):
 
+    def records(self):
+        return self.database.load("templates")
+
     def list(self):
-        templates = self.database.load("templates")
+        templates = self.records()
 
         for tpl in templates:
             print(
@@ -22,7 +25,7 @@ class TemplateManager(base.BaseManager):
         return templates
 
     def next_id(self):
-        db = self.database.load("templates")
+        db = self.records()
 
         if not db:
             return "TPL-0001"
@@ -35,7 +38,7 @@ class TemplateManager(base.BaseManager):
         return f"TPL-{last+1:04d}"
 
     def get(self, template_id):
-        for template in self.database.load("templates"):
+        for template in self.records():
             if template.get("id") == template_id:
                 return template
         return None
@@ -44,7 +47,7 @@ class TemplateManager(base.BaseManager):
         return self.get(template_id) is not None
 
     def create(self, template):
-        db = self.database.load("templates")
+        db = self.records()
 
         if "id" not in template:
             template["id"] = self.next_id()
@@ -54,7 +57,7 @@ class TemplateManager(base.BaseManager):
         return template
 
     def update(self, template_id, **fields):
-        db = self.database.load("templates")
+        db = self.records()
 
         for template in db:
             if template.get("id") == template_id:
@@ -65,7 +68,7 @@ class TemplateManager(base.BaseManager):
         return None
 
     def delete(self, template_id):
-        db = self.database.load("templates")
+        db = self.records()
         new_db = [t for t in db if t.get("id") != template_id]
 
         if len(new_db) == len(db):
@@ -75,4 +78,4 @@ class TemplateManager(base.BaseManager):
         return True
 
     def count(self):
-        return len(self.database.load("templates"))
+        return len(self.records())

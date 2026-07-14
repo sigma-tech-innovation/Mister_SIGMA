@@ -11,8 +11,11 @@ spec.loader.exec_module(base)
 
 class RegistryManager(base.BaseManager):
 
+    def records(self):
+        return self.database.load("registry")
+
     def list(self):
-        registry = self.database.load("registry")
+        registry = self.records()
 
         for reg in registry:
             print(
@@ -22,7 +25,7 @@ class RegistryManager(base.BaseManager):
         return registry
 
     def next_id(self):
-        db = self.database.load("registry")
+        db = self.records()
 
         if not db:
             return "REG-0001"
@@ -35,7 +38,7 @@ class RegistryManager(base.BaseManager):
         return f"REG-{last+1:04d}"
 
     def get(self, registry_id):
-        for reg in self.database.load("registry"):
+        for reg in self.records():
             if reg.get("id") == registry_id:
                 return reg
         return None
@@ -44,7 +47,7 @@ class RegistryManager(base.BaseManager):
         return self.get(registry_id) is not None
 
     def create(self, registry):
-        db = self.database.load("registry")
+        db = self.records()
 
         if "id" not in registry:
             registry["id"] = self.next_id()
@@ -54,7 +57,7 @@ class RegistryManager(base.BaseManager):
         return registry
 
     def update(self, registry_id, **fields):
-        db = self.database.load("registry")
+        db = self.records()
 
         for registry in db:
             if registry.get("id") == registry_id:
@@ -65,7 +68,7 @@ class RegistryManager(base.BaseManager):
         return None
 
     def delete(self, registry_id):
-        db = self.database.load("registry")
+        db = self.records()
         new_db = [r for r in db if r.get("id") != registry_id]
 
         if len(new_db) == len(db):
@@ -75,4 +78,4 @@ class RegistryManager(base.BaseManager):
         return True
 
     def count(self):
-        return len(self.database.load("registry"))
+        return len(self.records())
