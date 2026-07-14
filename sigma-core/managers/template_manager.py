@@ -43,5 +43,36 @@ class TemplateManager(base.BaseManager):
     def exists(self, template_id):
         return self.get(template_id) is not None
 
+    def create(self, template):
+        db = self.database.load("templates")
+
+        if "id" not in template:
+            template["id"] = self.next_id()
+
+        db.append(template)
+        self.database.save("templates", db)
+        return template
+
+    def update(self, template_id, **fields):
+        db = self.database.load("templates")
+
+        for template in db:
+            if template.get("id") == template_id:
+                template.update(fields)
+                self.database.save("templates", db)
+                return template
+
+        return None
+
+    def delete(self, template_id):
+        db = self.database.load("templates")
+        new_db = [t for t in db if t.get("id") != template_id]
+
+        if len(new_db) == len(db):
+            return False
+
+        self.database.save("templates", new_db)
+        return True
+
     def count(self):
         return len(self.database.load("templates"))
