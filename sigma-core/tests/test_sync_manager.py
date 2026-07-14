@@ -146,6 +146,24 @@ class SyncManagerTests(unittest.TestCase):
         self.assertEqual(result["errors"], [])
 
     @patch.object(sync_module.subprocess, "run")
+    def test_validate_dirty_repository(self, run_mock):
+        run_mock.side_effect = [
+            self.git_result("develop\n"),
+            self.git_result(" M file.py\n"),
+            self.git_result(
+                "https://example.invalid/repository\n"
+            ),
+        ]
+
+        result = self.m.validate()
+
+        self.assertFalse(result["ready"])
+        self.assertIn(
+            "Git working tree is not clean",
+            result["errors"]
+        )
+
+    @patch.object(sync_module.subprocess, "run")
     def test_validate_missing_identity(self, run_mock):
         self.local_config.data.pop("node_id")
 

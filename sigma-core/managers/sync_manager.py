@@ -157,6 +157,11 @@ class SyncManager:
                 "Git repository is unavailable"
             )
 
+        if git_state["available"] and not git_state["clean"]:
+            errors.append(
+                "Git working tree is not clean"
+            )
+
         return {
             "ready": not errors,
             "missing": missing,

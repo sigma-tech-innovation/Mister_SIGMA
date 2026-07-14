@@ -86,5 +86,9 @@ class BaseManager:
     def api(self):
         return self.engine.api
 
+    @property
+    def sync(self):
+        return self.engine.sync
+
     def manager(self, name):
         return self.engine.manager(name)
