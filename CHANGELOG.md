@@ -1,6 +1,17 @@
-# Changelog
+# Sigma CLI Changelog
 
-## v1.0.0
+## v0.6.0
 
-- Initialisation officielle du dépôt Mister SIGMA.
-- Création de la structure principale du projet.
+### Added
+- Modular CLI architecture
+- Dispatcher engine
+- Workspace manager
+- Registry engine
+- Registry validation
+- Node identity
+- Node registration
+- Global status command
+- Logger
+- Extended doctor
+- CLI help
+

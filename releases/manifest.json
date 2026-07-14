@@ -1,0 +1,18 @@
+{
+    "project": "Mister_SIGMA",
+    "latest": "1.1.0",
+    "releases": [
+        {
+            "version": "1.0.0",
+            "tag": "v1.0.0",
+            "state": "stable",
+            "file": "releases/v1.0.0.txt"
+        },
+        {
+            "version": "1.1.0",
+            "tag": "v1.1.0",
+            "state": "release-candidate",
+            "file": "releases/v1.1.0.txt"
+        }
+    ]
+}

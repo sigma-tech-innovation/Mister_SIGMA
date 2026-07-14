@@ -1,0 +1,19 @@
+{
+    "project": "Mister_SIGMA",
+    "machine_id": "32895d7f-e066-4647-862d-079b2e19358c",
+    "user_id": "fddb80da-e9c2-4238-bded-6c3547a13567",
+    "node_id": "cd54d910-6a02-4976-b845-dae9e1c7edcb",
+    "organization_id": "sigma-tech-innovation",
+    "workspace_id": "default",
+    "device_type": "android",
+    "environment": "development",
+    "hostname": "Admin-Sigma-Phone",
+    "owner": "Ayoub",
+    "profile": "default",
+    "role": "administrator",
+    "team": "Sigma",
+    "sync_enabled": true,
+    "registry_url": "https://github.com/sigma-tech-innovation/Mister_SIGMA",
+    "api_endpoint": "",
+    "last_sync": ""
+}
