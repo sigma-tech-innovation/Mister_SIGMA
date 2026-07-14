@@ -29,3 +29,15 @@ class PackageManager(base.BaseManager):
         )
 
         return f"PKG-{last+1:04d}"
+
+    def get(self, package_id):
+        for package in self.database.load("packages"):
+            if package.get("id") == package_id:
+                return package
+        return None
+
+    def exists(self, package_id):
+        return self.get(package_id) is not None
+
+    def count(self):
+        return len(self.database.load("packages"))
