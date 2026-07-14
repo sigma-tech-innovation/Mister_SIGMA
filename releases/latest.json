@@ -1,0 +1,10 @@
+{
+    "version": "1.1.0",
+    "tag": "v1.1.0",
+    "branch": "release/v1.1.0",
+    "state": "release-candidate",
+    "tests": 93,
+    "managers_tested": 17,
+    "doctor": "OK",
+    "health": "OK"
+}
