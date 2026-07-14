@@ -1,103 +1,189 @@
-import json
+import importlib.util
 from pathlib import Path
 
 
-class DatabaseBackend:
-    """
-    Backend abstrait.
-    """
-
-    def load(self, name):
-        raise NotImplementedError
-
-    def save(self, name, data):
-        raise NotImplementedError
+ROOT = Path.cwd()
 
 
-class JsonBackend(DatabaseBackend):
+def load_module(name, relative_path):
+    spec = importlib.util.spec_from_file_location(
+        name,
+        ROOT / relative_path
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
-    def __init__(self, root):
-        self.root = Path(root)
 
-    def path(self, name):
-        return self.root / f"{name}.json"
+base_backend = load_module(
+    "database_base_backend",
+    "sigma-core/managers/database_backends/base_backend.py"
+)
 
-    def load(self, name):
-        path = self.path(name)
+json_backend = load_module(
+    "database_json_backend",
+    "sigma-core/managers/database_backends/json_backend.py"
+)
 
-        if not path.exists():
-            return []
+sqlite_backend = load_module(
+    "database_sqlite_backend",
+    "sigma-core/managers/database_backends/sqlite_backend.py"
+)
 
-        return json.loads(
-            path.read_text(
-                encoding="utf-8"
-            )
-        )
-
-    def save(self, name, data):
-        path = self.path(name)
-
-        path.parent.mkdir(
-            parents=True,
-            exist_ok=True,
-        )
-
-        path.write_text(
-            json.dumps(
-                data,
-                indent=4,
-                ensure_ascii=False,
-            ),
-            encoding="utf-8",
-        )
+DatabaseBackend = base_backend.DatabaseBackend
+JsonBackend = json_backend.JsonBackend
+SQLiteBackend = sqlite_backend.SQLiteBackend
 
 
 class DatabaseManager:
 
+    BACKENDS = {
+        "json": JsonBackend,
+        "sqlite": SQLiteBackend,
+    }
+
     def __init__(self, engine):
         self.engine = engine
+        self.root = self.resolve_root(engine)
+        self.backend_key = "json"
+        self.backend = self.create_backend(
+            self.backend_key
+        )
 
+    def resolve_root(self, engine):
         if hasattr(engine, "workspace"):
-            root = engine.workspace.path(
+            return engine.workspace.path(
                 ".sigma-workspace",
-                "database",
+                "database"
             )
 
-        elif hasattr(engine, "root"):
-            root = (
+        if hasattr(engine, "root"):
+            return (
                 Path(engine.root)
                 / ".sigma-workspace"
                 / "database"
             )
 
-        elif hasattr(engine, "db"):
-            root = Path(engine.db)
+        if hasattr(engine, "db"):
+            return Path(engine.db)
 
-        else:
-            raise RuntimeError(
-                "Unable to locate database root"
+        raise RuntimeError(
+            "Unable to locate database root"
+        )
+
+    def create_backend(self, name):
+        backend_class = self.BACKENDS.get(name)
+
+        if backend_class is None:
+            raise ValueError(
+                f"Unknown database backend: {name}"
             )
 
-        self.backend = JsonBackend(root)
+        return backend_class(self.root)
+
+    def available_backends(self):
+        return sorted(self.BACKENDS)
+
+    def set_backend(self, name):
+        self.backend = self.create_backend(name)
+        self.backend_key = name
+        return self.backend
+
+    def migrate(
+        self,
+        target_backend,
+        names=None
+    ):
+        source_backend = self.backend
+        source_key = self.backend_key
+
+        selected_names = (
+            list(names)
+            if names is not None
+            else source_backend.list()
+        )
+
+        target = self.create_backend(
+            target_backend
+        )
+
+        migrated = []
+
+        for name in selected_names:
+            target.save(
+                name,
+                source_backend.load(name)
+            )
+            migrated.append(name)
+
+        return {
+            "source_backend": source_key,
+            "target_backend": target_backend,
+            "databases": sorted(migrated),
+            "count": len(migrated),
+        }
+
+    def switch_backend(
+        self,
+        name,
+        migrate=False
+    ):
+        migration = None
+
+        if migrate:
+            migration = self.migrate(name)
+
+        self.set_backend(name)
+
+        return {
+            "backend": self.backend_key,
+            "migration": migration,
+        }
 
     def backend_name(self):
-        return type(
-            self.backend
-        ).__name__
+        return type(self.backend).__name__
 
     def load(self, name):
         return self.backend.load(name)
 
     def save(self, name, data):
-        self.backend.save(name, data)
+        return self.backend.save(name, data)
+
+    def exists(self, name):
+        return self.backend.exists(name)
+
+    def delete(self, name):
+        return self.backend.delete(name)
+
+    def list(self):
+        return self.backend.list()
 
     def validate(self):
+        errors = []
+
+        if self.backend_key not in self.BACKENDS:
+            errors.append(
+                "Unknown active backend"
+            )
+
         return {
-            "valid": True,
+            "valid": not errors,
             "backend": self.backend_name(),
+            "backend_key": self.backend_key,
+            "available_backends": (
+                self.available_backends()
+            ),
+            "errors": errors,
         }
 
     def snapshot(self):
         return {
+            "root": str(self.root),
             "backend": self.backend_name(),
+            "backend_key": self.backend_key,
+            "available_backends": (
+                self.available_backends()
+            ),
+            "databases": self.list(),
+            "validation": self.validate(),
         }
