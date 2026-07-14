@@ -19,6 +19,10 @@ class BaseManager:
         return self.engine.config
 
     @property
+    def database_config(self):
+        return self.engine.database_config
+
+    @property
     def local_config(self):
         return self.engine.local_config
 

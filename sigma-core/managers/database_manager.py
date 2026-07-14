@@ -79,6 +79,15 @@ class DatabaseManager:
         )
 
     def configured_backend(self):
+        manager = getattr(
+            self.engine,
+            "database_config",
+            None
+        )
+
+        if manager is not None:
+            return manager.backend()
+
         config = getattr(
             self.engine,
             "config",
@@ -101,6 +110,15 @@ class DatabaseManager:
         return str(name or "json").strip().lower()
 
     def database_url(self):
+        manager = getattr(
+            self.engine,
+            "database_config",
+            None
+        )
+
+        if manager is not None:
+            return manager.url() or None
+
         config = getattr(
             self.engine,
             "config",

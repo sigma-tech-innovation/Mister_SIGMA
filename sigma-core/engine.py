@@ -23,6 +23,10 @@ Template = load("template","sigma-core/managers/template_manager.py")
 Release  = load("release","sigma-core/managers/release_manager.py")
 Api       = load("api","sigma-core/managers/api_manager.py")
 Config   = load("config","sigma-core/managers/config_manager.py")
+DatabaseConfig = load(
+    "database_config",
+    "sigma-core/managers/database_config_manager.py"
+)
 LocalConfig = load(
     "local_config",
     "sigma-core/managers/local_config_manager.py"
@@ -80,6 +84,7 @@ class SigmaEngine:
         self.releases = Release.ReleaseManager(self)
         self.api = Api.ApiManager(self)
         self.config = Config.ConfigManager(self)
+        self.database_config = DatabaseConfig.DatabaseConfigManager(self)
         self.local_config = LocalConfig.LocalConfigManager(self)
         self.local_config_migration = LocalConfigMigration.LocalConfigMigrationManager(self)
         self.identity = Identity.IdentityManager(self)
@@ -106,6 +111,7 @@ class SigmaEngine:
             "releases": self.releases,
             "api": self.api,
             "config": self.config,
+            "database_config": self.database_config,
             "local_config": self.local_config,
             "local_config_migration": self.local_config_migration,
             "identity": self.identity,
