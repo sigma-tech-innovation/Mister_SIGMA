@@ -24,6 +24,7 @@ Release  = load("release","sigma-core/managers/release_manager.py")
 Api       = load("api","sigma-core/managers/api_manager.py")
 Config   = load("config","sigma-core/managers/config_manager.py")
 Identity = load("identity","sigma-core/managers/identity_manager.py")
+Workspace = load("workspace","sigma-core/managers/workspace_manager.py")
 
 class SigmaEngine:
 
@@ -43,6 +44,7 @@ class SigmaEngine:
         self.api = Api.ApiManager(self)
         self.config = Config.ConfigManager(self)
         self.identity = Identity.IdentityManager(self)
+        self.workspace = Workspace.WorkspaceManager(self)
 
         self.managers = {
             "database": self.database,
@@ -55,6 +57,7 @@ class SigmaEngine:
             "api": self.api,
             "config": self.config,
             "identity": self.identity,
+            "workspace": self.workspace,
         }
 
     def manager(self, name):
