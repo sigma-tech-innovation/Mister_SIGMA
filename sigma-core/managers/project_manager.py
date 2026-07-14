@@ -34,3 +34,15 @@ class ProjectManager(base.BaseManager):
         )
 
         return f"PRJ-{last+1:04d}"
+
+    def get(self, project_id):
+        for project in self.db():
+            if project.get("id") == project_id:
+                return project
+        return None
+
+    def exists(self, project_id):
+        return self.get(project_id) is not None
+
+    def count(self):
+        return len(self.db())
