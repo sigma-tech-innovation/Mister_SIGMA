@@ -32,6 +32,10 @@ LocalConfigMigration = load(
     "sigma-core/managers/local_config_migration_manager.py"
 )
 Identity = load("identity","sigma-core/managers/identity_manager.py")
+Context = load(
+    "context_manager",
+    "sigma-core/managers/context_manager.py"
+)
 Workspace = load("workspace","sigma-core/managers/workspace_manager.py")
 Service = load("service","sigma-core/managers/service_manager.py")
 Logger = load("logger","sigma-core/managers/logger_manager.py")
@@ -63,6 +67,7 @@ class SigmaEngine:
         self.local_config = LocalConfig.LocalConfigManager(self)
         self.local_config_migration = LocalConfigMigration.LocalConfigMigrationManager(self)
         self.identity = Identity.IdentityManager(self)
+        self.context = Context.ContextManager(self)
         self.workspace = Workspace.WorkspaceManager(self)
         self.service = Service.ServiceManager(self)
         self.logger = Logger.LoggerManager(self)
@@ -84,6 +89,7 @@ class SigmaEngine:
             "local_config": self.local_config,
             "local_config_migration": self.local_config_migration,
             "identity": self.identity,
+            "context": self.context,
             "workspace": self.workspace,
             "service": self.service,
             "logger": self.logger,
