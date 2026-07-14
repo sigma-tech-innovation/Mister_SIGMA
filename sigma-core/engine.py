@@ -23,6 +23,7 @@ Template = load("template","sigma-core/managers/template_manager.py")
 Release  = load("release","sigma-core/managers/release_manager.py")
 Api       = load("api","sigma-core/managers/api_manager.py")
 Config   = load("config","sigma-core/managers/config_manager.py")
+Identity = load("identity","sigma-core/managers/identity_manager.py")
 
 class SigmaEngine:
 
@@ -41,6 +42,7 @@ class SigmaEngine:
         self.releases = Release.ReleaseManager(self)
         self.api = Api.ApiManager(self)
         self.config = Config.ConfigManager(self)
+        self.identity = Identity.IdentityManager(self)
 
         self.managers = {
             "database": self.database,
@@ -52,6 +54,7 @@ class SigmaEngine:
             "releases": self.releases,
             "api": self.api,
             "config": self.config,
+            "identity": self.identity,
         }
 
     def manager(self, name):
