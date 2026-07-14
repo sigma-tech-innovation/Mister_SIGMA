@@ -28,6 +28,7 @@ Workspace = load("workspace","sigma-core/managers/workspace_manager.py")
 Service = load("service","sigma-core/managers/service_manager.py")
 Logger = load("logger","sigma-core/managers/logger_manager.py")
 Event = load("event","sigma-core/managers/event_manager.py")
+Task = load("task","sigma-core/managers/task_manager.py")
 
 class SigmaEngine:
 
@@ -51,6 +52,7 @@ class SigmaEngine:
         self.service = Service.ServiceManager(self)
         self.logger = Logger.LoggerManager(self)
         self.event = Event.EventManager(self)
+        self.task = Task.TaskManager(self)
 
         self.managers = {
             "database": self.database,
@@ -67,6 +69,7 @@ class SigmaEngine:
             "service": self.service,
             "logger": self.logger,
             "event": self.event,
+            "task": self.task,
         }
 
     def manager(self, name):
