@@ -33,5 +33,15 @@ class NodeManagerTests(unittest.TestCase):
         if nodes:
             self.assertTrue(self.m.exists(nodes[0]["id"]))
 
+    def test_create_update_delete(self):
+        new = self.m.create({"name":"pytest-node","status":"active"})
+        self.assertTrue(self.m.exists(new["id"]))
+
+        updated = self.m.update(new["id"], status="offline")
+        self.assertEqual(updated["status"], "offline")
+
+        self.assertTrue(self.m.delete(new["id"]))
+        self.assertFalse(self.m.exists(new["id"]))
+
 if __name__ == "__main__":
     unittest.main()

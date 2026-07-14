@@ -44,5 +44,37 @@ class NodeManager(base.BaseManager):
     def exists(self, node_id):
         return self.get(node_id) is not None
 
+    def create(self, node):
+        db = self.database.load("nodes")
+
+        if "id" not in node:
+            node["id"] = self.next_id()
+
+        db.append(node)
+        self.database.save("nodes", db)
+        return node
+
+    def update(self, node_id, **fields):
+        db = self.database.load("nodes")
+
+        for node in db:
+            if node.get("id") == node_id:
+                node.update(fields)
+                self.database.save("nodes", db)
+                return node
+
+        return None
+
+    def delete(self, node_id):
+        db = self.database.load("nodes")
+
+        new_db = [n for n in db if n.get("id") != node_id]
+
+        if len(new_db) == len(db):
+            return False
+
+        self.database.save("nodes", new_db)
+        return True
+
     def count(self):
         return len(self.database.load("nodes"))
