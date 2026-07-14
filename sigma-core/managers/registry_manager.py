@@ -29,3 +29,15 @@ class RegistryManager(base.BaseManager):
         )
 
         return f"REG-{last+1:04d}"
+
+    def get(self, registry_id):
+        for reg in self.database.load("registry"):
+            if reg.get("id") == registry_id:
+                return reg
+        return None
+
+    def exists(self, registry_id):
+        return self.get(registry_id) is not None
+
+    def count(self):
+        return len(self.database.load("registry"))
