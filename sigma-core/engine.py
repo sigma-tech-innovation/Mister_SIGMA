@@ -23,6 +23,10 @@ Template = load("template","sigma-core/managers/template_manager.py")
 Release  = load("release","sigma-core/managers/release_manager.py")
 Api       = load("api","sigma-core/managers/api_manager.py")
 Config   = load("config","sigma-core/managers/config_manager.py")
+LocalConfig = load(
+    "local_config",
+    "sigma-core/managers/local_config_manager.py"
+)
 Identity = load("identity","sigma-core/managers/identity_manager.py")
 Workspace = load("workspace","sigma-core/managers/workspace_manager.py")
 Service = load("service","sigma-core/managers/service_manager.py")
@@ -48,6 +52,7 @@ class SigmaEngine:
         self.releases = Release.ReleaseManager(self)
         self.api = Api.ApiManager(self)
         self.config = Config.ConfigManager(self)
+        self.local_config = LocalConfig.LocalConfigManager(self)
         self.identity = Identity.IdentityManager(self)
         self.workspace = Workspace.WorkspaceManager(self)
         self.service = Service.ServiceManager(self)
@@ -66,6 +71,7 @@ class SigmaEngine:
             "releases": self.releases,
             "api": self.api,
             "config": self.config,
+            "local_config": self.local_config,
             "identity": self.identity,
             "workspace": self.workspace,
             "service": self.service,
