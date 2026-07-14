@@ -30,6 +30,7 @@ class BaseManagerTests(unittest.TestCase):
             "identity": object(),
             "context": object(),
             "authorization": object(),
+            "organization": object(),
             "workspace": object(),
             "logger": object(),
             "service": object(),
@@ -97,6 +98,10 @@ class BaseManagerTests(unittest.TestCase):
         self.assertIs(
             self.m.authorization,
             self.dependencies["authorization"]
+        )
+        self.assertIs(
+            self.m.organization,
+            self.dependencies["organization"]
         )
 
     def test_runtime_dependencies(self):
