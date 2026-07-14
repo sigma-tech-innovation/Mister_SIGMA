@@ -13,7 +13,6 @@ project = load(
     "project",
     "sigma-core/managers/project_manager.py"
 )
-
 engine = load(
     "engine",
     "sigma-core/engine.py"
@@ -31,6 +30,7 @@ class ProjectManagerTests(unittest.TestCase):
     def test_create_update_delete(self):
         created = self.m.create({
             "name": "pytest-project",
+            "type": "test",
             "status": "active"
         })
 
