@@ -43,5 +43,36 @@ class ReleaseManager(base.BaseManager):
     def exists(self, release_id):
         return self.get(release_id) is not None
 
+    def create(self, release):
+        db = self.database.load("releases")
+
+        if "id" not in release:
+            release["id"] = self.next_id()
+
+        db.append(release)
+        self.database.save("releases", db)
+        return release
+
+    def update(self, release_id, **fields):
+        db = self.database.load("releases")
+
+        for release in db:
+            if release.get("id") == release_id:
+                release.update(fields)
+                self.database.save("releases", db)
+                return release
+
+        return None
+
+    def delete(self, release_id):
+        db = self.database.load("releases")
+        new_db = [r for r in db if r.get("id") != release_id]
+
+        if len(new_db) == len(db):
+            return False
+
+        self.database.save("releases", new_db)
+        return True
+
     def count(self):
         return len(self.database.load("releases"))
