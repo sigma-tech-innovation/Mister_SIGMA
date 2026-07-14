@@ -38,6 +38,10 @@ Logger = load("logger","sigma-core/managers/logger_manager.py")
 Event = load("event","sigma-core/managers/event_manager.py")
 Task = load("task","sigma-core/managers/task_manager.py")
 Plugin = load("plugin","sigma-core/managers/plugin_manager.py")
+Sync = load(
+    "sync_manager",
+    "sigma-core/managers/sync_manager.py"
+)
 
 class SigmaEngine:
 
@@ -65,6 +69,7 @@ class SigmaEngine:
         self.event = Event.EventManager(self)
         self.task = Task.TaskManager(self)
         self.plugin = Plugin.PluginManager(self)
+        self.sync = Sync.SyncManager(self)
 
         self.managers = {
             "database": self.database,
@@ -85,6 +90,7 @@ class SigmaEngine:
             "event": self.event,
             "task": self.task,
             "plugin": self.plugin,
+            "sync": self.sync,
         }
 
     def manager(self, name):
