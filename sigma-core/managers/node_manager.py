@@ -12,8 +12,11 @@ spec.loader.exec_module(base)
 
 class NodeManager(base.BaseManager):
 
+    def records(self):
+        return self.database.load("nodes")
+
     def list(self):
-        nodes = self.database.load("nodes")
+        nodes = self.records()
 
         for node in nodes:
             print(
@@ -23,7 +26,7 @@ class NodeManager(base.BaseManager):
         return nodes
 
     def next_id(self):
-        db = self.database.load("nodes")
+        db = self.records()
 
         if not db:
             return "NODE-0001"
@@ -36,7 +39,7 @@ class NodeManager(base.BaseManager):
         return f"NODE-{last+1:04d}"
 
     def get(self, node_id):
-        for node in self.database.load("nodes"):
+        for node in self.records():
             if node.get("id") == node_id:
                 return node
         return None
@@ -45,7 +48,7 @@ class NodeManager(base.BaseManager):
         return self.get(node_id) is not None
 
     def create(self, node):
-        db = self.database.load("nodes")
+        db = self.records()
 
         if "id" not in node:
             node["id"] = self.next_id()
@@ -55,7 +58,7 @@ class NodeManager(base.BaseManager):
         return node
 
     def update(self, node_id, **fields):
-        db = self.database.load("nodes")
+        db = self.records()
 
         for node in db:
             if node.get("id") == node_id:
@@ -66,7 +69,7 @@ class NodeManager(base.BaseManager):
         return None
 
     def delete(self, node_id):
-        db = self.database.load("nodes")
+        db = self.records()
 
         new_db = [n for n in db if n.get("id") != node_id]
 
@@ -77,4 +80,4 @@ class NodeManager(base.BaseManager):
         return True
 
     def count(self):
-        return len(self.database.load("nodes"))
+        return len(self.records())

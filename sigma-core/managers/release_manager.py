@@ -11,8 +11,11 @@ spec.loader.exec_module(base)
 
 class ReleaseManager(base.BaseManager):
 
+    def records(self):
+        return self.database.load("releases")
+
     def list(self):
-        releases = self.database.load("releases")
+        releases = self.records()
 
         for rel in releases:
             print(
@@ -22,7 +25,7 @@ class ReleaseManager(base.BaseManager):
         return releases
 
     def next_id(self):
-        db = self.database.load("releases")
+        db = self.records()
 
         if not db:
             return "REL-0001"
@@ -35,7 +38,7 @@ class ReleaseManager(base.BaseManager):
         return f"REL-{last+1:04d}"
 
     def get(self, release_id):
-        for release in self.database.load("releases"):
+        for release in self.records():
             if release.get("id") == release_id:
                 return release
         return None
@@ -44,7 +47,7 @@ class ReleaseManager(base.BaseManager):
         return self.get(release_id) is not None
 
     def create(self, release):
-        db = self.database.load("releases")
+        db = self.records()
 
         if "id" not in release:
             release["id"] = self.next_id()
@@ -54,7 +57,7 @@ class ReleaseManager(base.BaseManager):
         return release
 
     def update(self, release_id, **fields):
-        db = self.database.load("releases")
+        db = self.records()
 
         for release in db:
             if release.get("id") == release_id:
@@ -65,7 +68,7 @@ class ReleaseManager(base.BaseManager):
         return None
 
     def delete(self, release_id):
-        db = self.database.load("releases")
+        db = self.records()
         new_db = [r for r in db if r.get("id") != release_id]
 
         if len(new_db) == len(db):
@@ -75,4 +78,4 @@ class ReleaseManager(base.BaseManager):
         return True
 
     def count(self):
-        return len(self.database.load("releases"))
+        return len(self.records())

@@ -1,5 +1,6 @@
 import importlib.util
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 
 
@@ -20,7 +21,13 @@ class BaseManagerTests(unittest.TestCase):
 
     def setUp(self):
         self.dependencies = {
+            "root": Path("/tmp/sigma"),
+            "db": Path("/tmp/sigma/sigma-db"),
+            "projects_dir": Path("/tmp/sigma/sigma-projects"),
             "config": object(),
+            "local_config": object(),
+            "local_config_migration": object(),
+            "identity": object(),
             "workspace": object(),
             "logger": object(),
             "service": object(),
@@ -29,68 +36,100 @@ class BaseManagerTests(unittest.TestCase):
             "plugin": object(),
             "registry": object(),
             "database": object(),
+            "projects": object(),
+            "nodes": object(),
+            "packages": object(),
+            "templates": object(),
+            "releases": object(),
+            "api": object(),
         }
 
         self.engine = SimpleNamespace(**self.dependencies)
+        self.engine.managers = {
+            "database": self.dependencies["database"],
+            "identity": self.dependencies["identity"],
+        }
+
+        def manager(name):
+            if name not in self.engine.managers:
+                raise KeyError(name)
+            return self.engine.managers[name]
+
+        self.engine.manager = manager
         self.m = base.BaseManager(self.engine)
 
     def test_manager_exists(self):
         self.assertIsNotNone(self.m)
         self.assertIs(self.m.engine, self.engine)
 
-    def test_config(self):
+    def test_paths(self):
+        self.assertIs(self.m.root, self.dependencies["root"])
+        self.assertIs(self.m.db, self.dependencies["db"])
+        self.assertIs(
+            self.m.projects_dir,
+            self.dependencies["projects_dir"]
+        )
+
+    def test_configuration_dependencies(self):
         self.assertIs(
             self.m.config,
             self.dependencies["config"]
         )
-
-    def test_workspace(self):
         self.assertIs(
-            self.m.workspace,
-            self.dependencies["workspace"]
+            self.m.local_config,
+            self.dependencies["local_config"]
+        )
+        self.assertIs(
+            self.m.local_config_migration,
+            self.dependencies["local_config_migration"]
+        )
+        self.assertIs(
+            self.m.identity,
+            self.dependencies["identity"]
         )
 
-    def test_logger(self):
-        self.assertIs(
-            self.m.logger,
-            self.dependencies["logger"]
-        )
+    def test_runtime_dependencies(self):
+        for name in (
+            "workspace",
+            "logger",
+            "service",
+            "event",
+            "task",
+            "plugin",
+        ):
+            self.assertIs(
+                getattr(self.m, name),
+                self.dependencies[name]
+            )
 
-    def test_service(self):
-        self.assertIs(
-            self.m.service,
-            self.dependencies["service"]
-        )
+    def test_data_dependencies(self):
+        for name in (
+            "registry",
+            "database",
+            "projects",
+            "nodes",
+            "packages",
+            "templates",
+            "releases",
+            "api",
+        ):
+            self.assertIs(
+                getattr(self.m, name),
+                self.dependencies[name]
+            )
 
-    def test_event(self):
+    def test_manager_lookup(self):
         self.assertIs(
-            self.m.event,
-            self.dependencies["event"]
-        )
-
-    def test_task(self):
-        self.assertIs(
-            self.m.task,
-            self.dependencies["task"]
-        )
-
-    def test_plugin(self):
-        self.assertIs(
-            self.m.plugin,
-            self.dependencies["plugin"]
-        )
-
-    def test_registry(self):
-        self.assertIs(
-            self.m.registry,
-            self.dependencies["registry"]
-        )
-
-    def test_database(self):
-        self.assertIs(
-            self.m.database,
+            self.m.manager("database"),
             self.dependencies["database"]
         )
+        self.assertIs(
+            self.m.manager("identity"),
+            self.dependencies["identity"]
+        )
+
+        with self.assertRaises(KeyError):
+            self.m.manager("missing")
 
 
 if __name__ == "__main__":
