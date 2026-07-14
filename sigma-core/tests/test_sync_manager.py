@@ -37,6 +37,43 @@ class DictionaryConfig:
         return value
 
 
+class FakeContext:
+
+    REQUIRED_FIELDS = (
+        "organization_id",
+        "user_id",
+        "workspace_id",
+        "installation_id",
+        "machine_id",
+        "node_id",
+    )
+
+    def __init__(self, global_config, local_config):
+        self.global_config = global_config
+        self.local_config = local_config
+
+    def identity(self):
+        global_data = self.global_config.load()
+        local_data = self.local_config.load()
+
+        return {
+            "organization_id": global_data.get(
+                "organization_id"
+            ),
+            "user_id": global_data.get("user_id"),
+            "workspace_id": global_data.get(
+                "workspace_id"
+            ),
+            "installation_id": local_data.get(
+                "installation_id"
+            ),
+            "machine_id": local_data.get(
+                "machine_id"
+            ),
+            "node_id": local_data.get("node_id"),
+        }
+
+
 class FakeEvent:
 
     def __init__(self):
@@ -67,10 +104,16 @@ class SyncManagerTests(unittest.TestCase):
 
         self.event = FakeEvent()
 
+        self.context = FakeContext(
+            self.global_config,
+            self.local_config
+        )
+
         self.engine = SimpleNamespace(
             root=Path("/tmp/sigma"),
             config=self.global_config,
             local_config=self.local_config,
+            context=self.context,
             event=self.event,
         )
 
