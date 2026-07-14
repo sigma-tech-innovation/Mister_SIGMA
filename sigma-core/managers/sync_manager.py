@@ -86,25 +86,7 @@ class SyncManager:
         }
 
     def identity(self):
-        global_config = self.engine.config.load()
-        local_config = self.engine.local_config.load()
-
-        return {
-            "organization_id": global_config.get(
-                "organization_id"
-            ),
-            "user_id": global_config.get("user_id"),
-            "workspace_id": global_config.get(
-                "workspace_id"
-            ),
-            "installation_id": local_config.get(
-                "installation_id"
-            ),
-            "machine_id": local_config.get(
-                "machine_id"
-            ),
-            "node_id": local_config.get("node_id"),
-        }
+        return self.engine.context.identity()
 
     def snapshot(self):
         return {
