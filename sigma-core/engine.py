@@ -25,6 +25,7 @@ Api       = load("api","sigma-core/managers/api_manager.py")
 Config   = load("config","sigma-core/managers/config_manager.py")
 Identity = load("identity","sigma-core/managers/identity_manager.py")
 Workspace = load("workspace","sigma-core/managers/workspace_manager.py")
+Service = load("service","sigma-core/managers/service_manager.py")
 
 class SigmaEngine:
 
@@ -45,6 +46,7 @@ class SigmaEngine:
         self.config = Config.ConfigManager(self)
         self.identity = Identity.IdentityManager(self)
         self.workspace = Workspace.WorkspaceManager(self)
+        self.service = Service.ServiceManager(self)
 
         self.managers = {
             "database": self.database,
@@ -58,6 +60,7 @@ class SigmaEngine:
             "config": self.config,
             "identity": self.identity,
             "workspace": self.workspace,
+            "service": self.service,
         }
 
     def manager(self, name):
