@@ -48,5 +48,36 @@ class ProjectManager(base.BaseManager):
     def exists(self, project_id):
         return self.get(project_id) is not None
 
+    def create(self, project):
+        db = self.db()
+
+        if "id" not in project:
+            project["id"] = self.next_id()
+
+        db.append(project)
+        self.database.save("projects", db)
+        return project
+
+    def update(self, project_id, **fields):
+        db = self.db()
+
+        for project in db:
+            if project.get("id") == project_id:
+                project.update(fields)
+                self.database.save("projects", db)
+                return project
+
+        return None
+
+    def delete(self, project_id):
+        db = self.db()
+        new_db = [p for p in db if p.get("id") != project_id]
+
+        if len(new_db) == len(db):
+            return False
+
+        self.database.save("projects", new_db)
+        return True
+
     def count(self):
         return len(self.db())
