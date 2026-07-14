@@ -31,6 +31,10 @@ class BaseManager:
         return self.engine.identity
 
     @property
+    def context(self):
+        return self.engine.context
+
+    @property
     def workspace(self):
         return self.engine.workspace
 

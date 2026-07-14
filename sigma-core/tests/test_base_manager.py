@@ -28,6 +28,7 @@ class BaseManagerTests(unittest.TestCase):
             "local_config": object(),
             "local_config_migration": object(),
             "identity": object(),
+            "context": object(),
             "workspace": object(),
             "logger": object(),
             "service": object(),
@@ -87,6 +88,10 @@ class BaseManagerTests(unittest.TestCase):
         self.assertIs(
             self.m.identity,
             self.dependencies["identity"]
+        )
+        self.assertIs(
+            self.m.context,
+            self.dependencies["context"]
         )
 
     def test_runtime_dependencies(self):
