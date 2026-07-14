@@ -1,0 +1,25 @@
+Mister SIGMA v1.1.0
+
+Status:
+- CRUD complet pour NodeManager
+- CRUD complet pour PackageManager
+- CRUD complet pour ProjectManager
+- CRUD complet pour RegistryManager
+- CRUD complet pour TemplateManager
+- CRUD complet pour ReleaseManager
+- CRUD complet pour ConfigManager
+- CRUD complet pour WorkspaceManager
+- Tests dédiés pour les 17 managers
+- Correction de ApiManager
+- 93 tests validés
+- Sigma Doctor OK
+- Sigma Health OK
+
+Tag:
+v1.1.0
+
+Branch:
+release/v1.1.0
+
+State:
+Release Candidate
