@@ -29,3 +29,15 @@ class NodeManager(base.BaseManager):
         )
 
         return f"NODE-{last+1:04d}"
+
+    def get(self, node_id):
+        for node in self.database.load("nodes"):
+            if node.get("id") == node_id:
+                return node
+        return None
+
+    def exists(self, node_id):
+        return self.get(node_id) is not None
+
+    def count(self):
+        return len(self.database.load("nodes"))
