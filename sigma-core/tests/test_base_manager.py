@@ -42,6 +42,7 @@ class BaseManagerTests(unittest.TestCase):
             "templates": object(),
             "releases": object(),
             "api": object(),
+            "sync": object(),
         }
 
         self.engine = SimpleNamespace(**self.dependencies)
@@ -112,6 +113,7 @@ class BaseManagerTests(unittest.TestCase):
             "templates",
             "releases",
             "api",
+            "sync",
         ):
             self.assertIs(
                 getattr(self.m, name),
