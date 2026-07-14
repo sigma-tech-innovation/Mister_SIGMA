@@ -29,3 +29,15 @@ class ReleaseManager(base.BaseManager):
         )
 
         return f"REL-{last+1:04d}"
+
+    def get(self, release_id):
+        for release in self.database.load("releases"):
+            if release.get("id") == release_id:
+                return release
+        return None
+
+    def exists(self, release_id):
+        return self.get(release_id) is not None
+
+    def count(self):
+        return len(self.database.load("releases"))
