@@ -43,6 +43,10 @@ class BaseManager:
         return self.engine.organization
 
     @property
+    def user(self):
+        return self.engine.user
+
+    @property
     def workspace(self):
         return self.engine.workspace
 

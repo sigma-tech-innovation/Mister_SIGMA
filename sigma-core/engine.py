@@ -44,6 +44,10 @@ Organization = load(
     "organization_manager",
     "sigma-core/managers/organization_manager.py"
 )
+User = load(
+    "user_manager",
+    "sigma-core/managers/user_manager.py"
+)
 Workspace = load("workspace","sigma-core/managers/workspace_manager.py")
 Service = load("service","sigma-core/managers/service_manager.py")
 Logger = load("logger","sigma-core/managers/logger_manager.py")
@@ -78,6 +82,7 @@ class SigmaEngine:
         self.context = Context.ContextManager(self)
         self.authorization = Authorization.AuthorizationManager(self)
         self.organization = Organization.OrganizationManager(self)
+        self.user = User.UserManager(self)
         self.workspace = Workspace.WorkspaceManager(self)
         self.service = Service.ServiceManager(self)
         self.logger = Logger.LoggerManager(self)
@@ -102,6 +107,7 @@ class SigmaEngine:
             "context": self.context,
             "authorization": self.authorization,
             "organization": self.organization,
+            "user": self.user,
             "workspace": self.workspace,
             "service": self.service,
             "logger": self.logger,
