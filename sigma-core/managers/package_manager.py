@@ -12,10 +12,14 @@ spec.loader.exec_module(base)
 class PackageManager(base.BaseManager):
 
     def list(self):
-        for pkg in self.database.load("packages"):
+        packages = self.database.load("packages")
+
+        for pkg in packages:
             print(
                 f'{pkg["id"]} | {pkg["name"]} | {pkg["version"]}'
             )
+
+        return packages
 
     def next_id(self):
         db = self.database.load("packages")

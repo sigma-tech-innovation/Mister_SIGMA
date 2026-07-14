@@ -12,10 +12,14 @@ spec.loader.exec_module(base)
 class TemplateManager(base.BaseManager):
 
     def list(self):
-        for tpl in self.database.load("templates"):
+        templates = self.database.load("templates")
+
+        for tpl in templates:
             print(
                 f'{tpl["id"]} | {tpl["name"]} | {tpl["version"]}'
             )
+
+        return templates
 
     def next_id(self):
         db = self.database.load("templates")

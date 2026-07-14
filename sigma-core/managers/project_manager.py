@@ -15,9 +15,13 @@ class ProjectManager(base.BaseManager):
         super().__init__(engine)
 
     def list(self):
-        for p in sorted(self.projects.iterdir()):
+        projects = sorted(self.projects.iterdir())
+
+        for p in projects:
             if p.is_dir():
                 print("-", p.name)
+
+        return [p.name for p in projects if p.is_dir()]
 
     def db(self):
         return self.database.load("projects")

@@ -12,10 +12,14 @@ spec.loader.exec_module(base)
 class RegistryManager(base.BaseManager):
 
     def list(self):
-        for reg in self.database.load("registry"):
+        registry = self.database.load("registry")
+
+        for reg in registry:
             print(
                 f'{reg["id"]} | {reg["name"]} | {reg["version"]}'
             )
+
+        return registry
 
     def next_id(self):
         db = self.database.load("registry")

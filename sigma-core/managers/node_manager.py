@@ -9,13 +9,18 @@ spec = importlib.util.spec_from_file_location(
 base = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(base)
 
+
 class NodeManager(base.BaseManager):
 
     def list(self):
-        for node in self.database.load("nodes"):
+        nodes = self.database.load("nodes")
+
+        for node in nodes:
             print(
                 f'{node["id"]} | {node["name"]} | {node["status"]}'
             )
+
+        return nodes
 
     def next_id(self):
         db = self.database.load("nodes")

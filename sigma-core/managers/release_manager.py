@@ -12,10 +12,14 @@ spec.loader.exec_module(base)
 class ReleaseManager(base.BaseManager):
 
     def list(self):
-        for rel in self.database.load("releases"):
+        releases = self.database.load("releases")
+
+        for rel in releases:
             print(
                 f'{rel["id"]} | {rel["version"]} | {rel["status"]}'
             )
+
+        return releases
 
     def next_id(self):
         db = self.database.load("releases")
