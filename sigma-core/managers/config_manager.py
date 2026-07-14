@@ -28,6 +28,42 @@ class ConfigManager:
         self.save(cfg)
 
 
+    def list(self):
+        return self.load()
+
+    def count(self):
+        return len(self.load())
+
+    def create(self, key, value):
+        cfg = self.load()
+
+        if key in cfg:
+            return None
+
+        cfg[key] = value
+        self.save(cfg)
+        return value
+
+    def update(self, key, value):
+        cfg = self.load()
+
+        if key not in cfg:
+            return None
+
+        cfg[key] = value
+        self.save(cfg)
+        return value
+
+    def delete(self, key):
+        cfg = self.load()
+
+        if key not in cfg:
+            return False
+
+        del cfg[key]
+        self.save(cfg)
+        return True
+
     def ensure_identity(self):
         cfg = self.load()
 
