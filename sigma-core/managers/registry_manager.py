@@ -43,5 +43,36 @@ class RegistryManager(base.BaseManager):
     def exists(self, registry_id):
         return self.get(registry_id) is not None
 
+    def create(self, registry):
+        db = self.database.load("registry")
+
+        if "id" not in registry:
+            registry["id"] = self.next_id()
+
+        db.append(registry)
+        self.database.save("registry", db)
+        return registry
+
+    def update(self, registry_id, **fields):
+        db = self.database.load("registry")
+
+        for registry in db:
+            if registry.get("id") == registry_id:
+                registry.update(fields)
+                self.database.save("registry", db)
+                return registry
+
+        return None
+
+    def delete(self, registry_id):
+        db = self.database.load("registry")
+        new_db = [r for r in db if r.get("id") != registry_id]
+
+        if len(new_db) == len(db):
+            return False
+
+        self.database.save("registry", new_db)
+        return True
+
     def count(self):
         return len(self.database.load("registry"))
