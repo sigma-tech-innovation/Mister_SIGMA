@@ -29,3 +29,15 @@ class TemplateManager(base.BaseManager):
         )
 
         return f"TPL-{last+1:04d}"
+
+    def get(self, template_id):
+        for template in self.database.load("templates"):
+            if template.get("id") == template_id:
+                return template
+        return None
+
+    def exists(self, template_id):
+        return self.get(template_id) is not None
+
+    def count(self):
+        return len(self.database.load("templates"))
