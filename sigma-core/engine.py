@@ -27,6 +27,10 @@ LocalConfig = load(
     "local_config",
     "sigma-core/managers/local_config_manager.py"
 )
+LocalConfigMigration = load(
+    "local_config_migration",
+    "sigma-core/managers/local_config_migration_manager.py"
+)
 Identity = load("identity","sigma-core/managers/identity_manager.py")
 Workspace = load("workspace","sigma-core/managers/workspace_manager.py")
 Service = load("service","sigma-core/managers/service_manager.py")
@@ -53,6 +57,7 @@ class SigmaEngine:
         self.api = Api.ApiManager(self)
         self.config = Config.ConfigManager(self)
         self.local_config = LocalConfig.LocalConfigManager(self)
+        self.local_config_migration = LocalConfigMigration.LocalConfigMigrationManager(self)
         self.identity = Identity.IdentityManager(self)
         self.workspace = Workspace.WorkspaceManager(self)
         self.service = Service.ServiceManager(self)
@@ -72,6 +77,7 @@ class SigmaEngine:
             "api": self.api,
             "config": self.config,
             "local_config": self.local_config,
+            "local_config_migration": self.local_config_migration,
             "identity": self.identity,
             "workspace": self.workspace,
             "service": self.service,
