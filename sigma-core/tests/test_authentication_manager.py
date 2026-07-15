@@ -282,9 +282,23 @@ class AuthenticationManagerTests(unittest.TestCase):
             snapshot["user_id"],
             "USER-CURRENT",
         )
+
+        self.assertEqual(
+            set(snapshot),
+            {
+                "organization_id",
+                "user_id",
+                "validation",
+            },
+        )
+
         self.assertNotIn(
-            "secret",
-            str(snapshot).lower(),
+            "secret_records",
+            snapshot,
+        )
+        self.assertNotIn(
+            "credentials",
+            snapshot,
         )
 
 
@@ -501,6 +515,357 @@ class AuthenticationManagerTests(unittest.TestCase):
             result["count"],
             1,
         )
+
+
+    def test_password_policy(self):
+        policy = self.manager.password_policy()
+
+        self.assertEqual(
+            policy["algorithm"],
+            "pbkdf2_sha256",
+        )
+        self.assertEqual(
+            policy["iterations"],
+            600000,
+        )
+        self.assertEqual(
+            policy["salt_bytes"],
+            16,
+        )
+
+    def test_password_validation(self):
+        self.assertFalse(
+            self.manager.validate_password(
+                "short"
+            )["valid"]
+        )
+
+        self.assertTrue(
+            self.manager.validate_password(
+                "Correct-Horse-123"
+            )["valid"]
+        )
+
+    def test_password_hash_is_salted(self):
+        first = self.manager.hash_password(
+            "Correct-Horse-123",
+            iterations=1000,
+        )
+        second = self.manager.hash_password(
+            "Correct-Horse-123",
+            iterations=1000,
+        )
+
+        self.assertNotEqual(
+            first["salt"],
+            second["salt"],
+        )
+        self.assertNotEqual(
+            first["hash"],
+            second["hash"],
+        )
+        self.assertNotIn(
+            "Correct-Horse-123",
+            str(first),
+        )
+
+    def test_password_hash_deterministic_with_fixed_salt(self):
+        first = self.manager.hash_password(
+            "Correct-Horse-123",
+            salt=b"0123456789abcdef",
+            iterations=1000,
+        )
+        second = self.manager.hash_password(
+            "Correct-Horse-123",
+            salt=b"0123456789abcdef",
+            iterations=1000,
+        )
+
+        self.assertEqual(first, second)
+
+    def test_verify_password_hash(self):
+        secret = self.manager.hash_password(
+            "Correct-Horse-123",
+            salt=b"0123456789abcdef",
+            iterations=1000,
+        )
+
+        self.assertTrue(
+            self.manager.verify_password_hash(
+                "Correct-Horse-123",
+                secret,
+            )
+        )
+        self.assertFalse(
+            self.manager.verify_password_hash(
+                "Wrong-Password-123",
+                secret,
+            )
+        )
+
+    def test_secret_repository_is_separate(self):
+        self.manager.save_secret(
+            "CRED-1",
+            {
+                "algorithm": "pbkdf2_sha256",
+                "digest": "sha256",
+                "iterations": 1000,
+                "salt": "salt",
+                "hash": "hash",
+            },
+        )
+
+        self.assertEqual(
+            self.manager.records(),
+            [],
+        )
+        self.assertEqual(
+            self.manager.get_secret(
+                "CRED-1"
+            )["credential_id"],
+            "CRED-1",
+        )
+
+    def test_set_and_verify_password(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+            "type": "password",
+        })
+
+        original_iterations = (
+            self.manager.PASSWORD_ITERATIONS
+        )
+        self.manager.PASSWORD_ITERATIONS = 1000
+
+        try:
+            result = self.manager.set_password(
+                "CRED-1",
+                "Correct-Horse-123",
+            )
+
+            self.assertTrue(
+                result["metadata"][
+                    "password_configured"
+                ]
+            )
+            self.assertTrue(
+                self.manager.verify_password(
+                    "CRED-1",
+                    "Correct-Horse-123",
+                )
+            )
+            self.assertFalse(
+                self.manager.verify_password(
+                    "CRED-1",
+                    "Wrong-Password-123",
+                )
+            )
+
+        finally:
+            self.manager.PASSWORD_ITERATIONS = (
+                original_iterations
+            )
+
+    def test_failed_attempts_lock_credential(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+            "type": "password",
+        })
+
+        original_iterations = (
+            self.manager.PASSWORD_ITERATIONS
+        )
+        self.manager.PASSWORD_ITERATIONS = 1000
+
+        try:
+            self.manager.set_password(
+                "CRED-1",
+                "Correct-Horse-123",
+            )
+
+            for _ in range(
+                self.manager.MAX_FAILED_ATTEMPTS
+            ):
+                self.assertFalse(
+                    self.manager.verify_password(
+                        "CRED-1",
+                        "Wrong-Password-123",
+                    )
+                )
+
+            credential = self.manager.get(
+                "CRED-1"
+            )
+
+            self.assertEqual(
+                credential["status"],
+                "locked",
+            )
+            self.assertEqual(
+                credential["failed_attempts"],
+                self.manager.MAX_FAILED_ATTEMPTS,
+            )
+
+        finally:
+            self.manager.PASSWORD_ITERATIONS = (
+                original_iterations
+            )
+
+    def test_change_password(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+            "type": "password",
+        })
+
+        original_iterations = (
+            self.manager.PASSWORD_ITERATIONS
+        )
+        self.manager.PASSWORD_ITERATIONS = 1000
+
+        try:
+            self.manager.set_password(
+                "CRED-1",
+                "Old-Password-123",
+            )
+
+            self.manager.change_password(
+                "CRED-1",
+                "Old-Password-123",
+                "New-Password-456",
+            )
+
+            self.assertFalse(
+                self.manager.verify_password(
+                    "CRED-1",
+                    "Old-Password-123",
+                )
+            )
+            self.assertTrue(
+                self.manager.verify_password(
+                    "CRED-1",
+                    "New-Password-456",
+                )
+            )
+
+        finally:
+            self.manager.PASSWORD_ITERATIONS = (
+                original_iterations
+            )
+
+    def test_change_password_rejects_wrong_current(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+            "type": "password",
+        })
+
+        original_iterations = (
+            self.manager.PASSWORD_ITERATIONS
+        )
+        self.manager.PASSWORD_ITERATIONS = 1000
+
+        try:
+            self.manager.set_password(
+                "CRED-1",
+                "Old-Password-123",
+            )
+
+            with self.assertRaises(
+                authentication_module
+                .InvalidCredentialError
+            ):
+                self.manager.change_password(
+                    "CRED-1",
+                    "Wrong-Password-123",
+                    "New-Password-456",
+                )
+
+        finally:
+            self.manager.PASSWORD_ITERATIONS = (
+                original_iterations
+            )
+
+    def test_revoke_deletes_secret(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+            "type": "password",
+        })
+
+        original_iterations = (
+            self.manager.PASSWORD_ITERATIONS
+        )
+        self.manager.PASSWORD_ITERATIONS = 1000
+
+        try:
+            self.manager.set_password(
+                "CRED-1",
+                "Correct-Horse-123",
+            )
+
+            self.assertIsNotNone(
+                self.manager.get_secret(
+                    "CRED-1"
+                )
+            )
+
+            self.manager.revoke(
+                "CRED-1"
+            )
+
+            self.assertIsNone(
+                self.manager.get_secret(
+                    "CRED-1"
+                )
+            )
+
+        finally:
+            self.manager.PASSWORD_ITERATIONS = (
+                original_iterations
+            )
+
+    def test_events_never_include_password_material(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+            "type": "password",
+        })
+
+        original_iterations = (
+            self.manager.PASSWORD_ITERATIONS
+        )
+        self.manager.PASSWORD_ITERATIONS = 1000
+
+        try:
+            self.manager.set_password(
+                "CRED-1",
+                "Correct-Horse-123",
+            )
+
+            serialized = str(
+                self.event.events
+            )
+
+            self.assertNotIn(
+                "Correct-Horse-123",
+                serialized,
+            )
+            self.assertNotIn(
+                "password_hash",
+                serialized,
+            )
+            self.assertNotIn(
+                '"hash"',
+                serialized,
+            )
+
+        finally:
+            self.manager.PASSWORD_ITERATIONS = (
+                original_iterations
+            )
 
 
 if __name__ == "__main__":

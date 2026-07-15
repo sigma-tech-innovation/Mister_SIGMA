@@ -1,3 +1,7 @@
+import base64
+import hashlib
+import hmac
+import secrets
 import uuid
 
 
@@ -63,6 +67,17 @@ class AuthenticationManager:
     """
 
     DATABASE_NAME = "credentials"
+    SECRET_DATABASE_NAME = "credential_secrets"
+
+    PASSWORD_ALGORITHM = "pbkdf2_sha256"
+    PASSWORD_DIGEST = "sha256"
+    PASSWORD_ITERATIONS = 600_000
+    PASSWORD_SALT_BYTES = 16
+    PASSWORD_KEY_BYTES = 32
+
+    PASSWORD_MIN_LENGTH = 12
+    PASSWORD_MAX_LENGTH = 1024
+    MAX_FAILED_ATTEMPTS = 5
 
     CREDENTIAL_TYPES = {
         "password",
@@ -127,6 +142,17 @@ class AuthenticationManager:
             records
         )
 
+    def secret_records(self):
+        return self.engine.database.load(
+            self.SECRET_DATABASE_NAME
+        )
+
+    def save_secret_records(self, records):
+        return self.engine.database.save(
+            self.SECRET_DATABASE_NAME,
+            records
+        )
+
     def list(self):
         return [
             self.public_record(record)
@@ -144,6 +170,275 @@ class AuthenticationManager:
 
     def normalize_status(self, value):
         return str(value or "").strip().lower()
+
+    def password_policy(self):
+        return {
+            "min_length": self.PASSWORD_MIN_LENGTH,
+            "max_length": self.PASSWORD_MAX_LENGTH,
+            "algorithm": self.PASSWORD_ALGORITHM,
+            "digest": self.PASSWORD_DIGEST,
+            "iterations": self.PASSWORD_ITERATIONS,
+            "salt_bytes": self.PASSWORD_SALT_BYTES,
+            "key_bytes": self.PASSWORD_KEY_BYTES,
+            "max_failed_attempts": (
+                self.MAX_FAILED_ATTEMPTS
+            ),
+        }
+
+    def validate_password(self, password):
+        errors = []
+
+        if not isinstance(password, str):
+            errors.append(
+                "Password must be a string"
+            )
+            return {
+                "valid": False,
+                "errors": errors,
+            }
+
+        length = len(password)
+
+        if length < self.PASSWORD_MIN_LENGTH:
+            errors.append(
+                "Password is too short"
+            )
+
+        if length > self.PASSWORD_MAX_LENGTH:
+            errors.append(
+                "Password is too long"
+            )
+
+        return {
+            "valid": not errors,
+            "errors": errors,
+        }
+
+    def encode_bytes(self, value):
+        return base64.urlsafe_b64encode(
+            value
+        ).decode("ascii")
+
+    def decode_bytes(self, value):
+        try:
+            return base64.urlsafe_b64decode(
+                str(value).encode("ascii")
+            )
+        except (
+            ValueError,
+            TypeError,
+        ) as error:
+            raise ValueError(
+                "Invalid encoded credential value"
+            ) from error
+
+    def derive_password_key(
+        self,
+        password,
+        *,
+        salt,
+        iterations=None,
+    ):
+        selected_iterations = int(
+            iterations
+            or self.PASSWORD_ITERATIONS
+        )
+
+        if selected_iterations < 1:
+            raise ValueError(
+                "Password iterations must be positive"
+            )
+
+        return hashlib.pbkdf2_hmac(
+            self.PASSWORD_DIGEST,
+            password.encode("utf-8"),
+            salt,
+            selected_iterations,
+            dklen=self.PASSWORD_KEY_BYTES,
+        )
+
+    def hash_password(
+        self,
+        password,
+        *,
+        salt=None,
+        iterations=None,
+    ):
+        validation = self.validate_password(
+            password
+        )
+
+        if not validation["valid"]:
+            raise ValueError(
+                "; ".join(validation["errors"])
+            )
+
+        selected_salt = (
+            salt
+            if salt is not None
+            else secrets.token_bytes(
+                self.PASSWORD_SALT_BYTES
+            )
+        )
+
+        if not isinstance(
+            selected_salt,
+            bytes,
+        ):
+            raise TypeError(
+                "Password salt must be bytes"
+            )
+
+        selected_iterations = int(
+            iterations
+            or self.PASSWORD_ITERATIONS
+        )
+
+        derived_key = self.derive_password_key(
+            password,
+            salt=selected_salt,
+            iterations=selected_iterations,
+        )
+
+        return {
+            "algorithm": self.PASSWORD_ALGORITHM,
+            "digest": self.PASSWORD_DIGEST,
+            "iterations": selected_iterations,
+            "salt": self.encode_bytes(
+                selected_salt
+            ),
+            "hash": self.encode_bytes(
+                derived_key
+            ),
+        }
+
+    def verify_password_hash(
+        self,
+        password,
+        secret_record,
+    ):
+        if not isinstance(password, str):
+            return False
+
+        if not isinstance(secret_record, dict):
+            return False
+
+        if (
+            secret_record.get("algorithm")
+            != self.PASSWORD_ALGORITHM
+        ):
+            return False
+
+        if (
+            secret_record.get("digest")
+            != self.PASSWORD_DIGEST
+        ):
+            return False
+
+        try:
+            salt = self.decode_bytes(
+                secret_record.get("salt", "")
+            )
+            expected = self.decode_bytes(
+                secret_record.get("hash", "")
+            )
+            iterations = int(
+                secret_record.get(
+                    "iterations",
+                    0,
+                )
+            )
+
+            if iterations < 1:
+                return False
+
+            actual = self.derive_password_key(
+                password,
+                salt=salt,
+                iterations=iterations,
+            )
+
+        except (
+            ValueError,
+            TypeError,
+        ):
+            return False
+
+        return hmac.compare_digest(
+            actual,
+            expected,
+        )
+
+    def get_secret(self, credential_id):
+        selected_id = str(
+            credential_id or ""
+        ).strip()
+
+        for record in self.secret_records():
+            if (
+                record.get("credential_id")
+                == selected_id
+            ):
+                return dict(record)
+
+        return None
+
+    def save_secret(
+        self,
+        credential_id,
+        secret_record,
+    ):
+        selected_id = str(
+            credential_id or ""
+        ).strip()
+
+        if not selected_id:
+            raise ValueError(
+                "Credential ID is required"
+            )
+
+        records = self.secret_records()
+        stored = {
+            "credential_id": selected_id,
+            **dict(secret_record),
+        }
+
+        for index, record in enumerate(records):
+            if (
+                record.get("credential_id")
+                == selected_id
+            ):
+                records[index] = stored
+                self.save_secret_records(
+                    records
+                )
+                return dict(stored)
+
+        records.append(stored)
+        self.save_secret_records(records)
+
+        return dict(stored)
+
+    def delete_secret(self, credential_id):
+        selected_id = str(
+            credential_id or ""
+        ).strip()
+
+        records = self.secret_records()
+        filtered = [
+            record
+            for record in records
+            if (
+                record.get("credential_id")
+                != selected_id
+            )
+        ]
+
+        if len(filtered) == len(records):
+            return False
+
+        self.save_secret_records(filtered)
+        return True
 
     def new_record(
         self,
@@ -491,11 +786,165 @@ class AuthenticationManager:
 
         return None
 
+    def set_password(
+        self,
+        credential_id,
+        password,
+    ):
+        credential = self.get(
+            credential_id
+        )
+
+        if credential is None:
+            raise KeyError(
+                f"Unknown credential: {credential_id}"
+            )
+
+        if credential.get("type") != "password":
+            raise ValueError(
+                "Credential type does not support passwords"
+            )
+
+        secret_record = self.hash_password(
+            password
+        )
+
+        self.save_secret(
+            credential_id,
+            secret_record,
+        )
+
+        updated = self.update(
+            credential_id,
+            status="active",
+            failed_attempts=0,
+            locked_until=None,
+            metadata={
+                **credential.get(
+                    "metadata",
+                    {},
+                ),
+                "password_configured": True,
+            },
+        )
+
+        emitter = getattr(
+            self.engine,
+            "event",
+            None,
+        )
+
+        if emitter is not None:
+            emitter.emit(
+                "authentication.password_set",
+                self.public_record(updated),
+            )
+
+        return updated
+
+    def verify_password(
+        self,
+        credential_id,
+        password,
+    ):
+        credential = self.get(
+            credential_id
+        )
+
+        if credential is None:
+            return False
+
+        if not self.can_authenticate(
+            credential
+        ):
+            return False
+
+        secret_record = self.get_secret(
+            credential_id
+        )
+
+        if secret_record is None:
+            return False
+
+        verified = self.verify_password_hash(
+            password,
+            secret_record,
+        )
+
+        if verified:
+            self.update(
+                credential_id,
+                failed_attempts=0,
+                last_authenticated_at=(
+                    self.engine.now()
+                ),
+            )
+
+            return True
+
+        attempts = (
+            credential.get(
+                "failed_attempts",
+                0,
+            )
+            + 1
+        )
+
+        fields = {
+            "failed_attempts": attempts,
+        }
+
+        if (
+            attempts
+            >= self.MAX_FAILED_ATTEMPTS
+        ):
+            fields["status"] = "locked"
+
+        self.update(
+            credential_id,
+            **fields,
+        )
+
+        return False
+
+    def change_password(
+        self,
+        credential_id,
+        current_password,
+        new_password,
+    ):
+        if not self.verify_password(
+            credential_id,
+            current_password,
+        ):
+            raise InvalidCredentialError(
+                "Invalid current password",
+                details={
+                    "credential_id": (
+                        credential_id
+                    ),
+                },
+            )
+
+        return self.set_password(
+            credential_id,
+            new_password,
+        )
+
     def revoke(self, credential_id):
-        return self.update(
+        credential = self.update(
             credential_id,
             status="revoked",
         )
+
+        if credential is None:
+            return None
+
+        self.delete_secret(
+            credential_id
+        )
+
+        return credential
 
     def is_active(self, record):
         return (
@@ -538,6 +987,12 @@ class AuthenticationManager:
                 self.STATUSES
             ),
             "database": self.DATABASE_NAME,
+            "secret_database": (
+                self.SECRET_DATABASE_NAME
+            ),
+            "password_policy": (
+                self.password_policy()
+            ),
             "errors": errors,
         }
 
