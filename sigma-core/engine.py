@@ -72,6 +72,11 @@ Session = load(
     "session_manager",
     "sigma-core/managers/session_manager.py"
 )
+
+Device = load(
+    "device_manager",
+    "sigma-core/managers/device_manager.py"
+)
 Workspace = load("workspace","sigma-core/managers/workspace_manager.py")
 Service = load("service","sigma-core/managers/service_manager.py")
 Logger = load("logger","sigma-core/managers/logger_manager.py")
@@ -126,6 +131,7 @@ class SigmaEngine:
         self.membership = Membership.MembershipManager(self)
         self.authentication = Authentication.AuthenticationManager(self)
         self.session = Session.SessionManager(self)
+        self.device = Device.DeviceManager(self)
         self.workspace = Workspace.WorkspaceManager(self)
         self.service = Service.ServiceManager(self)
         self.logger = Logger.LoggerManager(self)
@@ -157,6 +163,7 @@ class SigmaEngine:
             "membership": self.membership,
             "authentication": self.authentication,
             "session": self.session,
+            "device": self.device,
             "workspace": self.workspace,
             "service": self.service,
             "logger": self.logger,

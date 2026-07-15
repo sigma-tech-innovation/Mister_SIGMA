@@ -33,6 +33,7 @@ class BaseManagerTests(unittest.TestCase):
             "authorization": object(),
             "authentication": object(),
             "session": object(),
+            "device": object(),
             "organization": object(),
             "workspace": object(),
             "logger": object(),
@@ -109,6 +110,11 @@ class BaseManagerTests(unittest.TestCase):
         self.assertIs(
             self.m.session,
             self.dependencies["session"]
+        )
+
+        self.assertIs(
+            self.m.device,
+            self.dependencies["device"]
         )
         self.assertIs(
             self.m.organization,

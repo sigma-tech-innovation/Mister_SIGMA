@@ -63,6 +63,11 @@ class BaseManager:
     def session(self):
         return self.engine.session
 
+
+    @property
+    def device(self):
+        return self.engine.device
+
     @property
     def authentication(self):
         return self.engine.authentication
