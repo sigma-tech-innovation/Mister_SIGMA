@@ -418,5 +418,204 @@ class SessionManagerContractTests(
         )
 
 
+    def create_repository_session(
+        self,
+        session_id="SESSION-1",
+        user_id="USER-1",
+        organization_id="ORG-1",
+        workspace_id="WORKSPACE-1",
+        credential_id="CRED-1",
+        device_id=None,
+    ):
+        session = self.manager.new_session(
+            session_id=session_id,
+            user_id=user_id,
+            credential_id=credential_id,
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            device_id=device_id,
+        )
+
+        return self.manager.create_session(
+            session
+        )
+
+    def test_repository_initially_empty(self):
+        self.assertEqual(
+            self.manager.list(),
+            [],
+        )
+        self.assertEqual(
+            self.manager.count(),
+            0,
+        )
+
+    def test_repository_create_and_get(self):
+        session = (
+            self.create_repository_session()
+        )
+
+        self.assertIsNotNone(session)
+        self.assertEqual(
+            self.manager.count(),
+            1,
+        )
+        self.assertIs(
+            self.manager.get("SESSION-1"),
+            session,
+        )
+        self.assertTrue(
+            self.manager.exists("SESSION-1")
+        )
+
+    def test_repository_rejects_duplicate(self):
+        self.assertIsNotNone(
+            self.create_repository_session()
+        )
+
+        duplicate = (
+            self.create_repository_session()
+        )
+
+        self.assertIsNone(duplicate)
+        self.assertEqual(
+            self.manager.count(),
+            1,
+        )
+
+    def test_repository_delete(self):
+        self.create_repository_session()
+
+        deleted = self.manager.delete(
+            "SESSION-1"
+        )
+
+        self.assertEqual(
+            deleted.id,
+            "SESSION-1",
+        )
+        self.assertFalse(
+            self.manager.exists("SESSION-1")
+        )
+        self.assertIsNone(
+            self.manager.delete("SESSION-1")
+        )
+
+    def test_find_by_user(self):
+        self.create_repository_session(
+            session_id="SESSION-1",
+            user_id="USER-1",
+        )
+        self.create_repository_session(
+            session_id="SESSION-2",
+            user_id="USER-2",
+        )
+
+        result = self.manager.find(
+            user_id="USER-1"
+        )
+
+        self.assertEqual(
+            [session.id for session in result],
+            ["SESSION-1"],
+        )
+
+    def test_find_by_workspace_and_device(self):
+        self.create_repository_session(
+            session_id="SESSION-1",
+            workspace_id="WORKSPACE-1",
+            device_id="DEVICE-1",
+        )
+        self.create_repository_session(
+            session_id="SESSION-2",
+            workspace_id="WORKSPACE-2",
+            device_id="DEVICE-2",
+        )
+
+        result = self.manager.find(
+            workspace_id="WORKSPACE-1",
+            device_id="DEVICE-1",
+        )
+
+        self.assertEqual(
+            len(result),
+            1,
+        )
+        self.assertEqual(
+            result[0].id,
+            "SESSION-1",
+        )
+
+    def test_find_by_organization_and_credential(self):
+        self.create_repository_session(
+            session_id="SESSION-1",
+            organization_id="ORG-1",
+            credential_id="CRED-1",
+        )
+        self.create_repository_session(
+            session_id="SESSION-2",
+            organization_id="ORG-2",
+            credential_id="CRED-2",
+        )
+
+        result = self.manager.find(
+            organization_id="ORG-1",
+            credential_id="CRED-1",
+        )
+
+        self.assertEqual(
+            [session.id for session in result],
+            ["SESSION-1"],
+        )
+
+    def test_find_by_state_normalizes_value(self):
+        self.create_repository_session()
+
+        result = self.manager.find(
+            state=" ACTIVE "
+        )
+
+        self.assertEqual(
+            len(result),
+            1,
+        )
+        self.assertEqual(
+            result[0].state,
+            "active",
+        )
+
+    def test_create_session_rejects_invalid_model(self):
+        invalid = session_module.Session(
+            id="",
+            organization_id="ORG-1",
+            workspace_id="WORKSPACE-1",
+            user_id="USER-1",
+            credential_id="CRED-1",
+            state="active",
+            created_at=(
+                "2026-07-15T00:00:00+00:00"
+            ),
+            updated_at=(
+                "2026-07-15T00:00:00+00:00"
+            ),
+            expires_at=(
+                "2026-07-16T00:00:00+00:00"
+            ),
+            idle_expires_at=(
+                "2026-07-15T01:00:00+00:00"
+            ),
+            last_activity_at=(
+                "2026-07-15T00:00:00+00:00"
+            ),
+        )
+
+        with self.assertRaises(
+            session_module.InvalidSessionError
+        ):
+            self.manager.create_session(
+                invalid
+            )
+
+
 if __name__ == "__main__":
     unittest.main()

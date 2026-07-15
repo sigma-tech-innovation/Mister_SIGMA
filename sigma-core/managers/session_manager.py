@@ -179,6 +179,91 @@ class SessionRevoked(SessionEvent):
     event_type: str = "session.revoked"
 
 
+
+class SessionRepository:
+
+    def __init__(self):
+        self._sessions = {}
+
+    def create(self, session):
+        if session.id in self._sessions:
+            return None
+
+        self._sessions[session.id] = session
+        return session
+
+    def get(self, session_id):
+        return self._sessions.get(session_id)
+
+    def exists(self, session_id):
+        return session_id in self._sessions
+
+    def delete(self, session_id):
+        return self._sessions.pop(
+            session_id,
+            None,
+        )
+
+    def list(self):
+        return list(
+            self._sessions.values()
+        )
+
+    def count(self):
+        return len(
+            self._sessions
+        )
+
+    def find(
+        self,
+        *,
+        user_id=None,
+        organization_id=None,
+        workspace_id=None,
+        credential_id=None,
+        device_id=None,
+        state=None,
+    ):
+        sessions = self.list()
+
+        filters = {
+            "user_id": user_id,
+            "organization_id": organization_id,
+            "workspace_id": workspace_id,
+            "credential_id": credential_id,
+            "device_id": device_id,
+            "state": state,
+        }
+
+        for field, expected in filters.items():
+            if expected is None:
+                continue
+
+            selected = str(expected).strip()
+
+            sessions = [
+                session
+                for session in sessions
+                if str(
+                    getattr(
+                        session,
+                        field,
+                        "",
+                    )
+                    or ""
+                ).strip() == selected
+            ]
+
+        return sessions
+
+    def replace(self, session):
+        if session.id not in self._sessions:
+            return None
+
+        self._sessions[session.id] = session
+        return session
+
+
 class SessionManager:
     """
     Contrats initiaux du domaine Session.
@@ -205,6 +290,72 @@ class SessionManager:
 
     def __init__(self, engine):
         self.engine = engine
+        self.repository = (
+            SessionRepository()
+        )
+
+    def create_session(self, session):
+        validation = self.validate_session(
+            session
+        )
+
+        if not validation["valid"]:
+            raise InvalidSessionError(
+                "Invalid session",
+                details={
+                    "errors": validation["errors"],
+                },
+            )
+
+        return self.repository.create(
+            session
+        )
+
+    def get(self, session_id):
+        return self.repository.get(
+            str(session_id or "").strip()
+        )
+
+    def exists(self, session_id):
+        return self.repository.exists(
+            str(session_id or "").strip()
+        )
+
+    def list(self):
+        return self.repository.list()
+
+    def count(self):
+        return self.repository.count()
+
+    def delete(self, session_id):
+        return self.repository.delete(
+            str(session_id or "").strip()
+        )
+
+    def find(
+        self,
+        *,
+        user_id=None,
+        organization_id=None,
+        workspace_id=None,
+        credential_id=None,
+        device_id=None,
+        state=None,
+    ):
+        selected_state = (
+            self.normalize_state(state)
+            if state is not None
+            else None
+        )
+
+        return self.repository.find(
+            user_id=user_id,
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            credential_id=credential_id,
+            device_id=device_id,
+            state=selected_state,
+        )
 
     def normalize_state(self, value):
         if isinstance(value, SessionState):
