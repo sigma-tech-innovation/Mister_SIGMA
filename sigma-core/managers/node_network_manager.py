@@ -67,6 +67,41 @@ class NodeDisconnected(NodeEvent):
     event_type: str = "node.disconnected"
 
 
+
+
+from datetime import datetime
+from dataclasses import field
+
+
+@dataclass(frozen=True)
+class NodeNetworkPolicy:
+    allow_cluster_join: bool = True
+    allow_remote_management: bool = True
+    require_tls: bool = False
+
+    def validate(self):
+        return {
+            "valid": True,
+            "errors": [],
+        }
+
+
+@dataclass(frozen=True)
+class Node:
+    id: str
+    role: str
+    state: str
+    hostname: str
+    address: str
+    created_at: str
+    updated_at: str
+    metadata: dict = field(default_factory=dict)
+    version: int = 1
+
+    def as_dict(self):
+        return asdict(self)
+
+
 class NodeNetworkManager:
 
     STATES = {
@@ -86,6 +121,37 @@ class NodeNetworkManager:
 
     def __init__(self, engine):
         self.engine = engine
+
+    def now(self):
+        if hasattr(self.engine, "now"):
+            return self.engine.now()
+        return datetime.utcnow().isoformat()
+
+    def default_policy(self):
+        return NodeNetworkPolicy()
+
+    def new_node(
+        self,
+        *,
+        node_id,
+        role,
+        hostname="unknown",
+        address="0.0.0.0",
+        metadata=None,
+        state=NodeState.ONLINE.value,
+    ):
+        now = self.now()
+
+        return Node(
+            id=node_id,
+            role=str(role).strip().lower(),
+            state=str(state).strip().lower(),
+            hostname=str(hostname),
+            address=str(address),
+            created_at=now,
+            updated_at=now,
+            metadata=dict(metadata or {}),
+        )
 
     def validate(self):
         return {
