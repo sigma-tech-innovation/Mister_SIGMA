@@ -141,6 +141,85 @@ class Device:
         return asdict(self)
 
 
+
+class DeviceRepository:
+
+    def __init__(self):
+        self._devices = {}
+
+    def create(self, device):
+        if device.id in self._devices:
+            return None
+
+        self._devices[device.id] = device
+        return device
+
+    def get(self, device_id):
+        return self._devices.get(device_id)
+
+    def exists(self, device_id):
+        return device_id in self._devices
+
+    def delete(self, device_id):
+        return self._devices.pop(
+            device_id,
+            None,
+        )
+
+    def list(self):
+        return list(
+            self._devices.values()
+        )
+
+    def count(self):
+        return len(
+            self._devices
+        )
+
+    def find(
+        self,
+        *,
+        user_id=None,
+        organization_id=None,
+        workspace_id=None,
+        device_type=None,
+        state=None,
+    ):
+        devices = self.list()
+
+        filters = {
+            "user_id": user_id,
+            "organization_id": organization_id,
+            "workspace_id": workspace_id,
+            "device_type": device_type,
+            "state": state,
+        }
+
+        for field, expected in filters.items():
+            if expected is None:
+                continue
+
+            selected = str(expected).strip().lower()
+
+            devices = [
+                device
+                for device in devices
+                if str(
+                    getattr(device, field, "")
+                    or ""
+                ).strip().lower() == selected
+            ]
+
+        return devices
+
+    def replace(self, device):
+        if device.id not in self._devices:
+            return None
+
+        self._devices[device.id] = device
+        return device
+
+
 class DeviceManager:
     """
     Contrats initiaux du domaine Device Sigma.
@@ -174,6 +253,9 @@ class DeviceManager:
 
     def __init__(self, engine):
         self.engine = engine
+        self.repository = (
+            DeviceRepository()
+        )
 
     def now(self):
         if hasattr(self.engine, "now"):
@@ -212,7 +294,62 @@ class DeviceManager:
             metadata=dict(metadata or {}),
         )
 
+    def create_device(
+        self,
+        device,
+    ):
+        return self.repository.create(
+            device
+        )
+
+    def get(self, device_id):
+        return self.repository.get(
+            str(device_id or "").strip()
+        )
+
+    def exists(self, device_id):
+        return self.repository.exists(
+            str(device_id or "").strip()
+        )
+
+    def list(self):
+        return self.repository.list()
+
+    def count(self):
+        return self.repository.count()
+
+    def delete(self, device_id):
+        return self.repository.delete(
+            str(device_id or "").strip()
+        )
+
+    def find(
+        self,
+        *,
+        user_id=None,
+        organization_id=None,
+        workspace_id=None,
+        device_type=None,
+        state=None,
+    ):
+        return self.repository.find(
+            user_id=user_id,
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            device_type=(
+                self.normalize_type(device_type)
+                if device_type is not None
+                else None
+            ),
+            state=(
+                self.normalize_state(state)
+                if state is not None
+                else None
+            ),
+        )
+
     def normalize_state(self, value):
+
         if isinstance(value, DeviceState):
             return value.value
 

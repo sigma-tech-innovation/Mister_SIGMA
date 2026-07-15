@@ -300,5 +300,124 @@ class DeviceManagerContractTests(
         )
 
 
+    def create_repository_device(
+        self,
+        device_id="DEVICE-1",
+        user_id="USER-1",
+        organization_id="ORG-1",
+        workspace_id="WS-1",
+        device_type="phone",
+    ):
+        device = self.manager.new_device(
+            device_id=device_id,
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            user_id=user_id,
+            device_type=device_type,
+        )
+
+        return self.manager.create_device(
+            device
+        )
+
+    def test_repository_initially_empty(self):
+        self.assertEqual(
+            self.manager.count(),
+            0,
+        )
+        self.assertEqual(
+            self.manager.list(),
+            [],
+        )
+
+    def test_repository_create_and_get(self):
+        device = (
+            self.create_repository_device()
+        )
+
+        self.assertEqual(
+            self.manager.count(),
+            1,
+        )
+        self.assertIs(
+            self.manager.get("DEVICE-1"),
+            device,
+        )
+        self.assertTrue(
+            self.manager.exists("DEVICE-1")
+        )
+
+    def test_repository_rejects_duplicate(self):
+        self.create_repository_device()
+
+        duplicate = (
+            self.create_repository_device()
+        )
+
+        self.assertIsNone(duplicate)
+        self.assertEqual(
+            self.manager.count(),
+            1,
+        )
+
+    def test_repository_delete(self):
+        self.create_repository_device()
+
+        deleted = self.manager.delete(
+            "DEVICE-1"
+        )
+
+        self.assertEqual(
+            deleted.id,
+            "DEVICE-1",
+        )
+        self.assertFalse(
+            self.manager.exists("DEVICE-1")
+        )
+
+    def test_find_by_user(self):
+        self.create_repository_device(
+            device_id="DEVICE-1",
+            user_id="USER-1",
+        )
+        self.create_repository_device(
+            device_id="DEVICE-2",
+            user_id="USER-2",
+        )
+
+        result = self.manager.find(
+            user_id="USER-1"
+        )
+
+        self.assertEqual(
+            [d.id for d in result],
+            ["DEVICE-1"],
+        )
+
+    def test_find_by_state_and_type(self):
+        self.create_repository_device(
+            device_id="DEVICE-1",
+            device_type="phone",
+        )
+        self.create_repository_device(
+            device_id="DEVICE-2",
+            device_type="computer",
+        )
+
+        result = self.manager.find(
+            state="REGISTERED",
+            device_type=" PHONE ",
+        )
+
+        self.assertEqual(
+            len(result),
+            1,
+        )
+        self.assertEqual(
+            result[0].id,
+            "DEVICE-1",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
