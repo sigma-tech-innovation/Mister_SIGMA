@@ -64,6 +64,10 @@ Membership = load(
     "membership_manager",
     "sigma-core/managers/membership_manager.py"
 )
+Authentication = load(
+    "authentication_manager",
+    "sigma-core/managers/authentication_manager.py"
+)
 Workspace = load("workspace","sigma-core/managers/workspace_manager.py")
 Service = load("service","sigma-core/managers/service_manager.py")
 Logger = load("logger","sigma-core/managers/logger_manager.py")
@@ -116,6 +120,7 @@ class SigmaEngine:
         self.organization = Organization.OrganizationManager(self)
         self.user = User.UserManager(self)
         self.membership = Membership.MembershipManager(self)
+        self.authentication = Authentication.AuthenticationManager(self)
         self.workspace = Workspace.WorkspaceManager(self)
         self.service = Service.ServiceManager(self)
         self.logger = Logger.LoggerManager(self)
@@ -145,6 +150,7 @@ class SigmaEngine:
             "organization": self.organization,
             "user": self.user,
             "membership": self.membership,
+            "authentication": self.authentication,
             "workspace": self.workspace,
             "service": self.service,
             "logger": self.logger,
