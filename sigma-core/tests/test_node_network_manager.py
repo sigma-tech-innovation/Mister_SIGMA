@@ -119,5 +119,85 @@ class NodeContractsTests(unittest.TestCase):
         )
 
 
+    def create_repository_node(
+        self,
+        node_id="NODE-1",
+        role="core",
+        state="online",
+        hostname="alpha",
+    ):
+        node = self.manager.new_node(
+            node_id=node_id,
+            role=role,
+            hostname=hostname,
+            state=state,
+        )
+
+        return self.manager.create_node(node)
+
+    def test_manager_repository_empty(self):
+        self.assertEqual(
+            self.manager.count(),
+            0,
+        )
+
+    def test_manager_create_and_get(self):
+        node = self.create_repository_node()
+
+        self.assertEqual(
+            self.manager.get("NODE-1"),
+            node,
+        )
+
+    def test_manager_delete(self):
+        self.create_repository_node()
+
+        self.manager.delete("NODE-1")
+
+        self.assertFalse(
+            self.manager.exists("NODE-1")
+        )
+
+    def test_find_by_role(self):
+        self.create_repository_node(
+            node_id="NODE-1",
+            role="core",
+        )
+
+        self.create_repository_node(
+            node_id="NODE-2",
+            role="worker",
+        )
+
+        result = self.manager.find(
+            role="core",
+        )
+
+        self.assertEqual(
+            [n.id for n in result],
+            ["NODE-1"],
+        )
+
+    def test_find_by_state(self):
+        self.create_repository_node(
+            node_id="NODE-1",
+            state="online",
+        )
+
+        self.create_repository_node(
+            node_id="NODE-2",
+            state="offline",
+        )
+
+        result = self.manager.find(
+            state="offline",
+        )
+
+        self.assertEqual(
+            result[0].id,
+            "NODE-2",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

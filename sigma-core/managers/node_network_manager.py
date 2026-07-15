@@ -79,7 +79,48 @@ class NodeNetworkPolicy:
     allow_remote_management: bool = True
     require_tls: bool = False
 
+    def create_node(
+        self,
+        node,
+    ):
+        return self.repository.create(node)
+
+    def get(self, node_id):
+        return self.repository.get(
+            str(node_id).strip()
+        )
+
+    def exists(self, node_id):
+        return self.repository.exists(
+            str(node_id).strip()
+        )
+
+    def list(self):
+        return self.repository.list()
+
+    def count(self):
+        return self.repository.count()
+
+    def delete(self, node_id):
+        return self.repository.delete(
+            str(node_id).strip()
+        )
+
+    def find(
+        self,
+        *,
+        role=None,
+        state=None,
+        hostname=None,
+    ):
+        return self.repository.find(
+            role=role,
+            state=state,
+            hostname=hostname,
+        )
+
     def validate(self):
+
         return {
             "valid": True,
             "errors": [],
@@ -138,6 +179,36 @@ class NodeRepository:
         return len(self._nodes)
 
 
+    def find(
+        self,
+        *,
+        role=None,
+        state=None,
+        hostname=None,
+    ):
+        nodes = self.list()
+
+        filters = {
+            "role": role,
+            "state": state,
+            "hostname": hostname,
+        }
+
+        for field, expected in filters.items():
+            if expected is None:
+                continue
+
+            expected = str(expected).strip().lower()
+
+            nodes = [
+                node
+                for node in nodes
+                if str(getattr(node, field, "")).strip().lower() == expected
+            ]
+
+        return nodes
+
+
 class NodeNetworkManager:
 
     STATES = {
@@ -188,6 +259,38 @@ class NodeNetworkManager:
             created_at=now,
             updated_at=now,
             metadata=dict(metadata or {}),
+        )
+
+
+    def create_node(self, node):
+        return self.repository.create(node)
+
+    def get(self, node_id):
+        return self.repository.get(str(node_id).strip())
+
+    def exists(self, node_id):
+        return self.repository.exists(str(node_id).strip())
+
+    def list(self):
+        return self.repository.list()
+
+    def count(self):
+        return self.repository.count()
+
+    def delete(self, node_id):
+        return self.repository.delete(str(node_id).strip())
+
+    def find(
+        self,
+        *,
+        role=None,
+        state=None,
+        hostname=None,
+    ):
+        return self.repository.find(
+            role=role,
+            state=state,
+            hostname=hostname,
         )
 
     def validate(self):
