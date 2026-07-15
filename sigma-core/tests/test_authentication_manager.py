@@ -1,5 +1,8 @@
 import importlib.util
+import json
+import tempfile
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -20,21 +23,74 @@ authentication_module = load(
 )
 
 
+class FakeDatabase:
+
+    def __init__(self, root):
+        self.root = root
+
+    def path(self, name):
+        return self.root / f"{name}.json"
+
+    def load(self, name):
+        path = self.path(name)
+
+        if not path.exists():
+            return []
+
+        return json.loads(
+            path.read_text(
+                encoding="utf-8"
+            )
+        )
+
+    def save(self, name, data):
+        path = self.path(name)
+        path.write_text(
+            json.dumps(
+                data,
+                indent=4,
+            ),
+            encoding="utf-8",
+        )
+        return data
+
+
+class FakeEvent:
+
+    def __init__(self):
+        self.events = []
+
+    def emit(self, name, payload):
+        self.events.append(
+            (name, payload)
+        )
+
+
 class AuthenticationManagerTests(unittest.TestCase):
 
     def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.event = FakeEvent()
+
         self.engine = SimpleNamespace(
             now=lambda: "2026-07-15T01:00:00+00:00",
             context=SimpleNamespace(
                 organization_id=lambda: "ORG-1",
                 user_id=lambda: "USER-CURRENT",
             ),
+            database=FakeDatabase(
+                Path(self.temp.name)
+            ),
+            event=self.event,
         )
 
         self.manager = (
             authentication_module
             .AuthenticationManager(self.engine)
         )
+
+    def tearDown(self):
+        self.temp.cleanup()
 
     @patch.object(
         authentication_module.uuid,
@@ -229,6 +285,221 @@ class AuthenticationManagerTests(unittest.TestCase):
         self.assertNotIn(
             "secret",
             str(snapshot).lower(),
+        )
+
+
+    def test_empty_repository(self):
+        self.assertEqual(
+            self.manager.records(),
+            [],
+        )
+        self.assertEqual(
+            self.manager.list(),
+            [],
+        )
+        self.assertEqual(
+            self.manager.count(),
+            0,
+        )
+
+    def test_create_and_get_credential(self):
+        credential = self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+            "type": "password",
+        })
+
+        self.assertEqual(
+            credential["id"],
+            "CRED-1",
+        )
+        self.assertEqual(
+            self.manager.count(),
+            1,
+        )
+        self.assertEqual(
+            self.manager.get("CRED-1"),
+            credential,
+        )
+        self.assertTrue(
+            self.manager.exists("CRED-1")
+        )
+
+    def test_create_rejects_duplicate_id(self):
+        data = {
+            "id": "CRED-1",
+            "user_id": "USER-1",
+        }
+
+        self.assertIsNotNone(
+            self.manager.create(data)
+        )
+        self.assertIsNone(
+            self.manager.create({
+                "id": "CRED-1",
+                "user_id": "USER-2",
+            })
+        )
+
+    def test_create_rejects_duplicate_user_type(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+            "type": "password",
+        })
+
+        duplicate = self.manager.create({
+            "id": "CRED-2",
+            "user_id": "USER-1",
+            "type": "password",
+        })
+
+        self.assertIsNone(duplicate)
+
+        external = self.manager.create({
+            "id": "CRED-3",
+            "user_id": "USER-1",
+            "type": "external",
+        })
+
+        self.assertIsNotNone(external)
+
+    def test_get_by_user_and_type(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+            "type": "password",
+        })
+        self.manager.create({
+            "id": "CRED-2",
+            "user_id": "USER-1",
+            "type": "external",
+        })
+
+        self.assertEqual(
+            len(
+                self.manager.get_by_user(
+                    "USER-1"
+                )
+            ),
+            2,
+        )
+        self.assertEqual(
+            self.manager.get_by_user(
+                "USER-1",
+                credential_type="password",
+            )[0]["id"],
+            "CRED-1",
+        )
+
+    def test_update_increments_version(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+        })
+
+        updated = self.manager.update(
+            "CRED-1",
+            status="disabled",
+            metadata={
+                "reason": "manual",
+            },
+        )
+
+        self.assertEqual(
+            updated["version"],
+            2,
+        )
+        self.assertEqual(
+            updated["status"],
+            "disabled",
+        )
+        self.assertEqual(
+            updated["metadata"],
+            {
+                "reason": "manual",
+            },
+        )
+
+    def test_update_rejects_secret_fields(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+        })
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "Secret fields are not allowed",
+        ):
+            self.manager.update(
+                "CRED-1",
+                password_hash="secret",
+            )
+
+    def test_update_rejects_immutable_fields(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+        })
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "Immutable fields",
+        ):
+            self.manager.update(
+                "CRED-1",
+                user_id="USER-2",
+            )
+
+    def test_revoke(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+        })
+
+        revoked = self.manager.revoke(
+            "CRED-1"
+        )
+
+        self.assertEqual(
+            revoked["status"],
+            "revoked",
+        )
+        self.assertFalse(
+            self.manager.can_authenticate(
+                revoked
+            )
+        )
+
+    def test_events_are_public(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+        })
+
+        name, payload = self.event.events[0]
+
+        self.assertEqual(
+            name,
+            "authentication.credential_created",
+        )
+        self.assertNotIn(
+            "password_hash",
+            payload,
+        )
+
+    def test_validate_repository(self):
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+        })
+
+        result = self.manager.validate()
+
+        self.assertTrue(result["valid"])
+        self.assertEqual(
+            result["count"],
+            1,
         )
 
 
