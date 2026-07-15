@@ -868,5 +868,327 @@ class AuthenticationManagerTests(unittest.TestCase):
             )
 
 
+    def configure_fast_password(self):
+        self.original_iterations = (
+            self.manager.PASSWORD_ITERATIONS
+        )
+        self.manager.PASSWORD_ITERATIONS = 1000
+
+        self.addCleanup(
+            setattr,
+            self.manager,
+            "PASSWORD_ITERATIONS",
+            self.original_iterations,
+        )
+
+    def create_password_credential(self):
+        self.configure_fast_password()
+
+        self.manager.create({
+            "id": "CRED-1",
+            "user_id": "USER-1",
+            "type": "password",
+        })
+
+        self.manager.set_password(
+            "CRED-1",
+            "Correct-Horse-123",
+        )
+
+    def test_authenticate_success(self):
+        self.create_password_credential()
+
+        result = self.manager.authenticate(
+            "CRED-1",
+            "Correct-Horse-123",
+            context={
+                "source": "unit-test",
+            },
+        )
+
+        self.assertTrue(
+            result["authenticated"]
+        )
+        self.assertEqual(
+            result["user_id"],
+            "USER-1",
+        )
+        self.assertEqual(
+            result["credential_id"],
+            "CRED-1",
+        )
+        self.assertTrue(
+            result["audit_id"].startswith(
+                "AUTHLOG-"
+            )
+        )
+
+    def test_authenticate_invalid_password(self):
+        self.create_password_credential()
+
+        with self.assertRaises(
+            authentication_module
+            .InvalidCredentialError
+        ):
+            self.manager.authenticate(
+                "CRED-1",
+                "Wrong-Password-123",
+            )
+
+        audit = self.manager.list_audit()
+
+        self.assertEqual(
+            audit[-1]["outcome"],
+            "failure",
+        )
+        self.assertEqual(
+            audit[-1]["details"]["reason"],
+            "invalid_credential",
+        )
+
+    def test_authenticate_unknown_credential(self):
+        with self.assertRaises(
+            authentication_module
+            .InvalidCredentialError
+        ):
+            self.manager.authenticate(
+                "CRED-MISSING",
+                "Unknown-Password-123",
+            )
+
+        audit = self.manager.list_audit()
+
+        self.assertEqual(
+            audit[-1]["credential_id"],
+            None,
+        )
+        self.assertEqual(
+            audit[-1]["user_id"],
+            None,
+        )
+
+    def test_authenticate_disabled_credential(self):
+        self.create_password_credential()
+
+        self.manager.update(
+            "CRED-1",
+            status="disabled",
+        )
+
+        with self.assertRaises(
+            authentication_module
+            .CredentialDisabledError
+        ):
+            self.manager.authenticate(
+                "CRED-1",
+                "Correct-Horse-123",
+            )
+
+        self.assertEqual(
+            self.manager.list_audit()[-1][
+                "details"
+            ]["reason"],
+            "credential_disabled",
+        )
+
+    def test_authenticate_locked_credential(self):
+        self.create_password_credential()
+
+        self.manager.update(
+            "CRED-1",
+            status="locked",
+        )
+
+        with self.assertRaises(
+            authentication_module
+            .CredentialLockedError
+        ):
+            self.manager.authenticate(
+                "CRED-1",
+                "Correct-Horse-123",
+            )
+
+        self.assertEqual(
+            self.manager.list_audit()[-1][
+                "details"
+            ]["reason"],
+            "credential_locked",
+        )
+
+    def test_repeated_failures_raise_locked_error(self):
+        self.create_password_credential()
+
+        for _ in range(
+            self.manager.MAX_FAILED_ATTEMPTS - 1
+        ):
+            with self.assertRaises(
+                authentication_module
+                .InvalidCredentialError
+            ):
+                self.manager.authenticate(
+                    "CRED-1",
+                    "Wrong-Password-123",
+                )
+
+        with self.assertRaises(
+            authentication_module
+            .CredentialLockedError
+        ):
+            self.manager.authenticate(
+                "CRED-1",
+                "Wrong-Password-123",
+            )
+
+        self.assertEqual(
+            self.manager.get(
+                "CRED-1"
+            )["status"],
+            "locked",
+        )
+
+    def test_audit_filters(self):
+        self.create_password_credential()
+
+        self.manager.authenticate(
+            "CRED-1",
+            "Correct-Horse-123",
+        )
+
+        by_credential = (
+            self.manager.list_audit(
+                credential_id="CRED-1"
+            )
+        )
+        by_user = self.manager.list_audit(
+            user_id="USER-1"
+        )
+
+        self.assertEqual(
+            len(by_credential),
+            1,
+        )
+        self.assertEqual(
+            len(by_user),
+            1,
+        )
+
+    def test_audit_sanitizes_sensitive_context(self):
+        self.create_password_credential()
+
+        self.manager.authenticate(
+            "CRED-1",
+            "Correct-Horse-123",
+            context={
+                "ip": "127.0.0.1",
+                "password": "must-disappear",
+                "nested": {
+                    "access_token": (
+                        "must-disappear"
+                    ),
+                    "device": "android",
+                },
+            },
+        )
+
+        audit = self.manager.list_audit()[-1]
+        serialized = str(audit)
+
+        self.assertIn(
+            "127.0.0.1",
+            serialized,
+        )
+        self.assertIn(
+            "android",
+            serialized,
+        )
+        self.assertNotIn(
+            "must-disappear",
+            serialized,
+        )
+        self.assertNotIn(
+            "password",
+            audit["details"]["context"],
+        )
+        self.assertNotIn(
+            "access_token",
+            audit["details"][
+                "context"
+            ]["nested"],
+        )
+
+    def test_authentication_events_are_public(self):
+        self.create_password_credential()
+
+        self.manager.authenticate(
+            "CRED-1",
+            "Correct-Horse-123",
+        )
+
+        event_name, payload = (
+            self.event.events[-1]
+        )
+
+        self.assertEqual(
+            event_name,
+            "authentication.succeeded",
+        )
+        self.assertEqual(
+            payload["outcome"],
+            "success",
+        )
+
+        serialized = str(payload).lower()
+
+        self.assertNotIn(
+            "correct-horse",
+            serialized,
+        )
+        self.assertNotIn(
+            "password",
+            serialized,
+        )
+        self.assertNotIn(
+            "hash",
+            serialized,
+        )
+        self.assertNotIn(
+            "salt",
+            serialized,
+        )
+
+    def test_authenticate_creates_no_session(self):
+        self.create_password_credential()
+
+        result = self.manager.authenticate(
+            "CRED-1",
+            "Correct-Horse-123",
+        )
+
+        self.assertNotIn(
+            "session_id",
+            result,
+        )
+        self.assertNotIn(
+            "token",
+            result,
+        )
+        self.assertNotIn(
+            "refresh_token",
+            result,
+        )
+
+    def test_validate_reports_audit_database(self):
+        result = self.manager.validate()
+
+        self.assertEqual(
+            result["audit_database"],
+            "authentication_audit",
+        )
+        self.assertEqual(
+            result["audit_count"],
+            0,
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

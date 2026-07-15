@@ -68,6 +68,7 @@ class AuthenticationManager:
 
     DATABASE_NAME = "credentials"
     SECRET_DATABASE_NAME = "credential_secrets"
+    AUDIT_DATABASE_NAME = "authentication_audit"
 
     PASSWORD_ALGORITHM = "pbkdf2_sha256"
     PASSWORD_DIGEST = "sha256"
@@ -152,6 +153,58 @@ class AuthenticationManager:
             self.SECRET_DATABASE_NAME,
             records
         )
+
+    def audit_records(self):
+        return self.engine.database.load(
+            self.AUDIT_DATABASE_NAME
+        )
+
+    def save_audit_records(self, records):
+        return self.engine.database.save(
+            self.AUDIT_DATABASE_NAME,
+            records
+        )
+
+    def list_audit(
+        self,
+        *,
+        credential_id=None,
+        user_id=None,
+    ):
+        records = self.audit_records()
+
+        if credential_id is not None:
+            selected_credential = str(
+                credential_id
+            ).strip()
+
+            records = [
+                record
+                for record in records
+                if (
+                    record.get("credential_id")
+                    == selected_credential
+                )
+            ]
+
+        if user_id is not None:
+            selected_user = str(
+                user_id
+            ).strip()
+
+            records = [
+                record
+                for record in records
+                if (
+                    record.get("user_id")
+                    == selected_user
+                )
+            ]
+
+        return [
+            dict(record)
+            for record in records
+        ]
 
     def list(self):
         return [
@@ -439,6 +492,135 @@ class AuthenticationManager:
 
         self.save_secret_records(filtered)
         return True
+
+    def sanitize_audit_details(self, value):
+        forbidden_fragments = {
+            "password",
+            "secret",
+            "token",
+            "hash",
+            "salt",
+            "api_key",
+            "authorization",
+        }
+
+        if isinstance(value, dict):
+            sanitized = {}
+
+            for key, item in value.items():
+                normalized_key = str(
+                    key
+                ).strip().lower()
+
+                if any(
+                    fragment in normalized_key
+                    for fragment
+                    in forbidden_fragments
+                ):
+                    continue
+
+                sanitized[str(key)] = (
+                    self.sanitize_audit_details(
+                        item
+                    )
+                )
+
+            return sanitized
+
+        if isinstance(value, list):
+            return [
+                self.sanitize_audit_details(
+                    item
+                )
+                for item in value
+            ]
+
+        if isinstance(value, tuple):
+            return [
+                self.sanitize_audit_details(
+                    item
+                )
+                for item in value
+            ]
+
+        if isinstance(
+            value,
+            (
+                str,
+                int,
+                float,
+                bool,
+            ),
+        ) or value is None:
+            return value
+
+        return str(value)
+
+    def record_audit(
+        self,
+        *,
+        action,
+        outcome,
+        credential=None,
+        details=None,
+    ):
+        selected_credential = dict(
+            credential or {}
+        )
+
+        record = {
+            "id": f"AUTHLOG-{uuid.uuid4()}",
+            "organization_id": (
+                selected_credential.get(
+                    "organization_id"
+                )
+                or self.engine.context.organization_id()
+            ),
+            "user_id": (
+                selected_credential.get(
+                    "user_id"
+                )
+            ),
+            "credential_id": (
+                selected_credential.get(
+                    "id"
+                )
+            ),
+            "action": str(
+                action or ""
+            ).strip().lower(),
+            "outcome": str(
+                outcome or ""
+            ).strip().lower(),
+            "occurred_at": self.engine.now(),
+            "details": (
+                self.sanitize_audit_details(
+                    details or {}
+                )
+            ),
+        }
+
+        records = self.audit_records()
+        records.append(record)
+        self.save_audit_records(records)
+
+        emitter = getattr(
+            self.engine,
+            "event",
+            None,
+        )
+
+        if emitter is not None:
+            emitter.emit(
+                (
+                    "authentication.succeeded"
+                    if record["outcome"] == "success"
+                    else "authentication.failed"
+                ),
+                dict(record),
+            )
+
+        return dict(record)
 
     def new_record(
         self,
@@ -907,6 +1089,183 @@ class AuthenticationManager:
 
         return False
 
+    def authenticate(
+        self,
+        credential_id,
+        password,
+        *,
+        context=None,
+    ):
+        selected_id = str(
+            credential_id or ""
+        ).strip()
+
+        credential = self.get(
+            selected_id
+        )
+
+        safe_context = (
+            self.sanitize_audit_details(
+                context or {}
+            )
+        )
+
+        if credential is None:
+            self.record_audit(
+                action="authenticate",
+                outcome="failure",
+                details={
+                    "reason": (
+                        "invalid_credential"
+                    ),
+                    "context": safe_context,
+                },
+            )
+
+            raise InvalidCredentialError(
+                "Invalid credential"
+            )
+
+        status = self.normalize_status(
+            credential.get("status")
+        )
+
+        if status == "disabled":
+            self.record_audit(
+                action="authenticate",
+                outcome="failure",
+                credential=credential,
+                details={
+                    "reason": (
+                        "credential_disabled"
+                    ),
+                    "context": safe_context,
+                },
+            )
+
+            raise CredentialDisabledError(
+                "Credential is disabled",
+                details={
+                    "credential_id": selected_id,
+                },
+            )
+
+        if status == "locked":
+            self.record_audit(
+                action="authenticate",
+                outcome="failure",
+                credential=credential,
+                details={
+                    "reason": (
+                        "credential_locked"
+                    ),
+                    "context": safe_context,
+                },
+            )
+
+            raise CredentialLockedError(
+                "Credential is locked",
+                details={
+                    "credential_id": selected_id,
+                },
+            )
+
+        if status != "active":
+            self.record_audit(
+                action="authenticate",
+                outcome="failure",
+                credential=credential,
+                details={
+                    "reason": (
+                        "invalid_credential"
+                    ),
+                    "context": safe_context,
+                },
+            )
+
+            raise InvalidCredentialError(
+                "Invalid credential"
+            )
+
+        if not self.verify_password(
+            selected_id,
+            password,
+        ):
+            updated = self.get(
+                selected_id
+            )
+
+            reason = (
+                "credential_locked"
+                if (
+                    updated is not None
+                    and updated.get("status")
+                    == "locked"
+                )
+                else "invalid_credential"
+            )
+
+            self.record_audit(
+                action="authenticate",
+                outcome="failure",
+                credential=(
+                    updated or credential
+                ),
+                details={
+                    "reason": reason,
+                    "context": safe_context,
+                },
+            )
+
+            if reason == "credential_locked":
+                raise CredentialLockedError(
+                    "Credential is locked",
+                    details={
+                        "credential_id": selected_id,
+                    },
+                )
+
+            raise InvalidCredentialError(
+                "Invalid credential"
+            )
+
+        authenticated = self.get(
+            selected_id
+        )
+
+        audit = self.record_audit(
+            action="authenticate",
+            outcome="success",
+            credential=authenticated,
+            details={
+                "context": safe_context,
+            },
+        )
+
+        return {
+            "authenticated": True,
+            "organization_id": (
+                authenticated[
+                    "organization_id"
+                ]
+            ),
+            "user_id": authenticated[
+                "user_id"
+            ],
+            "credential_id": (
+                authenticated["id"]
+            ),
+            "credential_type": (
+                authenticated["type"]
+            ),
+            "authenticated_at": (
+                authenticated[
+                    "last_authenticated_at"
+                ]
+            ),
+            "audit_id": audit["id"],
+        }
+
     def change_password(
         self,
         credential_id,
@@ -989,6 +1348,12 @@ class AuthenticationManager:
             "database": self.DATABASE_NAME,
             "secret_database": (
                 self.SECRET_DATABASE_NAME
+            ),
+            "audit_database": (
+                self.AUDIT_DATABASE_NAME
+            ),
+            "audit_count": len(
+                self.audit_records()
             ),
             "password_policy": (
                 self.password_policy()
