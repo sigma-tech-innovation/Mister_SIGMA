@@ -617,5 +617,140 @@ class SessionManagerContractTests(
             )
 
 
+    def test_touch_updates_activity_and_version(self):
+        session = (
+            self.create_repository_session()
+        )
+
+        updated = self.manager.touch(
+            session,
+            at=(
+                "2026-07-15T00:10:00+00:00"
+            ),
+        )
+
+        self.assertEqual(
+            updated.last_activity_at,
+            "2026-07-15T00:10:00+00:00",
+        )
+        self.assertEqual(
+            updated.updated_at,
+            "2026-07-15T00:10:00+00:00",
+        )
+        self.assertEqual(
+            updated.idle_expires_at,
+            "2026-07-15T01:10:00+00:00",
+        )
+        self.assertEqual(
+            updated.version,
+            2,
+        )
+        self.assertIs(
+            self.manager.get("SESSION-1"),
+            updated,
+        )
+
+    def test_revoke_session(self):
+        session = (
+            self.create_repository_session()
+        )
+
+        revoked = self.manager.revoke(
+            session,
+            reason="manual",
+            at=(
+                "2026-07-15T00:15:00+00:00"
+            ),
+        )
+
+        self.assertEqual(
+            revoked.state,
+            "revoked",
+        )
+        self.assertEqual(
+            revoked.revoked_at,
+            "2026-07-15T00:15:00+00:00",
+        )
+        self.assertEqual(
+            revoked.revoked_reason,
+            "manual",
+        )
+        self.assertEqual(
+            revoked.version,
+            2,
+        )
+
+    def test_renew_session(self):
+        session = (
+            self.create_repository_session()
+        )
+
+        policy = session_module.SessionPolicy(
+            absolute_ttl_seconds=7200,
+            idle_ttl_seconds=1800,
+        )
+
+        renewed = self.manager.renew(
+            session,
+            policy=policy,
+            at=(
+                "2026-07-15T01:00:00+00:00"
+            ),
+        )
+
+        self.assertEqual(
+            renewed.expires_at,
+            "2026-07-15T03:00:00+00:00",
+        )
+        self.assertEqual(
+            renewed.idle_expires_at,
+            "2026-07-15T01:30:00+00:00",
+        )
+        self.assertEqual(
+            renewed.last_activity_at,
+            "2026-07-15T01:00:00+00:00",
+        )
+        self.assertEqual(
+            renewed.version,
+            2,
+        )
+
+    def test_touch_preserves_absolute_expiration(self):
+        session = (
+            self.create_repository_session()
+        )
+
+        original_expires_at = (
+            session.expires_at
+        )
+
+        updated = self.manager.touch(
+            session,
+            at=(
+                "2026-07-15T00:10:00+00:00"
+            ),
+        )
+
+        self.assertEqual(
+            updated.expires_at,
+            original_expires_at,
+        )
+
+    def test_repository_replace_missing(self):
+        session = self.manager.new_session(
+            session_id="SESSION-MISSING",
+            user_id="USER-1",
+            credential_id="CRED-1",
+            organization_id="ORG-1",
+            workspace_id="WORKSPACE-1",
+        )
+
+        self.assertIsNone(
+            self.manager.repository.replace(
+                session
+            )
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
