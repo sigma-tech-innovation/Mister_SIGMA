@@ -25,6 +25,7 @@ class BaseManagerTests(unittest.TestCase):
             "db": Path("/tmp/sigma/sigma-db"),
             "projects_dir": Path("/tmp/sigma/sigma-projects"),
             "config": object(),
+            "data_provider": object(),
             "local_config": object(),
             "local_config_migration": object(),
             "identity": object(),
@@ -102,6 +103,12 @@ class BaseManagerTests(unittest.TestCase):
         self.assertIs(
             self.m.organization,
             self.dependencies["organization"]
+        )
+
+    def test_data_provider_dependency(self):
+        self.assertIs(
+            self.m.data_provider,
+            self.dependencies["data_provider"]
         )
 
     def test_runtime_dependencies(self):

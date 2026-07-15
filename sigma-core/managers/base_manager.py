@@ -23,6 +23,10 @@ class BaseManager:
         return self.engine.database_config
 
     @property
+    def data_provider(self):
+        return self.engine.data_provider
+
+    @property
     def local_config(self):
         return self.engine.local_config
 
