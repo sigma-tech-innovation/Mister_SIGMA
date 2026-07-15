@@ -348,6 +348,292 @@ class DeviceManager:
             ),
         )
 
+    def emit_event(
+        self,
+        event_class,
+        device,
+        *,
+        details=None,
+    ):
+        event = event_class(
+            device_id=device.id,
+            user_id=device.user_id,
+            organization_id=(
+                device.organization_id
+            ),
+            occurred_at=self.now(),
+            details=dict(details or {}),
+        )
+
+        emitter = getattr(
+            self.engine,
+            "event",
+            None,
+        )
+
+        if emitter is not None:
+            emitter.emit(
+                event.event_type,
+                event.as_dict(),
+            )
+
+        return event
+
+    def register(
+        self,
+        *,
+        device_id,
+        organization_id,
+        workspace_id,
+        user_id,
+        device_type,
+        platform="unknown",
+        hostname="unknown",
+        metadata=None,
+    ):
+        if self.exists(device_id):
+            raise DeviceAlreadyExistsError(
+                "Device already exists",
+                details={
+                    "device_id": device_id,
+                },
+            )
+
+        device = self.new_device(
+            device_id=device_id,
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            user_id=user_id,
+            device_type=device_type,
+            platform=platform,
+            hostname=hostname,
+            metadata=metadata,
+        )
+
+        created = self.create_device(
+            device
+        )
+
+        if created is None:
+            raise DeviceAlreadyExistsError(
+                "Device already exists",
+                details={
+                    "device_id": device_id,
+                },
+            )
+
+        self.emit_event(
+            DeviceRegistered,
+            created,
+            details={
+                "state": created.state,
+                "device_type": (
+                    created.device_type
+                ),
+            },
+        )
+
+        return created
+
+    def update_state(
+        self,
+        device,
+        state,
+        *,
+        reason=None,
+    ):
+        now = self.now()
+
+        metadata = dict(
+            device.metadata
+        )
+
+        if reason is not None:
+            metadata[
+                "state_change_reason"
+            ] = str(reason)
+
+        updated = Device(
+            **{
+                **device.as_dict(),
+                "state": (
+                    self.normalize_state(
+                        state
+                    )
+                ),
+                "updated_at": now,
+                "metadata": metadata,
+                "version": (
+                    device.version + 1
+                ),
+            }
+        )
+
+        replaced = (
+            self.repository.replace(
+                updated
+            )
+        )
+
+        if replaced is None:
+            raise DeviceNotFoundError(
+                "Device not found",
+                details={
+                    "device_id": device.id,
+                },
+            )
+
+        return replaced
+
+    def trust(self, device_id):
+        device = self.get(device_id)
+
+        if device is None:
+            raise DeviceNotFoundError(
+                "Device not found",
+                details={
+                    "device_id": device_id,
+                },
+            )
+
+        if (
+            device.state
+            == DeviceState.REVOKED.value
+        ):
+            raise DeviceRevokedError(
+                "Device is revoked",
+                details={
+                    "device_id": device_id,
+                },
+            )
+
+        if (
+            device.state
+            == DeviceState.DISABLED.value
+        ):
+            raise DeviceDisabledError(
+                "Device is disabled",
+                details={
+                    "device_id": device_id,
+                },
+            )
+
+        if (
+            device.state
+            == DeviceState.TRUSTED.value
+        ):
+            return device
+
+        trusted = self.update_state(
+            device,
+            DeviceState.TRUSTED,
+        )
+
+        self.emit_event(
+            DeviceTrusted,
+            trusted,
+            details={
+                "previous_state": (
+                    device.state
+                ),
+            },
+        )
+
+        return trusted
+
+    def disable(
+        self,
+        device_id,
+        *,
+        reason="disabled",
+    ):
+        device = self.get(device_id)
+
+        if device is None:
+            raise DeviceNotFoundError(
+                "Device not found",
+                details={
+                    "device_id": device_id,
+                },
+            )
+
+        if (
+            device.state
+            == DeviceState.REVOKED.value
+        ):
+            raise DeviceRevokedError(
+                "Device is revoked",
+                details={
+                    "device_id": device_id,
+                },
+            )
+
+        if (
+            device.state
+            == DeviceState.DISABLED.value
+        ):
+            return device
+
+        disabled = self.update_state(
+            device,
+            DeviceState.DISABLED,
+            reason=reason,
+        )
+
+        self.emit_event(
+            DeviceDisabled,
+            disabled,
+            details={
+                "previous_state": (
+                    device.state
+                ),
+                "reason": str(reason),
+            },
+        )
+
+        return disabled
+
+    def revoke(
+        self,
+        device_id,
+        *,
+        reason="revoked",
+    ):
+        device = self.get(device_id)
+
+        if device is None:
+            raise DeviceNotFoundError(
+                "Device not found",
+                details={
+                    "device_id": device_id,
+                },
+            )
+
+        if (
+            device.state
+            == DeviceState.REVOKED.value
+        ):
+            return device
+
+        revoked = self.update_state(
+            device,
+            DeviceState.REVOKED,
+            reason=reason,
+        )
+
+        self.emit_event(
+            DeviceRevoked,
+            revoked,
+            details={
+                "previous_state": (
+                    device.state
+                ),
+                "reason": str(reason),
+            },
+        )
+
+        return revoked
+
     def normalize_state(self, value):
 
         if isinstance(value, DeviceState):

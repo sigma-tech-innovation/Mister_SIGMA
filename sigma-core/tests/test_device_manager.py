@@ -419,5 +419,174 @@ class DeviceManagerContractTests(
         )
 
 
+    def test_register(self):
+        device = self.manager.register(
+            device_id="DEVICE-REGISTER",
+            organization_id="ORG-1",
+            workspace_id="WS-1",
+            user_id="USER-1",
+            device_type="phone",
+        )
+
+        self.assertEqual(
+            device.state,
+            "registered",
+        )
+        self.assertTrue(
+            self.manager.exists(
+                "DEVICE-REGISTER"
+            )
+        )
+
+    def test_register_duplicate(self):
+        self.manager.register(
+            device_id="DEVICE-DUP",
+            organization_id="ORG-1",
+            workspace_id="WS-1",
+            user_id="USER-1",
+            device_type="phone",
+        )
+
+        with self.assertRaises(
+            device_module.DeviceAlreadyExistsError
+        ):
+            self.manager.register(
+                device_id="DEVICE-DUP",
+                organization_id="ORG-1",
+                workspace_id="WS-1",
+                user_id="USER-1",
+                device_type="phone",
+            )
+
+    def test_trust(self):
+        self.manager.register(
+            device_id="DEVICE-TRUST",
+            organization_id="ORG-1",
+            workspace_id="WS-1",
+            user_id="USER-1",
+            device_type="phone",
+        )
+
+        trusted = self.manager.trust(
+            "DEVICE-TRUST"
+        )
+
+        self.assertEqual(
+            trusted.state,
+            "trusted",
+        )
+        self.assertEqual(
+            trusted.version,
+            2,
+        )
+
+    def test_disable(self):
+        self.manager.register(
+            device_id="DEVICE-DISABLE",
+            organization_id="ORG-1",
+            workspace_id="WS-1",
+            user_id="USER-1",
+            device_type="phone",
+        )
+
+        disabled = self.manager.disable(
+            "DEVICE-DISABLE",
+            reason="policy",
+        )
+
+        self.assertEqual(
+            disabled.state,
+            "disabled",
+        )
+        self.assertEqual(
+            disabled.metadata[
+                "state_change_reason"
+            ],
+            "policy",
+        )
+
+    def test_revoke(self):
+        self.manager.register(
+            device_id="DEVICE-REVOKE",
+            organization_id="ORG-1",
+            workspace_id="WS-1",
+            user_id="USER-1",
+            device_type="phone",
+        )
+
+        revoked = self.manager.revoke(
+            "DEVICE-REVOKE",
+        )
+
+        self.assertEqual(
+            revoked.state,
+            "revoked",
+        )
+
+    def test_trust_missing(self):
+        with self.assertRaises(
+            device_module.DeviceNotFoundError
+        ):
+            self.manager.trust(
+                "UNKNOWN"
+            )
+
+    def test_disable_missing(self):
+        with self.assertRaises(
+            device_module.DeviceNotFoundError
+        ):
+            self.manager.disable(
+                "UNKNOWN"
+            )
+
+    def test_revoke_missing(self):
+        with self.assertRaises(
+            device_module.DeviceNotFoundError
+        ):
+            self.manager.revoke(
+                "UNKNOWN"
+            )
+
+    def test_disabled_device_cannot_be_trusted(self):
+        self.manager.register(
+            device_id="DEVICE-X",
+            organization_id="ORG-1",
+            workspace_id="WS-1",
+            user_id="USER-1",
+            device_type="phone",
+        )
+
+        self.manager.disable(
+            "DEVICE-X"
+        )
+
+        with self.assertRaises(
+            device_module.DeviceDisabledError
+        ):
+            self.manager.trust(
+                "DEVICE-X"
+            )
+
+    def test_revoked_device_cannot_be_trusted(self):
+        self.manager.register(
+            device_id="DEVICE-Y",
+            organization_id="ORG-1",
+            workspace_id="WS-1",
+            user_id="USER-1",
+            device_type="phone",
+        )
+
+        self.manager.revoke(
+            "DEVICE-Y"
+        )
+
+        with self.assertRaises(
+            device_module.DeviceRevokedError
+        ):
+            self.manager.trust(
+                "DEVICE-Y"
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
