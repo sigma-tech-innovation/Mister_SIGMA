@@ -1,0 +1,15 @@
+{
+    "phase": "04",
+    "manager": "AuthenticationManager",
+    "status": "planned",
+    "parts": [
+        "4A-contracts-domain",
+        "4B-credential-storage",
+        "4C-password-policy",
+        "4D-application-events",
+        "4E-api-cli",
+        "4F-integration"
+    ],
+    "current_part": "4A",
+    "secrets_included": false
+}
