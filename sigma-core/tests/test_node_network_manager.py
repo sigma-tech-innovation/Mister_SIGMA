@@ -199,5 +199,66 @@ class NodeContractsTests(unittest.TestCase):
         )
 
 
+    def test_register(self):
+        node = self.manager.new_node(
+            node_id="NODE-R",
+            role="core",
+        )
+
+        self.manager.register(node)
+
+        self.assertTrue(
+            self.manager.exists("NODE-R")
+        )
+
+    def test_disconnect(self):
+        node = self.manager.new_node(
+            node_id="NODE-D",
+            role="core",
+        )
+
+        self.manager.register(node)
+
+        node = self.manager.disconnect("NODE-D")
+
+        self.assertEqual(
+            node.state,
+            "offline",
+        )
+
+    def test_maintenance(self):
+        node = self.manager.new_node(
+            node_id="NODE-M",
+            role="core",
+        )
+
+        self.manager.register(node)
+
+        node = self.manager.maintenance("NODE-M")
+
+        self.assertEqual(
+            node.state,
+            "maintenance",
+        )
+
+    def test_reconnect(self):
+        node = self.manager.new_node(
+            node_id="NODE-C",
+            role="core",
+        )
+
+        self.manager.register(node)
+
+        self.manager.disconnect("NODE-C")
+
+        node = self.manager.reconnect("NODE-C")
+
+        self.assertEqual(
+            node.state,
+            "online",
+        )
+
+
+
 if __name__ == "__main__":
     unittest.main()

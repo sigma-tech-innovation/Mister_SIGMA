@@ -79,54 +79,13 @@ class NodeNetworkPolicy:
     allow_remote_management: bool = True
     require_tls: bool = False
 
-    def create_node(
-        self,
-        node,
-    ):
-        return self.repository.create(node)
 
-    def get(self, node_id):
-        return self.repository.get(
-            str(node_id).strip()
-        )
-
-    def exists(self, node_id):
-        return self.repository.exists(
-            str(node_id).strip()
-        )
-
-    def list(self):
-        return self.repository.list()
-
-    def count(self):
-        return self.repository.count()
-
-    def delete(self, node_id):
-        return self.repository.delete(
-            str(node_id).strip()
-        )
-
-    def find(
-        self,
-        *,
-        role=None,
-        state=None,
-        hostname=None,
-    ):
-        return self.repository.find(
-            role=role,
-            state=state,
-            hostname=hostname,
-        )
 
     def validate(self):
-
         return {
             "valid": True,
             "errors": [],
         }
-
-
 @dataclass(frozen=True)
 class Node:
     id: str
@@ -293,6 +252,90 @@ class NodeNetworkManager:
             hostname=hostname,
         )
 
+
+
+    def register(self, node):
+        created = self.repository.create(node)
+
+        if created is None:
+            raise NodeAlreadyExistsError(
+                "Node already exists",
+                details={"node_id": node.id},
+            )
+
+        return created
+
+    def disconnect(self, node_id):
+        node = self.get(node_id)
+
+        if node is None:
+            raise NodeNotFoundError(
+                "Node not found",
+                details={"node_id": node_id},
+            )
+
+        updated = Node(
+            id=node.id,
+            role=node.role,
+            state=NodeState.OFFLINE.value,
+            hostname=node.hostname,
+            address=node.address,
+            created_at=node.created_at,
+            updated_at=self.now(),
+            metadata=dict(node.metadata),
+            version=node.version + 1,
+        )
+
+        self.repository.replace(updated)
+        return updated
+
+    def maintenance(self, node_id):
+        node = self.get(node_id)
+
+        if node is None:
+            raise NodeNotFoundError(
+                "Node not found",
+                details={"node_id": node_id},
+            )
+
+        updated = Node(
+            id=node.id,
+            role=node.role,
+            state=NodeState.MAINTENANCE.value,
+            hostname=node.hostname,
+            address=node.address,
+            created_at=node.created_at,
+            updated_at=self.now(),
+            metadata=dict(node.metadata),
+            version=node.version + 1,
+        )
+
+        self.repository.replace(updated)
+        return updated
+
+    def reconnect(self, node_id):
+        node = self.get(node_id)
+
+        if node is None:
+            raise NodeNotFoundError(
+                "Node not found",
+                details={"node_id": node_id},
+            )
+
+        updated = Node(
+            id=node.id,
+            role=node.role,
+            state=NodeState.ONLINE.value,
+            hostname=node.hostname,
+            address=node.address,
+            created_at=node.created_at,
+            updated_at=self.now(),
+            metadata=dict(node.metadata),
+            version=node.version + 1,
+        )
+
+        self.repository.replace(updated)
+        return updated
     def validate(self):
         return {
             "valid": True,
