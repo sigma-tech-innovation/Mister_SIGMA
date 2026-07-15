@@ -1,0 +1,241 @@
+import importlib.util
+import unittest
+from types import SimpleNamespace
+
+
+def load(name, path):
+    spec = importlib.util.spec_from_file_location(
+        name,
+        path,
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+device_module = load(
+    "device_manager",
+    "sigma-core/managers/device_manager.py",
+)
+
+
+class DeviceManagerContractTests(
+    unittest.TestCase
+):
+
+    def setUp(self):
+        self.engine = SimpleNamespace()
+        self.manager = (
+            device_module.DeviceManager(
+                self.engine
+            )
+        )
+
+    def test_manager_exists(self):
+        self.assertIs(
+            self.manager.engine,
+            self.engine,
+        )
+
+    def test_device_states(self):
+        self.assertEqual(
+            self.manager.STATES,
+            {
+                "registered",
+                "trusted",
+                "disabled",
+                "revoked",
+            },
+        )
+
+    def test_device_types(self):
+        expected = {
+            "phone",
+            "tablet",
+            "computer",
+            "server",
+            "vps",
+            "raspberry_pi",
+            "iot",
+            "gateway",
+            "radio",
+            "virtual",
+            "unknown",
+        }
+
+        self.assertEqual(
+            self.manager.TYPES,
+            expected,
+        )
+
+    def test_normalize_state(self):
+        self.assertEqual(
+            self.manager.normalize_state(
+                " TRUSTED "
+            ),
+            "trusted",
+        )
+
+        self.assertEqual(
+            self.manager.normalize_state(
+                device_module
+                .DeviceState.REVOKED
+            ),
+            "revoked",
+        )
+
+    def test_normalize_type(self):
+        self.assertEqual(
+            self.manager.normalize_type(
+                " RASPBERRY_PI "
+            ),
+            "raspberry_pi",
+        )
+
+        self.assertEqual(
+            self.manager.normalize_type(
+                device_module.DeviceType.VPS
+            ),
+            "vps",
+        )
+
+    def test_state_exists(self):
+        self.assertTrue(
+            self.manager.state_exists(
+                "registered"
+            )
+        )
+
+        self.assertFalse(
+            self.manager.state_exists(
+                "missing"
+            )
+        )
+
+    def test_type_exists(self):
+        self.assertTrue(
+            self.manager.type_exists(
+                "phone"
+            )
+        )
+
+        self.assertTrue(
+            self.manager.type_exists(
+                "raspberry_pi"
+            )
+        )
+
+        self.assertFalse(
+            self.manager.type_exists(
+                "spaceship"
+            )
+        )
+
+    def test_error_contract(self):
+        error = (
+            device_module
+            .DeviceNotFoundError(
+                "Device not found",
+                details={
+                    "device_id": "DEVICE-1",
+                },
+            )
+        )
+
+        self.assertEqual(
+            error.as_dict(),
+            {
+                "code": (
+                    "SIGMA_DEVICE_NOT_FOUND"
+                ),
+                "message": (
+                    "Device not found"
+                ),
+                "retryable": False,
+                "details": {
+                    "device_id": "DEVICE-1",
+                },
+            },
+        )
+
+    def test_event_contract(self):
+        event = (
+            device_module.DeviceRegistered(
+                device_id="DEVICE-1",
+                user_id="USER-1",
+                organization_id="ORG-1",
+                occurred_at=(
+                    "2026-07-15T00:00:00"
+                ),
+                details={
+                    "platform": "android",
+                },
+            )
+        )
+
+        self.assertEqual(
+            event.as_dict(),
+            {
+                "device_id": "DEVICE-1",
+                "user_id": "USER-1",
+                "organization_id": "ORG-1",
+                "occurred_at": (
+                    "2026-07-15T00:00:00"
+                ),
+                "details": {
+                    "platform": "android",
+                },
+                "event_type": (
+                    "device.registered"
+                ),
+            },
+        )
+
+    def test_events_are_immutable(self):
+        event = device_module.DeviceRevoked(
+            device_id="DEVICE-1",
+            user_id="USER-1",
+            organization_id="ORG-1",
+            occurred_at="2026",
+            details={},
+        )
+
+        with self.assertRaises(
+            AttributeError
+        ):
+            event.device_id = "DEVICE-2"
+
+    def test_validate(self):
+        result = self.manager.validate()
+
+        self.assertTrue(result["valid"])
+        self.assertIn(
+            "trusted",
+            result["states"],
+        )
+        self.assertIn(
+            "raspberry_pi",
+            result["types"],
+        )
+        self.assertIn(
+            "device.registered",
+            result["event_types"],
+        )
+
+    def test_snapshot(self):
+        snapshot = self.manager.snapshot()
+
+        self.assertTrue(
+            snapshot["validation"]["valid"]
+        )
+
+        self.assertEqual(
+            set(snapshot),
+            {
+                "validation",
+            },
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()
