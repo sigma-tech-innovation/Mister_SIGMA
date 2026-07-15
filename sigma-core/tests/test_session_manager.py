@@ -1,5 +1,6 @@
 import importlib.util
 import unittest
+from datetime import datetime, timezone
 from types import SimpleNamespace
 
 
@@ -24,7 +25,11 @@ class SessionManagerContractTests(
 ):
 
     def setUp(self):
-        self.engine = SimpleNamespace()
+        self.engine = SimpleNamespace(
+            now=lambda: (
+                "2026-07-15T00:00:00+00:00"
+            ),
+        )
         self.manager = (
             session_module.SessionManager(
                 self.engine
@@ -173,6 +178,243 @@ class SessionManagerContractTests(
             {
                 "validation",
             },
+        )
+
+
+    def test_default_policy(self):
+        policy = self.manager.default_policy()
+
+        self.assertEqual(
+            policy.absolute_ttl_seconds,
+            86400,
+        )
+        self.assertEqual(
+            policy.idle_ttl_seconds,
+            3600,
+        )
+        self.assertTrue(policy.renewable)
+        self.assertTrue(
+            policy.validate()["valid"]
+        )
+
+    def test_invalid_policy(self):
+        policy = session_module.SessionPolicy(
+            absolute_ttl_seconds=60,
+            idle_ttl_seconds=120,
+        )
+
+        result = policy.validate()
+
+        self.assertFalse(result["valid"])
+        self.assertIn(
+            "Idle TTL cannot exceed absolute TTL",
+            result["errors"],
+        )
+
+    def test_new_session(self):
+        session = self.manager.new_session(
+            session_id="SESSION-1",
+            user_id="USER-1",
+            credential_id="CRED-1",
+            organization_id="ORG-1",
+            workspace_id="WORKSPACE-1",
+            device_id="DEVICE-1",
+            metadata={
+                "source": "unit-test",
+            },
+        )
+
+        self.assertEqual(
+            session.id,
+            "SESSION-1",
+        )
+        self.assertEqual(
+            session.state,
+            "active",
+        )
+        self.assertEqual(
+            session.device_id,
+            "DEVICE-1",
+        )
+        self.assertEqual(
+            session.version,
+            1,
+        )
+        self.assertEqual(
+            session.metadata,
+            {
+                "source": "unit-test",
+            },
+        )
+
+    def test_session_expirations(self):
+        policy = session_module.SessionPolicy(
+            absolute_ttl_seconds=7200,
+            idle_ttl_seconds=1800,
+        )
+
+        session = self.manager.new_session(
+            session_id="SESSION-1",
+            user_id="USER-1",
+            credential_id="CRED-1",
+            organization_id="ORG-1",
+            workspace_id="WORKSPACE-1",
+            policy=policy,
+        )
+
+        self.assertEqual(
+            session.expires_at,
+            "2026-07-15T02:00:00+00:00",
+        )
+        self.assertEqual(
+            session.idle_expires_at,
+            "2026-07-15T00:30:00+00:00",
+        )
+
+    def test_validate_session(self):
+        session = self.manager.new_session(
+            session_id="SESSION-1",
+            user_id="USER-1",
+            credential_id="CRED-1",
+            organization_id="ORG-1",
+            workspace_id="WORKSPACE-1",
+        )
+
+        result = self.manager.validate_session(
+            session
+        )
+
+        self.assertTrue(result["valid"])
+        self.assertEqual(
+            result["errors"],
+            [],
+        )
+
+    def test_validate_session_rejects_missing_id(self):
+        session = session_module.Session(
+            id="",
+            organization_id="ORG-1",
+            workspace_id="WORKSPACE-1",
+            user_id="USER-1",
+            credential_id="CRED-1",
+            state="active",
+            created_at=(
+                "2026-07-15T00:00:00+00:00"
+            ),
+            updated_at=(
+                "2026-07-15T00:00:00+00:00"
+            ),
+            expires_at=(
+                "2026-07-16T00:00:00+00:00"
+            ),
+            idle_expires_at=(
+                "2026-07-15T01:00:00+00:00"
+            ),
+            last_activity_at=(
+                "2026-07-15T00:00:00+00:00"
+            ),
+        )
+
+        result = self.manager.validate_session(
+            session
+        )
+
+        self.assertFalse(result["valid"])
+        self.assertIn(
+            "Missing fields: id",
+            result["errors"],
+        )
+
+    def test_is_expired_by_idle_timeout(self):
+        session = self.manager.new_session(
+            session_id="SESSION-1",
+            user_id="USER-1",
+            credential_id="CRED-1",
+            organization_id="ORG-1",
+            workspace_id="WORKSPACE-1",
+        )
+
+        self.assertFalse(
+            self.manager.is_expired(
+                session,
+                at=datetime(
+                    2026,
+                    7,
+                    15,
+                    0,
+                    30,
+                    tzinfo=timezone.utc,
+                ),
+            )
+        )
+
+        self.assertTrue(
+            self.manager.is_expired(
+                session,
+                at=datetime(
+                    2026,
+                    7,
+                    15,
+                    1,
+                    0,
+                    tzinfo=timezone.utc,
+                ),
+            )
+        )
+
+    def test_is_expired_by_absolute_timeout(self):
+        policy = session_module.SessionPolicy(
+            absolute_ttl_seconds=60,
+            idle_ttl_seconds=60,
+        )
+
+        session = self.manager.new_session(
+            session_id="SESSION-1",
+            user_id="USER-1",
+            credential_id="CRED-1",
+            organization_id="ORG-1",
+            workspace_id="WORKSPACE-1",
+            policy=policy,
+        )
+
+        self.assertTrue(
+            self.manager.is_expired(
+                session,
+                at=(
+                    "2026-07-15T00:01:00+00:00"
+                ),
+            )
+        )
+
+    def test_session_as_dict(self):
+        session = self.manager.new_session(
+            session_id="SESSION-1",
+            user_id="USER-1",
+            credential_id="CRED-1",
+            organization_id="ORG-1",
+            workspace_id="WORKSPACE-1",
+        )
+
+        data = session.as_dict()
+
+        self.assertEqual(
+            data["id"],
+            "SESSION-1",
+        )
+        self.assertEqual(
+            data["state"],
+            "active",
+        )
+
+    def test_validate_reports_default_policy(self):
+        result = self.manager.validate()
+
+        self.assertTrue(result["valid"])
+        self.assertEqual(
+            result["default_policy"][
+                "absolute_ttl_seconds"
+            ],
+            86400,
         )
 
 

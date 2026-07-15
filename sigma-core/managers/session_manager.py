@@ -1,4 +1,5 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 
 
@@ -54,6 +55,95 @@ class SessionState(str, Enum):
     EXPIRED = "expired"
     REVOKED = "revoked"
     DISABLED = "disabled"
+
+
+@dataclass(frozen=True)
+class SessionPolicy:
+    absolute_ttl_seconds: int = 86400
+    idle_ttl_seconds: int = 3600
+    renewable: bool = True
+
+    def validate(self):
+        errors = []
+
+        if (
+            not isinstance(
+                self.absolute_ttl_seconds,
+                int,
+            )
+            or isinstance(
+                self.absolute_ttl_seconds,
+                bool,
+            )
+            or self.absolute_ttl_seconds < 1
+        ):
+            errors.append(
+                "Absolute TTL must be a positive integer"
+            )
+
+        if (
+            not isinstance(
+                self.idle_ttl_seconds,
+                int,
+            )
+            or isinstance(
+                self.idle_ttl_seconds,
+                bool,
+            )
+            or self.idle_ttl_seconds < 1
+        ):
+            errors.append(
+                "Idle TTL must be a positive integer"
+            )
+
+        if (
+            isinstance(
+                self.absolute_ttl_seconds,
+                int,
+            )
+            and isinstance(
+                self.idle_ttl_seconds,
+                int,
+            )
+            and self.idle_ttl_seconds
+            > self.absolute_ttl_seconds
+        ):
+            errors.append(
+                "Idle TTL cannot exceed absolute TTL"
+            )
+
+        return {
+            "valid": not errors,
+            "errors": errors,
+        }
+
+    def as_dict(self):
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class Session:
+    id: str
+    organization_id: str
+    workspace_id: str
+    user_id: str
+    credential_id: str
+    state: str
+    created_at: str
+    updated_at: str
+    expires_at: str
+    idle_expires_at: str
+    last_activity_at: str
+    device_id: str | None = None
+    revoked_at: str | None = None
+    revoked_reason: str | None = None
+    metadata: dict = field(
+        default_factory=dict
+    )
+    version: int = 1
+
+    def as_dict(self):
+        return asdict(self)
 
 
 @dataclass(frozen=True)
@@ -122,6 +212,316 @@ class SessionManager:
 
         return str(value or "").strip().lower()
 
+    def now_utc(self):
+        value = self.engine.now()
+
+        if isinstance(value, datetime):
+            current = value
+        else:
+            current = datetime.fromisoformat(
+                str(value).replace(
+                    "Z",
+                    "+00:00",
+                )
+            )
+
+        if current.tzinfo is None:
+            current = current.replace(
+                tzinfo=timezone.utc
+            )
+
+        return current.astimezone(
+            timezone.utc
+        )
+
+    def format_datetime(self, value):
+        return value.astimezone(
+            timezone.utc
+        ).isoformat()
+
+    def parse_datetime(self, value):
+        parsed = datetime.fromisoformat(
+            str(value).replace(
+                "Z",
+                "+00:00",
+            )
+        )
+
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(
+                tzinfo=timezone.utc
+            )
+
+        return parsed.astimezone(
+            timezone.utc
+        )
+
+    def default_policy(self):
+        return SessionPolicy()
+
+    def validate_policy(self, policy):
+        if not isinstance(
+            policy,
+            SessionPolicy,
+        ):
+            return {
+                "valid": False,
+                "errors": [
+                    "Session policy must be a SessionPolicy"
+                ],
+            }
+
+        return policy.validate()
+
+    def new_session(
+        self,
+        *,
+        session_id,
+        user_id,
+        credential_id,
+        organization_id,
+        workspace_id,
+        device_id=None,
+        metadata=None,
+        policy=None,
+    ):
+        selected_policy = (
+            policy
+            or self.default_policy()
+        )
+
+        validation = self.validate_policy(
+            selected_policy
+        )
+
+        if not validation["valid"]:
+            raise ValueError(
+                "; ".join(
+                    validation["errors"]
+                )
+            )
+
+        now = self.now_utc()
+
+        session = Session(
+            id=str(
+                session_id or ""
+            ).strip(),
+            organization_id=str(
+                organization_id or ""
+            ).strip(),
+            workspace_id=str(
+                workspace_id or ""
+            ).strip(),
+            user_id=str(
+                user_id or ""
+            ).strip(),
+            credential_id=str(
+                credential_id or ""
+            ).strip(),
+            device_id=(
+                str(device_id).strip()
+                if device_id is not None
+                else None
+            ),
+            state=SessionState.ACTIVE.value,
+            created_at=self.format_datetime(
+                now
+            ),
+            updated_at=self.format_datetime(
+                now
+            ),
+            expires_at=self.format_datetime(
+                now
+                + timedelta(
+                    seconds=(
+                        selected_policy
+                        .absolute_ttl_seconds
+                    )
+                )
+            ),
+            idle_expires_at=self.format_datetime(
+                now
+                + timedelta(
+                    seconds=(
+                        selected_policy
+                        .idle_ttl_seconds
+                    )
+                )
+            ),
+            last_activity_at=(
+                self.format_datetime(now)
+            ),
+            metadata=dict(
+                metadata or {}
+            ),
+            version=1,
+        )
+
+        result = self.validate_session(
+            session
+        )
+
+        if not result["valid"]:
+            raise ValueError(
+                "; ".join(result["errors"])
+            )
+
+        return session
+
+    def validate_session(self, session):
+        errors = []
+
+        if not isinstance(
+            session,
+            Session,
+        ):
+            return {
+                "valid": False,
+                "errors": [
+                    "Session must be a Session instance"
+                ],
+            }
+
+        required = {
+            "id": session.id,
+            "organization_id": (
+                session.organization_id
+            ),
+            "workspace_id": (
+                session.workspace_id
+            ),
+            "user_id": session.user_id,
+            "credential_id": (
+                session.credential_id
+            ),
+            "state": session.state,
+            "created_at": (
+                session.created_at
+            ),
+            "updated_at": (
+                session.updated_at
+            ),
+            "expires_at": (
+                session.expires_at
+            ),
+            "idle_expires_at": (
+                session.idle_expires_at
+            ),
+            "last_activity_at": (
+                session.last_activity_at
+            ),
+        }
+
+        missing = sorted(
+            key
+            for key, value in required.items()
+            if not value
+        )
+
+        if missing:
+            errors.append(
+                "Missing fields: "
+                + ", ".join(missing)
+            )
+
+        if not self.state_exists(
+            session.state
+        ):
+            errors.append(
+                "Invalid session state"
+            )
+
+        if (
+            not isinstance(
+                session.version,
+                int,
+            )
+            or isinstance(
+                session.version,
+                bool,
+            )
+            or session.version < 1
+        ):
+            errors.append(
+                "Version must be a positive integer"
+            )
+
+        if not isinstance(
+            session.metadata,
+            dict,
+        ):
+            errors.append(
+                "Metadata must be a dictionary"
+            )
+
+        try:
+            created_at = self.parse_datetime(
+                session.created_at
+            )
+            expires_at = self.parse_datetime(
+                session.expires_at
+            )
+            idle_expires_at = self.parse_datetime(
+                session.idle_expires_at
+            )
+        except ValueError:
+            errors.append(
+                "Invalid session datetime"
+            )
+        else:
+            if expires_at <= created_at:
+                errors.append(
+                    "Absolute expiration must be after creation"
+                )
+
+            if idle_expires_at <= created_at:
+                errors.append(
+                    "Idle expiration must be after creation"
+                )
+
+            if idle_expires_at > expires_at:
+                errors.append(
+                    "Idle expiration cannot exceed absolute expiration"
+                )
+
+        return {
+            "valid": not errors,
+            "errors": errors,
+        }
+
+    def is_expired(
+        self,
+        session,
+        *,
+        at=None,
+    ):
+        current = (
+            at
+            if isinstance(at, datetime)
+            else (
+                self.parse_datetime(at)
+                if at is not None
+                else self.now_utc()
+            )
+        )
+
+        absolute_expiration = (
+            self.parse_datetime(
+                session.expires_at
+            )
+        )
+        idle_expiration = (
+            self.parse_datetime(
+                session.idle_expires_at
+            )
+        )
+
+        return (
+            current >= absolute_expiration
+            or current >= idle_expiration
+        )
+
     def state_exists(self, value):
         return (
             self.normalize_state(value)
@@ -129,13 +529,25 @@ class SessionManager:
         )
 
     def validate(self):
+        policy = self.default_policy()
+        policy_validation = (
+            policy.validate()
+        )
+
         return {
-            "valid": True,
+            "valid": (
+                policy_validation["valid"]
+            ),
             "states": sorted(self.STATES),
             "event_types": sorted(
                 self.EVENT_TYPES
             ),
-            "errors": [],
+            "default_policy": (
+                policy.as_dict()
+            ),
+            "errors": (
+                policy_validation["errors"]
+            ),
         }
 
     def snapshot(self):
