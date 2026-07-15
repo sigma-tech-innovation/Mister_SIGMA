@@ -27,6 +27,10 @@ DatabaseConfig = load(
     "database_config",
     "sigma-core/managers/database_config_manager.py"
 )
+DataProvider = load(
+    "data_provider",
+    "sigma-core/managers/data_provider_manager.py"
+)
 LocalConfig = load(
     "local_config",
     "sigma-core/managers/local_config_manager.py"
@@ -85,6 +89,7 @@ class SigmaEngine:
         self.api = Api.ApiManager(self)
         self.config = Config.ConfigManager(self)
         self.database_config = DatabaseConfig.DatabaseConfigManager(self)
+        self.data_provider = DataProvider.DataProviderManager(self)
         self.local_config = LocalConfig.LocalConfigManager(self)
         self.local_config_migration = LocalConfigMigration.LocalConfigMigrationManager(self)
         self.identity = Identity.IdentityManager(self)
@@ -112,6 +117,7 @@ class SigmaEngine:
             "api": self.api,
             "config": self.config,
             "database_config": self.database_config,
+            "data_provider": self.data_provider,
             "local_config": self.local_config,
             "local_config_migration": self.local_config_migration,
             "identity": self.identity,
