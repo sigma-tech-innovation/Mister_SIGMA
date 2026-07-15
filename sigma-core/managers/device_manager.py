@@ -103,6 +103,44 @@ class DeviceRevoked(DeviceEvent):
     event_type: str = "device.revoked"
 
 
+
+
+from datetime import datetime
+from dataclasses import field
+
+
+@dataclass(frozen=True)
+class DeviceTrustPolicy:
+    trusted: bool = False
+    require_attestation: bool = False
+    allow_remote_access: bool = True
+
+    def validate(self):
+        return {
+            "valid": True,
+            "errors": [],
+        }
+
+
+@dataclass(frozen=True)
+class Device:
+    id: str
+    organization_id: str
+    workspace_id: str
+    user_id: str
+    state: str
+    device_type: str
+    platform: str
+    hostname: str
+    created_at: str
+    updated_at: str
+    metadata: dict = field(default_factory=dict)
+    version: int = 1
+
+    def as_dict(self):
+        return asdict(self)
+
+
 class DeviceManager:
     """
     Contrats initiaux du domaine Device Sigma.
@@ -136,6 +174,43 @@ class DeviceManager:
 
     def __init__(self, engine):
         self.engine = engine
+
+    def now(self):
+        if hasattr(self.engine, "now"):
+            return self.engine.now()
+        return datetime.utcnow().isoformat()
+
+    def default_policy(self):
+        return DeviceTrustPolicy()
+
+    def new_device(
+        self,
+        *,
+        device_id,
+        organization_id,
+        workspace_id,
+        user_id,
+        device_type,
+        platform="unknown",
+        hostname="unknown",
+        metadata=None,
+        state=DeviceState.REGISTERED.value,
+    ):
+        now = self.now()
+
+        return Device(
+            id=device_id,
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            user_id=user_id,
+            state=self.normalize_state(state),
+            device_type=self.normalize_type(device_type),
+            platform=str(platform),
+            hostname=str(hostname),
+            created_at=now,
+            updated_at=now,
+            metadata=dict(metadata or {}),
+        )
 
     def normalize_state(self, value):
         if isinstance(value, DeviceState):

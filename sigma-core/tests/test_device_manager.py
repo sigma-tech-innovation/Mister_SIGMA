@@ -24,7 +24,9 @@ class DeviceManagerContractTests(
 ):
 
     def setUp(self):
-        self.engine = SimpleNamespace()
+        self.engine = SimpleNamespace(
+            now=lambda: "2026-07-15T00:00:00+00:00"
+        )
         self.manager = (
             device_module.DeviceManager(
                 self.engine
@@ -234,6 +236,67 @@ class DeviceManagerContractTests(
             {
                 "validation",
             },
+        )
+
+
+    def test_default_policy(self):
+        policy = self.manager.default_policy()
+
+        self.assertFalse(policy.trusted)
+        self.assertTrue(
+            policy.allow_remote_access
+        )
+        self.assertTrue(
+            policy.validate()["valid"]
+        )
+
+    def test_new_device(self):
+        device = self.manager.new_device(
+            device_id="DEVICE-1",
+            organization_id="ORG-1",
+            workspace_id="WS-1",
+            user_id="USER-1",
+            device_type="phone",
+            platform="android",
+            hostname="pixel",
+            metadata={
+                "manufacturer": "Google",
+            },
+        )
+
+        self.assertEqual(
+            device.id,
+            "DEVICE-1",
+        )
+        self.assertEqual(
+            device.device_type,
+            "phone",
+        )
+        self.assertEqual(
+            device.platform,
+            "android",
+        )
+        self.assertEqual(
+            device.state,
+            "registered",
+        )
+        self.assertEqual(
+            device.version,
+            1,
+        )
+
+    def test_device_as_dict(self):
+        device = self.manager.new_device(
+            device_id="DEVICE-1",
+            organization_id="ORG-1",
+            workspace_id="WS-1",
+            user_id="USER-1",
+            device_type="computer",
+        )
+
+        self.assertEqual(
+            device.as_dict()["id"],
+            "DEVICE-1",
         )
 
 
