@@ -34,6 +34,18 @@ class FakeProvider:
             "errors": [],
         }
 
+    def pull(self, resource=None):
+        return {
+            "resource": resource,
+            "records": [1],
+        }
+
+    def push(self, resource, records):
+        return {
+            "resource": resource,
+            "records": records,
+        }
+
     def snapshot(self):
         return {
             "provider": self.provider_key,
@@ -135,6 +147,58 @@ class DataProviderManagerTests(unittest.TestCase):
         self.assertTrue(
             result["validation"]["valid"]
         )
+
+
+    def test_pull_provider(self):
+        self.manager.register(
+            "fake",
+            FakeProvider(),
+        )
+
+        result = self.manager.pull(
+            "fake",
+            "users",
+        )
+
+        self.assertEqual(
+            result["resource"],
+            "users",
+        )
+        self.assertEqual(
+            result["records"],
+            [1],
+        )
+
+    def test_push_provider(self):
+        self.manager.register(
+            "fake",
+            FakeProvider(),
+        )
+
+        result = self.manager.push(
+            "fake",
+            "users",
+            [{"id": 1}],
+        )
+
+        self.assertEqual(
+            result["resource"],
+            "users",
+        )
+        self.assertEqual(
+            result["records"],
+            [{"id": 1}],
+        )
+
+    def test_unknown_provider(self):
+        with self.assertRaisesRegex(
+            KeyError,
+            "Unknown provider",
+        ):
+            self.manager.pull(
+                "missing",
+                "users",
+            )
 
 
 if __name__ == "__main__":

@@ -31,6 +31,10 @@ DataProvider = load(
     "data_provider",
     "sigma-core/managers/data_provider_manager.py"
 )
+NotionProvider = load(
+    "notion_provider",
+    "sigma-core/managers/data_providers/notion_provider.py"
+)
 LocalConfig = load(
     "local_config",
     "sigma-core/managers/local_config_manager.py"
@@ -90,6 +94,20 @@ class SigmaEngine:
         self.config = Config.ConfigManager(self)
         self.database_config = DatabaseConfig.DatabaseConfigManager(self)
         self.data_provider = DataProvider.DataProviderManager(self)
+        self.notion_provider = NotionProvider.NotionProvider(
+            token=self.config.get(
+                "notion_token",
+                ""
+            ),
+            database_id=self.config.get(
+                "notion_database_id",
+                ""
+            ),
+        )
+        self.data_provider.register(
+            "notion",
+            self.notion_provider
+        )
         self.local_config = LocalConfig.LocalConfigManager(self)
         self.local_config_migration = LocalConfigMigration.LocalConfigMigrationManager(self)
         self.identity = Identity.IdentityManager(self)
@@ -118,6 +136,7 @@ class SigmaEngine:
             "config": self.config,
             "database_config": self.database_config,
             "data_provider": self.data_provider,
+            "notion_provider": self.notion_provider,
             "local_config": self.local_config,
             "local_config_migration": self.local_config_migration,
             "identity": self.identity,

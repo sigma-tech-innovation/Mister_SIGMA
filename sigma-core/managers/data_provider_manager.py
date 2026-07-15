@@ -37,6 +37,34 @@ class DataProviderManager:
         key = str(name).strip().lower()
         return self.providers.get(key)
 
+    def pull(self, name, resource=None):
+        provider = self.get(name)
+
+        if provider is None:
+            raise KeyError(
+                f"Unknown provider: {name}"
+            )
+
+        return provider.pull(resource)
+
+    def push(
+        self,
+        name,
+        resource,
+        records,
+    ):
+        provider = self.get(name)
+
+        if provider is None:
+            raise KeyError(
+                f"Unknown provider: {name}"
+            )
+
+        return provider.push(
+            resource,
+            records,
+        )
+
     def exists(self, name):
         return self.get(name) is not None
 
