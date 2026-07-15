@@ -70,5 +70,54 @@ class NodeContractsTests(unittest.TestCase):
         )
 
 
+    def test_repository_empty(self):
+        self.assertEqual(
+            self.manager.repository.count(),
+            0,
+        )
+
+    def test_repository_create(self):
+        node = self.manager.new_node(
+            node_id="NODE-1",
+            role="core",
+        )
+
+        self.manager.repository.create(node)
+
+        self.assertTrue(
+            self.manager.repository.exists(
+                "NODE-1"
+            )
+        )
+
+    def test_repository_get(self):
+        node = self.manager.new_node(
+            node_id="NODE-2",
+            role="edge",
+        )
+
+        self.manager.repository.create(node)
+
+        self.assertEqual(
+            self.manager.repository.get("NODE-2").id,
+            "NODE-2",
+        )
+
+    def test_repository_delete(self):
+        node = self.manager.new_node(
+            node_id="NODE-3",
+            role="worker",
+        )
+
+        self.manager.repository.create(node)
+        self.manager.repository.delete("NODE-3")
+
+        self.assertFalse(
+            self.manager.repository.exists(
+                "NODE-3"
+            )
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

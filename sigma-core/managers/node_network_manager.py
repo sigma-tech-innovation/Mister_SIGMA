@@ -102,6 +102,42 @@ class Node:
         return asdict(self)
 
 
+
+class NodeRepository:
+
+    def __init__(self):
+        self._nodes = {}
+
+    def create(self, node):
+        if node.id in self._nodes:
+            return None
+
+        self._nodes[node.id] = node
+        return node
+
+    def get(self, node_id):
+        return self._nodes.get(node_id)
+
+    def exists(self, node_id):
+        return node_id in self._nodes
+
+    def replace(self, node):
+        if node.id not in self._nodes:
+            return None
+
+        self._nodes[node.id] = node
+        return node
+
+    def delete(self, node_id):
+        return self._nodes.pop(node_id, None)
+
+    def list(self):
+        return list(self._nodes.values())
+
+    def count(self):
+        return len(self._nodes)
+
+
 class NodeNetworkManager:
 
     STATES = {
@@ -121,6 +157,7 @@ class NodeNetworkManager:
 
     def __init__(self, engine):
         self.engine = engine
+        self.repository = NodeRepository()
 
     def now(self):
         if hasattr(self.engine, "now"):
