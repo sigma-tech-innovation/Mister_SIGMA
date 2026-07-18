@@ -497,5 +497,64 @@ class NodeContractsTests(unittest.TestCase):
             {"type": "fiber"},
         )
 
+
+    def test_new_zone(self):
+        zone = self.manager.new_zone(
+            name="Zone-A",
+            kind="logical",
+            metadata={"site": "Tangier"},
+        )
+
+        self.assertEqual(zone.name, "Zone-A")
+        self.assertEqual(zone.kind, "logical")
+        self.assertEqual(
+            zone.metadata,
+            {"site": "Tangier"},
+        )
+
+    def test_new_zone_copies_metadata(self):
+        metadata = {"country": "Morocco"}
+
+        zone = self.manager.new_zone(
+            name="Zone-B",
+            kind="geographic",
+            metadata=metadata,
+        )
+
+        metadata["country"] = "France"
+
+        self.assertEqual(
+            zone.metadata,
+            {"country": "Morocco"},
+        )
+
+
+    def test_new_region(self):
+        region = self.manager.new_region(
+            name="North",
+            metadata={"country": "Morocco"},
+        )
+
+        self.assertEqual(region.name, "North")
+        self.assertEqual(
+            region.metadata,
+            {"country": "Morocco"},
+        )
+
+    def test_new_region_copies_metadata(self):
+        metadata = {"continent": "Africa"}
+
+        region = self.manager.new_region(
+            name="North",
+            metadata=metadata,
+        )
+
+        metadata["continent"] = "Europe"
+
+        self.assertEqual(
+            region.metadata,
+            {"continent": "Africa"},
+        )
+
 if __name__ == "__main__":
     unittest.main()

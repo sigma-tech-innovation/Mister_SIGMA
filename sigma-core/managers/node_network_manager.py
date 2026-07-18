@@ -143,6 +143,27 @@ class NodeLink:
         return asdict(self)
 
 
+
+@dataclass(frozen=True)
+class Zone:
+    name: str
+    kind: str
+    metadata: dict = field(default_factory=dict)
+
+    def as_dict(self):
+        return asdict(self)
+
+
+
+@dataclass(frozen=True)
+class Region:
+    name: str
+    metadata: dict = field(default_factory=dict)
+
+    def as_dict(self):
+        return asdict(self)
+
+
 class NodeRepository:
 
     def __init__(self):
@@ -348,6 +369,38 @@ class NodeNetworkManager:
             latency=latency,
             priority=priority,
             status=status,
+            metadata=dict(metadata),
+        )
+
+
+
+    def new_zone(
+        self,
+        name,
+        kind,
+        metadata=None,
+    ):
+        if metadata is None:
+            metadata = {}
+
+        return Zone(
+            name=name,
+            kind=kind,
+            metadata=dict(metadata),
+        )
+
+
+
+    def new_region(
+        self,
+        name,
+        metadata=None,
+    ):
+        if metadata is None:
+            metadata = {}
+
+        return Region(
+            name=name,
             metadata=dict(metadata),
         )
 
