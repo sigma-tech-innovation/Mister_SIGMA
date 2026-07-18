@@ -164,6 +164,17 @@ class Region:
         return asdict(self)
 
 
+
+@dataclass(frozen=True)
+class TopologySnapshot:
+    nodes: list = field(default_factory=list)
+    links: list = field(default_factory=list)
+    metadata: dict = field(default_factory=dict)
+
+    def as_dict(self):
+        return asdict(self)
+
+
 class NodeRepository:
 
     def __init__(self):
@@ -403,6 +414,53 @@ class NodeNetworkManager:
             name=name,
             metadata=dict(metadata),
         )
+
+
+
+    def new_topology_snapshot(
+        self,
+        nodes=None,
+        links=None,
+        metadata=None,
+    ):
+        if nodes is None:
+            nodes = []
+
+        if links is None:
+            links = []
+
+        if metadata is None:
+            metadata = {}
+
+        return TopologySnapshot(
+            nodes=list(nodes),
+            links=list(links),
+            metadata=dict(metadata),
+        )
+
+
+
+    def find_by_zone(
+        self,
+        zone_name,
+    ):
+        return []
+
+
+
+    def find_by_region(
+        self,
+        region_name,
+    ):
+        return []
+
+
+
+    def find_by_capability(
+        self,
+        capability_name,
+    ):
+        return []
 
 
     def create_node(self, node):

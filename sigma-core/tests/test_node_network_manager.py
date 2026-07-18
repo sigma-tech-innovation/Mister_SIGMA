@@ -556,5 +556,57 @@ class NodeContractsTests(unittest.TestCase):
             {"continent": "Africa"},
         )
 
+
+    def test_new_topology_snapshot(self):
+        snapshot = self.manager.new_topology_snapshot(
+            nodes=["N1", "N2"],
+            links=["L1"],
+            metadata={"version": 1},
+        )
+
+        self.assertEqual(snapshot.nodes, ["N1", "N2"])
+        self.assertEqual(snapshot.links, ["L1"])
+        self.assertEqual(snapshot.metadata, {"version": 1})
+
+    def test_new_topology_snapshot_copies_data(self):
+        nodes = ["N1"]
+        links = ["L1"]
+        metadata = {"v": 1}
+
+        snapshot = self.manager.new_topology_snapshot(
+            nodes=nodes,
+            links=links,
+            metadata=metadata,
+        )
+
+        nodes.append("N2")
+        links.append("L2")
+        metadata["v"] = 2
+
+        self.assertEqual(snapshot.nodes, ["N1"])
+        self.assertEqual(snapshot.links, ["L1"])
+        self.assertEqual(snapshot.metadata, {"v": 1})
+
+
+    def test_find_by_zone(self):
+        self.assertEqual(
+            self.manager.find_by_zone("Production"),
+            [],
+        )
+
+
+    def test_find_by_region(self):
+        self.assertEqual(
+            self.manager.find_by_region("North"),
+            [],
+        )
+
+
+    def test_find_by_capability(self):
+        self.assertEqual(
+            self.manager.find_by_capability("mqtt"),
+            [],
+        )
+
 if __name__ == "__main__":
     unittest.main()
