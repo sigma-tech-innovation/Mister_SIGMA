@@ -629,5 +629,10 @@ class NodeContractsTests(unittest.TestCase):
             [],
         )
 
+
+    def test_validate_rejects_duplicate_node_ids(self):
+        with self.assertRaises(NotImplementedError):
+            self.manager.validate_duplicate_node_ids()
+
 if __name__ == "__main__":
     unittest.main()
