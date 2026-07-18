@@ -622,5 +622,12 @@ class NodeContractsTests(unittest.TestCase):
             [],
         )
 
+
+    def test_find_outgoing_links(self):
+        self.assertEqual(
+            self.manager.find_outgoing_links("node-1"),
+            [],
+        )
+
 if __name__ == "__main__":
     unittest.main()

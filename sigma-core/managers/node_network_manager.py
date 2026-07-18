@@ -479,6 +479,14 @@ class NodeNetworkManager:
         return []
 
 
+
+    def find_outgoing_links(
+        self,
+        node_id,
+    ):
+        return []
+
+
     def create_node(self, node):
         return self.repository.create(node)
 
