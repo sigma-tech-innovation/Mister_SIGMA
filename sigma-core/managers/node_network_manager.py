@@ -463,6 +463,22 @@ class NodeNetworkManager:
         return []
 
 
+
+    def find_by_endpoint(
+        self,
+        endpoint_name,
+    ):
+        return []
+
+
+
+    def find_incoming_links(
+        self,
+        node_id,
+    ):
+        return []
+
+
     def create_node(self, node):
         return self.repository.create(node)
 

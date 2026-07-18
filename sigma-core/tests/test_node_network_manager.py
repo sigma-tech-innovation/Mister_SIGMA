@@ -608,5 +608,19 @@ class NodeContractsTests(unittest.TestCase):
             [],
         )
 
+
+    def test_find_by_endpoint(self):
+        self.assertEqual(
+            self.manager.find_by_endpoint("api"),
+            [],
+        )
+
+
+    def test_find_incoming_links(self):
+        self.assertEqual(
+            self.manager.find_incoming_links("node-1"),
+            [],
+        )
+
 if __name__ == "__main__":
     unittest.main()
