@@ -501,6 +501,13 @@ class NodeNetworkManager:
         raise NotImplementedError
 
 
+
+    def validate_duplicate_link_ids(
+        self,
+    ):
+        raise NotImplementedError
+
+
     def create_node(self, node):
         return self.repository.create(node)
 
