@@ -128,6 +128,21 @@ class NodeCapability:
         return asdict(self)
 
 
+
+@dataclass(frozen=True)
+class NodeLink:
+    source_node: str
+    destination_node: str
+    logical_cost: int
+    latency: int
+    priority: int
+    status: str = "declared"
+    metadata: dict = field(default_factory=dict)
+
+    def as_dict(self):
+        return asdict(self)
+
+
 class NodeRepository:
 
     def __init__(self):
@@ -308,6 +323,31 @@ class NodeNetworkManager:
             name=name,
             version=version,
             state=state,
+            metadata=dict(metadata),
+        )
+
+
+
+    def new_link(
+        self,
+        source_node,
+        destination_node,
+        logical_cost,
+        latency,
+        priority,
+        status="declared",
+        metadata=None,
+    ):
+        if metadata is None:
+            metadata = {}
+
+        return NodeLink(
+            source_node=source_node,
+            destination_node=destination_node,
+            logical_cost=logical_cost,
+            latency=latency,
+            priority=priority,
+            status=status,
             metadata=dict(metadata),
         )
 

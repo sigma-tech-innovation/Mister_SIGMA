@@ -458,5 +458,44 @@ class NodeContractsTests(unittest.TestCase):
             {"encoding": "utf-8"},
         )
 
+
+    def test_new_link(self):
+        link = self.manager.new_link(
+            source_node="node-a",
+            destination_node="node-b",
+            logical_cost=10,
+            latency=5,
+            priority=100,
+            status="declared",
+            metadata={"medium": "ethernet"},
+        )
+
+        self.assertEqual(link.source_node, "node-a")
+        self.assertEqual(link.destination_node, "node-b")
+        self.assertEqual(link.logical_cost, 10)
+        self.assertEqual(link.latency, 5)
+        self.assertEqual(link.priority, 100)
+        self.assertEqual(link.status, "declared")
+        self.assertEqual(link.metadata, {"medium": "ethernet"})
+
+    def test_new_link_copies_metadata(self):
+        metadata = {"type": "fiber"}
+
+        link = self.manager.new_link(
+            source_node="A",
+            destination_node="B",
+            logical_cost=1,
+            latency=0,
+            priority=1,
+            metadata=metadata,
+        )
+
+        metadata["type"] = "wifi"
+
+        self.assertEqual(
+            link.metadata,
+            {"type": "fiber"},
+        )
+
 if __name__ == "__main__":
     unittest.main()
