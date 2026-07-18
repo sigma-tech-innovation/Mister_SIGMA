@@ -116,6 +116,18 @@ class NodeEndpoint:
         return asdict(self)
 
 
+
+@dataclass(frozen=True)
+class NodeCapability:
+    name: str
+    version: str
+    state: str = "declared"
+    metadata: dict = field(default_factory=dict)
+
+    def as_dict(self):
+        return asdict(self)
+
+
 class NodeRepository:
 
     def __init__(self):
@@ -280,6 +292,25 @@ class NodeNetworkManager:
             security=dict(security),
             status=status,
         )
+
+
+    def new_capability(
+        self,
+        name,
+        version,
+        state="declared",
+        metadata=None,
+    ):
+        if metadata is None:
+            metadata = {}
+
+        return NodeCapability(
+            name=name,
+            version=version,
+            state=state,
+            metadata=dict(metadata),
+        )
+
 
     def create_node(self, node):
         return self.repository.create(node)

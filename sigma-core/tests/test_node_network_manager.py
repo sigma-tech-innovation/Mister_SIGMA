@@ -424,5 +424,39 @@ class NodeContractsTests(unittest.TestCase):
         )
 
 
+
+    def test_new_capability(self):
+        capability = self.manager.new_capability(
+            name="telemetry",
+            version="1.0",
+            state="declared",
+            metadata={"format": "json"},
+        )
+
+        self.assertEqual(capability.name, "telemetry")
+        self.assertEqual(capability.version, "1.0")
+        self.assertEqual(capability.state, "declared")
+        self.assertEqual(
+            capability.metadata,
+            {"format": "json"},
+        )
+
+    def test_new_capability_copies_metadata(self):
+        metadata = {"encoding": "utf-8"}
+
+        capability = self.manager.new_capability(
+            name="logging",
+            version="2.1",
+            state="declared",
+            metadata=metadata,
+        )
+
+        metadata["encoding"] = "binary"
+
+        self.assertEqual(
+            capability.metadata,
+            {"encoding": "utf-8"},
+        )
+
 if __name__ == "__main__":
     unittest.main()
