@@ -1,17 +1,9 @@
-# Sigma CLI Changelog
+# 📝 Journal des changements Mister_SIGMA
 
-## v0.6.0
+Le journal canonique et actuel est :
 
-### Added
-- Modular CLI architecture
-- Dispatcher engine
-- Workspace manager
-- Registry engine
-- Registry validation
-- Node identity
-- Node registration
-- Global status command
-- Logger
-- Extended doctor
-- CLI help
+[`docs/CHANGELOG.md`](docs/CHANGELOG.md)
 
+L’ancien changelog limité à Sigma CLI v0.6.0 reste disponible dans l’historique
+Git. Ce fichier est conservé comme point d’entrée historique afin d’éviter une
+seconde source de vérité.

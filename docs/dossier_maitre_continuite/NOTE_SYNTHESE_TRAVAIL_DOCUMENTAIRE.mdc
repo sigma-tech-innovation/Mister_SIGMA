@@ -1,0 +1,1563 @@
+# Mister_SIGMA — Note de synthèse documentaire
+
+## Statut
+
+- Projet : Mister_SIGMA
+- Branche de référence : `feature/SIG-07-node-network-manager`
+- Phase réelle active : **Phase 7A — NodeNetworkManager**
+- Structure documentaire : **40 parties complètes**
+- Nature des phases 7B à 10 : **architecture cible et feuille de route**
+- Source de vérité opérationnelle : **le dépôt Git, le code et les tests**
+
+## Travail documentaire réalisé
+
+Un Dossier Maître de Continuité composé de 40 parties a été préparé afin de conserver :
+
+- la vision générale du projet ;
+- les règles de gouvernance ;
+- la discipline de développement ;
+- l’historique des décisions ;
+- l’état réel du projet ;
+- l’architecture des managers ;
+- la feuille de route réseau et distribuée ;
+- les conventions de maintenance ;
+- la procédure complète de reprise.
+
+La numérotation officielle des 40 parties doit rester fixe.
+
+## Managers documentés
+
+- ContextManager
+- IdentityManager
+- AuthorizationManager
+- OrganizationManager
+- WorkspaceManager V2
+- MembershipManager
+- AuthenticationManager
+- SessionManager
+- DeviceManager
+- NodeNetworkManager
+- ReplicationManager
+- ConflictManager
+- SynchronizationEngine
+
+## État réel du projet
+
+- Phases 1 à 6 : considérées comme terminées et intégrées.
+- Phase 7A : en cours.
+- Phases 7B à 7F : planifiées.
+- Phase 8 : future.
+- Phase 9 : future.
+- Phase 10 : future.
+
+Les parties relatives aux phases futures décrivent une cible documentaire et ne constituent pas une preuve d’implémentation.
+
+## Phase 7 — NodeNetworkManager
+
+### Phase 7A — Topologie
+
+Éléments prévus :
+
+- Node
+- NodeEndpoint
+- NodeCapability
+- NodeLink
+- zones et régions
+- snapshots de topologie
+- recherche par zone et capacité
+
+### Phase 7B — Découverte et heartbeat
+
+Cible future :
+
+- découverte des nœuds ;
+- heartbeat ;
+- TTL ;
+- expiration ;
+- états UNKNOWN, HEALTHY, DEGRADED, UNREACHABLE, DISABLED et REVOKED.
+
+### Phase 7C — Sécurité transport
+
+Cible future :
+
+- TLS ;
+- mTLS ;
+- certificats ;
+- identité cryptographique des nœuds ;
+- rotation des clés ;
+- révocation ;
+- politique de confiance.
+
+### Phase 7D — Routage réseau
+
+Cible future :
+
+- sélection déterministe des chemins ;
+- coûts ;
+- latence ;
+- priorité ;
+- fallback ;
+- multi-saut ;
+- détection des cycles ;
+- cache avec invalidation.
+
+### Phase 7E — Tests réseau
+
+Cible future :
+
+- tests de topologie ;
+- tests de heartbeat ;
+- tests TLS/mTLS ;
+- tests de routage ;
+- tests de partitions ;
+- tests de reprise ;
+- tests de résilience.
+
+### Phase 7F — Validation finale
+
+La phase 07 ne sera considérée comme terminée qu’après :
+
+- compilation réussie ;
+- tests ciblés au vert ;
+- suite complète au vert ;
+- Doctor : OK ;
+- Health : OK ;
+- Sync Validate : Prêt = True ;
+- `git diff --check` sans erreur ;
+- revue du diff ;
+- commit atomique ;
+- fusion validée.
+
+## Phases distribuées futures
+
+### Phase 8 — ReplicationManager
+
+Objectifs :
+
+- réplication idempotente ;
+- lots ;
+- curseurs ;
+- accusés de réception ;
+- push, pull ou mode hybride ;
+- reprise après interruption ;
+- détection des doublons.
+
+### Phase 9 — ConflictManager
+
+Objectifs :
+
+- détection des versions concurrentes ;
+- classification des conflits ;
+- conservation des versions candidates ;
+- résolution déterministe ;
+- résolution automatique ou manuelle ;
+- audit complet.
+
+### Phase 10 — SynchronizationEngine
+
+Objectifs :
+
+- orchestration de la réplication ;
+- synchronisation bidirectionnelle ;
+- fonctionnement hors ligne ;
+- checkpoints ;
+- résolution des conflits ;
+- convergence ;
+- rapports de synchronisation.
+
+## Architecture cible
+
+```text
+CLI / API
+    |
+SigmaEngine
+    |
+Managers métier
+    |
+Repositories
+    |
+Memory / Files / PostgreSQL
+    |
+Docker / Multi-node
+## Continuité du développement
+
+Le Dossier Maître de Continuité décrit l’architecture cible complète de Mister_SIGMA.
+
+Le développement réel continue depuis l’état actuel du dépôt, notamment les menus après le splashscreen et la phase active du NodeNetworkManager.
+
+Les parties futures du dossier servent de feuille de route. Elles ne doivent jamais être interprétées comme une preuve que les fonctions correspondantes sont déjà implémentées.
+
+## État réel de reprise
+
+Au moment de cette note, le développement doit reprendre depuis l’état réel observé dans le dépôt :
+
+- menus après le splashscreen en cours de développement ;
+- branche active : `feature/SIG-07-node-network-manager` ;
+- phase active : **Phase 7A — NodeNetworkManager** ;
+- sous-tâche de référence : **7A.3b** ;
+- point d’inspection actuel : `sigma-core/managers/node_network_manager.py` ;
+- insertion prévue entre `reconnect()` et `validate()` ;
+- toute reprise doit commencer par une inspection du code réel avant modification.
+
+La documentation ne remplace pas la vérification du dépôt.
+
+## Vision globale du développement futur
+
+Mister_SIGMA doit évoluer progressivement vers une plateforme centrale capable de piloter, configurer, superviser et connecter plusieurs applications, services, appareils et environnements techniques.
+
+Les grandes familles d’évolution prévues sont :
+
+### 1. Interface utilisateur
+
+- splashscreen ;
+- menus principaux ;
+- sous-menus ;
+- navigation CLI ;
+- navigation interactive ;
+- affichage des états ;
+- affichage des erreurs ;
+- raccourcis ;
+- aide intégrée ;
+- confirmation des actions sensibles ;
+- profils utilisateur ;
+- préférences d’affichage ;
+- thèmes ;
+- mode administrateur ;
+- mode opérateur ;
+- mode diagnostic.
+
+### 2. Gestion des configurations
+
+Un système central de configuration devra permettre de gérer :
+
+- les paramètres généraux de Mister_SIGMA ;
+- les paramètres par organisation ;
+- les paramètres par workspace ;
+- les paramètres par appareil ;
+- les paramètres par intégration ;
+- les paramètres par environnement ;
+- les valeurs par défaut ;
+- les surcharges locales ;
+- les profils de production, test et développement ;
+- la validation des schémas ;
+- la migration des anciennes configurations ;
+- la sauvegarde et la restauration.
+
+Les configurations devront être versionnées, validées et documentées.
+
+## Système de plugins et intégrations
+
+Les intégrations futures devront être ajoutées sous forme de modules ou plugins indépendants.
+
+Chaque plugin devra idéalement contenir :
+
+```text
+manifest.json
+config.schema.json
+client.py
+service.py
+exceptions.py
+README.md
+tests/
+
+Colle ce bloc complet dans nano avant de le fermer :
+
+# 🚀 Continuité du développement de Mister_SIGMA
+
+## 📌 Vision générale
+
+Le Dossier Maître de Continuité décrit l’architecture cible complète de Mister_SIGMA.
+
+Le développement réel continue depuis l’état actuel du dépôt, notamment :
+
+- les menus après le splashscreen ;
+- la navigation CLI ;
+- la phase active du `NodeNetworkManager` ;
+- la sous-tâche réelle en cours dans le code.
+
+Les parties futures du dossier servent de feuille de route.
+
+Elles ne doivent jamais être considérées comme une preuve que les fonctionnalités correspondantes sont déjà implémentées.
+
+---
+
+## 🧭 État réel de reprise
+
+Au moment de cette note, le développement doit reprendre depuis l’état réellement observé dans le dépôt :
+
+- **Projet :** Mister_SIGMA
+- **Branche active :** `feature/SIG-07-node-network-manager`
+- **Interface en cours :** menus après le splashscreen
+- **Phase active :** Phase 7A — NodeNetworkManager
+- **Sous-tâche de référence :** 7A.3b
+- **Fichier inspecté :** `sigma-core/managers/node_network_manager.py`
+- **Point d’insertion prévu :** entre `reconnect()` et `validate()`
+- **Règle obligatoire :** inspecter le code réel avant toute modification
+
+La documentation ne remplace jamais la vérification du dépôt, du code et des tests.
+
+---
+
+# 🌍 Vision globale du développement futur
+
+Mister_SIGMA doit évoluer progressivement vers une plateforme centrale capable de :
+
+- piloter plusieurs applications ;
+- gérer plusieurs configurations ;
+- superviser des services ;
+- connecter des appareils ;
+- administrer des environnements locaux et distants ;
+- centraliser les diagnostics ;
+- gérer les utilisateurs et les permissions ;
+- fonctionner sur Termux, VPS et Docker ;
+- fonctionner en mode CLI, API et multi-nœud ;
+- rester utilisable hors ligne lorsque cela est possible.
+
+---
+
+# 🖥️ 1. Interface utilisateur
+
+L’interface future pourra comprendre :
+
+- splashscreen ;
+- menus principaux ;
+- sous-menus ;
+- navigation CLI ;
+- navigation interactive ;
+- tableau de bord ;
+- affichage des états ;
+- affichage des erreurs ;
+- raccourcis ;
+- aide intégrée ;
+- confirmations pour les actions sensibles ;
+- profils utilisateur ;
+- préférences d’affichage ;
+- thèmes ;
+- mode administrateur ;
+- mode opérateur ;
+- mode diagnostic.
+
+L’interface doit rester séparée de la logique métier.
+
+Les menus ne doivent pas accéder directement aux repositories ou aux services externes.
+
+---
+
+# ⚙️ 2. Gestion centralisée des configurations
+
+Un système central de configuration devra permettre de gérer :
+
+- les paramètres généraux de Mister_SIGMA ;
+- les paramètres par organisation ;
+- les paramètres par workspace ;
+- les paramètres par utilisateur ;
+- les paramètres par appareil ;
+- les paramètres par intégration ;
+- les paramètres par environnement ;
+- les valeurs par défaut ;
+- les surcharges locales ;
+- les profils de développement ;
+- les profils de test ;
+- les profils de production ;
+- la validation des schémas ;
+- la migration des anciennes configurations ;
+- la sauvegarde ;
+- la restauration ;
+- l’historique des modifications.
+
+Les configurations devront être :
+
+- versionnées ;
+- validées ;
+- documentées ;
+- isolées par périmètre ;
+- compatibles avec les migrations ;
+- protégées contre les valeurs sensibles exposées.
+
+---
+
+# 🧩 3. Système de plugins et d’intégrations
+
+Les intégrations futures devront être ajoutées sous forme de modules ou de plugins indépendants.
+
+## 📁 Structure possible
+
+```text
+sigma-plugins/
+├── home_assistant/
+├── esphome/
+├── n8n/
+├── notion/
+├── vps_sigma/
+├── vscode/
+├── acode/
+├── healthclora/
+└── autres_integrations/
+
+📦 Contenu recommandé pour chaque plugin
+
+plugin_name/
+├── manifest.json
+├── config.schema.json
+├── client.py
+├── service.py
+├── exceptions.py
+├── health.py
+├── README.md
+├── CONFIGURATION.md
+├── SECURITY.md
+├── TROUBLESHOOTING.md
+├── CHANGELOG.md
+└── tests/
+
+✅ Chaque intégration devra disposer de
+
+sa propre configuration ;
+
+son schéma de validation ;
+
+son client technique ;
+
+son service métier ;
+
+ses exceptions ;
+
+ses logs ;
+
+sa documentation ;
+
+ses tests ;
+
+ses règles de sécurité ;
+
+son état de santé ;
+
+sa procédure de connexion ;
+
+sa procédure de déconnexion ;
+
+son mécanisme d’activation ;
+
+son mécanisme de désactivation ;
+
+ses limites clairement documentées.
+
+
+
+---
+
+🏠 4. Intégration Home Assistant
+
+Fonctions possibles
+
+connexion à l’API Home Assistant ;
+
+authentification par jeton ;
+
+lecture des entités ;
+
+lecture des états ;
+
+affichage des appareils ;
+
+appel de services ;
+
+activation de scènes ;
+
+gestion des automatisations ;
+
+déclenchement d’actions ;
+
+surveillance de disponibilité ;
+
+affichage des erreurs ;
+
+journalisation des actions ;
+
+intégration avec les menus de Mister_SIGMA ;
+
+contrôle des permissions ;
+
+filtrage par organisation ou workspace.
+
+
+Points de vigilance
+
+ne jamais enregistrer le jeton dans Git ;
+
+vérifier TLS lorsque l’instance utilise HTTPS ;
+
+limiter les actions dangereuses ;
+
+demander une confirmation pour les opérations sensibles ;
+
+ne pas afficher de données privées dans les logs.
+
+
+
+---
+
+🔌 5. Intégration ESPHome
+
+Fonctions possibles
+
+gestion des appareils ESP ;
+
+détection des nœuds ;
+
+lecture des capteurs ;
+
+contrôle des actionneurs ;
+
+consultation des logs ;
+
+mise à jour des configurations ;
+
+validation YAML ;
+
+compilation des firmwares ;
+
+déploiement OTA ;
+
+affichage de l’état en ligne ou hors ligne ;
+
+lecture des versions ;
+
+gestion des erreurs de compilation ;
+
+intégration avec Home Assistant ;
+
+sauvegarde des configurations ;
+
+restauration d’une configuration précédente.
+
+
+Points de vigilance
+
+protéger les mots de passe OTA ;
+
+protéger les clés API ;
+
+vérifier l’appareil cible avant déploiement ;
+
+éviter les mises à jour simultanées non contrôlées ;
+
+conserver un mécanisme de retour arrière.
+
+
+
+---
+
+🔄 6. Intégration n8n
+
+Fonctions possibles
+
+connexion à l’API n8n ;
+
+affichage des workflows ;
+
+activation des workflows ;
+
+désactivation des workflows ;
+
+lancement manuel ;
+
+lecture des exécutions ;
+
+surveillance des erreurs ;
+
+affichage des webhooks ;
+
+import de workflows ;
+
+export de workflows ;
+
+gestion des environnements ;
+
+suivi des statuts ;
+
+gestion des versions ;
+
+intégration avec les événements Mister_SIGMA ;
+
+déclenchement d’actions depuis les menus.
+
+
+Points de vigilance
+
+protéger les clés API ;
+
+ne pas afficher les credentials n8n ;
+
+vérifier les permissions avant lancement ;
+
+tracer les exécutions manuelles ;
+
+empêcher les boucles de déclenchement.
+
+
+
+---
+
+📝 7. Intégration Notion
+
+Fonctions possibles
+
+connexion à l’API Notion ;
+
+lecture des bases de données ;
+
+création de pages ;
+
+mise à jour de pages ;
+
+synchronisation de documentation ;
+
+gestion des notes de projet ;
+
+suivi des tâches ;
+
+gestion de la feuille de route ;
+
+export des rapports ;
+
+liaison avec les phases du projet ;
+
+archivage des décisions ;
+
+création de comptes rendus ;
+
+génération de rapports de validation ;
+
+synchronisation des notes de continuité.
+
+
+Points de vigilance
+
+limiter les pages accessibles ;
+
+protéger le jeton d’intégration ;
+
+éviter l’écrasement non contrôlé ;
+
+conserver un historique des modifications ;
+
+distinguer les données locales des données publiées.
+
+
+
+---
+
+🖧 8. Intégration VPS Sigma
+
+Fonctions possibles
+
+connexion SSH sécurisée ;
+
+affichage de l’état du serveur ;
+
+surveillance CPU ;
+
+surveillance mémoire ;
+
+surveillance disque ;
+
+état des services ;
+
+gestion Docker ;
+
+état des conteneurs ;
+
+lecture des logs ;
+
+redémarrage contrôlé ;
+
+arrêt contrôlé ;
+
+déploiement ;
+
+sauvegarde ;
+
+restauration ;
+
+surveillance réseau ;
+
+gestion des alertes ;
+
+rotation des clés ;
+
+contrôle des accès ;
+
+vérification des certificats ;
+
+mise à jour des services ;
+
+diagnostic distant.
+
+
+Points de vigilance
+
+utiliser des clés SSH sécurisées ;
+
+limiter les commandes autorisées ;
+
+demander confirmation avant redémarrage ou arrêt ;
+
+tracer les opérations administratives ;
+
+ne jamais exposer une clé privée ;
+
+appliquer le principe du moindre privilège.
+
+
+
+---
+
+💻 9. Intégration VS Code
+
+Fonctions possibles
+
+ouverture du projet ;
+
+génération des fichiers de configuration ;
+
+génération de .vscode/settings.json ;
+
+gestion des tâches ;
+
+lancement des tests ;
+
+lancement du lint ;
+
+lancement de la compilation ;
+
+accès aux logs ;
+
+navigation dans les dossiers ;
+
+intégration avec le serveur de développement ;
+
+synchronisation des paramètres de workspace ;
+
+génération de commandes de debug ;
+
+ouverture ciblée d’un fichier ;
+
+préparation de l’environnement développeur.
+
+
+Points de vigilance
+
+ne pas écraser les paramètres existants sans confirmation ;
+
+distinguer les fichiers générés des fichiers manuels ;
+
+éviter les chemins absolus non portables ;
+
+conserver la compatibilité Termux, Linux et VPS.
+
+
+
+---
+
+📱 10. Intégration Acode
+
+Fonctions possibles
+
+accès rapide aux fichiers du projet ;
+
+configuration de raccourcis ;
+
+édition mobile ;
+
+synchronisation avec Git ;
+
+lancement de scripts Termux ;
+
+consultation des logs ;
+
+ouverture de fichiers ciblés ;
+
+navigation dans le projet ;
+
+intégration avec les commandes de Mister_SIGMA ;
+
+accès rapide aux fichiers de configuration ;
+
+affichage des rapports ;
+
+ouverture de la documentation active.
+
+
+Points de vigilance
+
+éviter les modifications concurrentes ;
+
+vérifier le working tree avant édition ;
+
+conserver des sauvegardes ;
+
+éviter l’exposition des secrets dans l’éditeur ;
+
+documenter les scripts lancés depuis Acode.
+
+
+
+---
+
+🩺 11. Intégration HealthClora
+
+Les fonctions exactes devront être précisées selon la nature réelle de l’application HealthClora.
+
+Fonctions possibles
+
+connexion à son API ;
+
+gestion des profils ;
+
+lecture des données disponibles ;
+
+synchronisation contrôlée ;
+
+affichage des indicateurs ;
+
+gestion des alertes ;
+
+export des rapports ;
+
+gestion stricte des autorisations ;
+
+chiffrement des données ;
+
+journalisation sans données sensibles ;
+
+historique des synchronisations ;
+
+gestion du consentement ;
+
+contrôle des accès par rôle ;
+
+suppression ou anonymisation contrôlée.
+
+
+🔐 Exigences renforcées
+
+Toute intégration liée à des données de santé devra appliquer :
+
+confidentialité renforcée ;
+
+consentement explicite ;
+
+chiffrement au repos ;
+
+chiffrement en transit ;
+
+contrôle d’accès strict ;
+
+audit des consultations ;
+
+minimisation des données ;
+
+durée de conservation définie ;
+
+suppression contrôlée ;
+
+absence totale de données sensibles dans les logs ;
+
+conformité avec la réglementation applicable.
+
+
+
+---
+
+🔐 12. Gestion des secrets
+
+Les secrets ne devront jamais être stockés directement dans le dépôt.
+
+Exemples de secrets concernés
+
+mots de passe ;
+
+clés API ;
+
+jetons d’accès ;
+
+jetons OAuth ;
+
+clés privées ;
+
+certificats privés ;
+
+identifiants SSH ;
+
+chaînes de connexion ;
+
+secrets de webhooks ;
+
+mots de passe OTA ;
+
+clés Home Assistant ;
+
+clés ESPHome ;
+
+identifiants VPS.
+
+
+Méthodes recommandées
+
+Les secrets devront être fournis par :
+
+variables d’environnement ;
+
+fichiers locaux exclus par Git ;
+
+gestionnaire de secrets ;
+
+configuration chiffrée ;
+
+stockage sécurisé du système ;
+
+coffre-fort de secrets sur VPS ;
+
+variables protégées de CI/CD.
+
+
+Exemple .gitignore
+
+.env
+.env.*
+secrets/
+credentials/
+*.secret
+*.key
+*.pem
+*.p12
+*.pfx
+*.token
+
+Les exemples de configuration devront contenir uniquement des valeurs fictives.
+
+Exemple :
+
+HOME_ASSISTANT_URL=https://example.local
+HOME_ASSISTANT_TOKEN=CHANGE_ME
+N8N_API_KEY=CHANGE_ME
+NOTION_TOKEN=CHANGE_ME
+VPS_SIGMA_HOST=example.com
+
+
+---
+
+🧠 13. PluginManager ou IntegrationManager
+
+Une future couche commune pourra gérer toutes les intégrations.
+
+Responsabilités possibles
+
+découvrir les plugins ;
+
+charger les manifests ;
+
+vérifier les versions ;
+
+valider les configurations ;
+
+activer une intégration ;
+
+désactiver une intégration ;
+
+vérifier les dépendances ;
+
+exposer l’état de santé ;
+
+uniformiser les erreurs ;
+
+gérer les permissions ;
+
+gérer les versions ;
+
+fournir des diagnostics ;
+
+isoler un plugin défaillant ;
+
+empêcher un plugin de bloquer tout le moteur ;
+
+gérer les timeouts ;
+
+gérer les tentatives ;
+
+charger les clients ;
+
+enregistrer les événements ;
+
+produire des rapports.
+
+
+Le nom final devra être choisi après inspection de l’architecture existante.
+
+Aucune nouvelle classe ne doit être ajoutée sans vérifier qu’un mécanisme équivalent n’existe pas déjà.
+
+
+---
+
+🧭 14. Menus futurs
+
+Une arborescence possible des menus est :
+
+Mister_SIGMA
+├── 📊 Tableau de bord
+├── 📁 Projet
+│   ├── État
+│   ├── Phase active
+│   ├── Tests
+│   ├── Git
+│   └── Documentation
+├── 🧩 Intégrations
+│   ├── Home Assistant
+│   ├── ESPHome
+│   ├── n8n
+│   ├── Notion
+│   ├── VPS Sigma
+│   ├── VS Code
+│   ├── Acode
+│   └── HealthClora
+├── 🌐 Réseau
+│   ├── Nœuds
+│   ├── Topologie
+│   ├── État de santé
+│   ├── Routage
+│   └── Synchronisation
+├── ⚙️ Configuration
+│   ├── Générale
+│   ├── Organisations
+│   ├── Workspaces
+│   ├── Appareils
+│   ├── Plugins
+│   └── Secrets
+├── 🩺 Diagnostic
+│   ├── Doctor
+│   ├── Health
+│   ├── Sync Validate
+│   ├── Logs
+│   └── Rapports
+└── 🔐 Administration
+    ├── Utilisateurs
+    ├── Rôles
+    ├── Permissions
+    ├── Sessions
+    └── Sécurité
+
+Cette arborescence est une cible à adapter au code réel.
+
+Elle ne doit pas être implémentée entièrement en une seule tâche.
+
+
+---
+
+🪜 15. Priorité recommandée
+
+L’ordre recommandé pour continuer est :
+
+1. stabiliser le splashscreen ;
+
+
+2. stabiliser les menus ;
+
+
+3. documenter l’arborescence réelle ;
+
+
+4. vérifier le code actuel du NodeNetworkManager ;
+
+
+5. terminer la tâche active 7A.3b ;
+
+
+6. exécuter les tests ciblés ;
+
+
+7. terminer la phase 7A ;
+
+
+8. valider la phase 7A ;
+
+
+9. ajouter une abstraction commune de configuration ;
+
+
+10. définir un PluginManager ou IntegrationManager ;
+
+
+11. intégrer une seule application pilote ;
+
+
+12. ajouter ses tests ;
+
+
+13. documenter son fonctionnement ;
+
+
+14. valider complètement ;
+
+
+15. ajouter les autres intégrations progressivement.
+
+
+
+Il ne faut pas commencer toutes les intégrations en parallèle.
+
+
+---
+
+🥇 16. Première intégration recommandée
+
+La première intégration doit être choisie selon le besoin réel et l’état du dépôt.
+
+Ordre possible
+
+1. Home Assistant ;
+
+
+2. ESPHome ;
+
+
+3. n8n ;
+
+
+4. VPS Sigma ;
+
+
+5. Notion ;
+
+
+6. VS Code ;
+
+
+7. Acode ;
+
+
+8. HealthClora.
+
+
+
+Home Assistant ou ESPHome peuvent servir de première intégration pilote, car le projet contient déjà des dossiers liés à ces technologies.
+
+Avant de commencer, il faudra inspecter :
+
+home_assistant/
+esphome/
+sigma-plugins/
+sigma-config.json
+sigma-core/
+sigma-cli/
+sigma-api/
+
+
+---
+
+🧾 17. Configuration commune des intégrations
+
+Chaque configuration pourra contenir :
+
+enabled
+name
+plugin_id
+plugin_version
+base_url
+authentication_type
+timeout
+retry_count
+verify_tls
+healthcheck_enabled
+log_level
+organization_id
+workspace_id
+device_id
+environment
+metadata
+
+Les champs réels devront être définis selon chaque service.
+
+Exemple conceptuel
+
+{
+  "enabled": true,
+  "name": "Home Assistant principal",
+  "plugin_id": "home_assistant",
+  "base_url": "https://example.local",
+  "authentication_type": "token",
+  "timeout": 15,
+  "retry_count": 3,
+  "verify_tls": true,
+  "healthcheck_enabled": true,
+  "log_level": "INFO",
+  "organization_id": "org-example",
+  "workspace_id": "workspace-example",
+  "metadata": {}
+}
+
+Aucun secret réel ne doit apparaître dans cet exemple.
+
+
+---
+
+🚦 18. États communs possibles
+
+Les intégrations pourront exposer des états uniformes :
+
+UNKNOWN
+CONFIGURED
+CONNECTING
+CONNECTED
+HEALTHY
+DEGRADED
+DISCONNECTED
+DISABLED
+ERROR
+REVOKED
+
+Les transitions d’état devront être :
+
+explicites ;
+
+déterministes ;
+
+testables ;
+
+journalisées ;
+
+compatibles avec les diagnostics.
+
+
+
+---
+
+🧪 19. Tests futurs pour les intégrations
+
+Chaque intégration devra tester :
+
+configuration valide ;
+
+configuration invalide ;
+
+secret absent ;
+
+secret invalide ;
+
+authentification refusée ;
+
+service indisponible ;
+
+timeout ;
+
+réponse invalide ;
+
+réponse incomplète ;
+
+reprise après erreur ;
+
+activation ;
+
+désactivation ;
+
+isolation entre organisations ;
+
+isolation entre workspaces ;
+
+permissions insuffisantes ;
+
+absence de secret dans les logs ;
+
+compatibilité de version ;
+
+non-régression globale.
+
+
+Les tests ne doivent pas dépendre obligatoirement d’Internet.
+
+Les services externes devront être simulés ou mockés lorsque cela est possible.
+
+
+---
+
+📊 20. Observabilité future
+
+Mister_SIGMA pourra afficher :
+
+état de chaque intégration ;
+
+dernière connexion réussie ;
+
+dernière tentative ;
+
+dernière erreur ;
+
+durée de réponse ;
+
+nombre d’échecs ;
+
+nombre de réussites ;
+
+version du service distant ;
+
+état des permissions ;
+
+état des certificats ;
+
+date d’expiration des certificats ;
+
+historique limité des opérations ;
+
+alertes actives ;
+
+état de la configuration ;
+
+état du plugin ;
+
+statut de synchronisation.
+
+
+Les diagnostics ne doivent jamais contenir de secrets.
+
+
+---
+
+💾 21. Sauvegarde et restauration
+
+Les futures configurations devront prévoir :
+
+export des paramètres ;
+
+import contrôlé ;
+
+validation avant restauration ;
+
+sauvegarde chiffrée des données sensibles ;
+
+version du format ;
+
+compatibilité ascendante ;
+
+journal de restauration ;
+
+possibilité de retour arrière ;
+
+vérification de l’intégrité ;
+
+restauration ciblée par intégration ;
+
+sauvegarde avant migration ;
+
+rapport final.
+
+
+Une restauration ne doit jamais écraser silencieusement une configuration valide.
+
+
+---
+
+🚀 22. Déploiement futur
+
+Mister_SIGMA pourra évoluer vers plusieurs modes :
+
+exécution locale dans Termux ;
+
+exécution sur VPS ;
+
+exécution dans Docker ;
+
+mode API ;
+
+mode CLI ;
+
+mode multi-nœud ;
+
+mode hors ligne ;
+
+mode administrateur distant ;
+
+mode développement ;
+
+mode test ;
+
+mode production.
+
+
+Chaque mode devra utiliser le même moteur métier.
+
+La CLI, l’API et les intégrations ne doivent pas dupliquer les règles métier.
+
+
+---
+
+🛡️ 23. Sécurité future
+
+Les évolutions devront conserver :
+
+authentification explicite ;
+
+autorisation restrictive ;
+
+isolation multi-tenant ;
+
+contrôle des plugins ;
+
+validation stricte des entrées ;
+
+chiffrement des échanges ;
+
+rotation des secrets ;
+
+révocation ;
+
+audit ;
+
+absence de secrets dans les logs ;
+
+absence d’accès implicite ;
+
+principe du moindre privilège ;
+
+confirmation des actions destructives ;
+
+journalisation des actions administratives ;
+
+contrôle de l’identité du nœud ;
+
+protection des données sensibles.
+
+
+
+---
+
+📚 24. Documentation future
+
+Pour chaque nouvelle intégration, ajouter :
+
+README.md
+CONFIGURATION.md
+SECURITY.md
+TROUBLESHOOTING.md
+CHANGELOG.md
+tests/
+
+La documentation devra préciser :
+
+ce qui est réellement implémenté ;
+
+ce qui est encore prévu ;
+
+les prérequis ;
+
+la configuration ;
+
+les permissions ;
+
+les limites ;
+
+les tests disponibles ;
+
+la procédure de connexion ;
+
+la procédure de déconnexion ;
+
+la procédure de dépannage ;
+
+les erreurs connues ;
+
+les versions compatibles ;
+
+les règles de sécurité.
+
+
+
+---
+
+📝 25. Règle de continuité
+
+À chaque fin de session importante, mettre à jour cette note avec :
+
+la date ;
+
+la branche ;
+
+le dernier commit ;
+
+la phase active ;
+
+la sous-tâche active ;
+
+la tâche terminée ;
+
+les fichiers modifiés ;
+
+les tests exécutés ;
+
+les résultats ;
+
+les diagnostics ;
+
+la prochaine tâche unique ;
+
+les risques connus ;
+
+les limites connues ;
+
+les décisions importantes.
+
+
+Modèle de mise à jour
+
+Date :
+Branche :
+Dernier commit :
+Phase :
+Sous-tâche :
+Travail terminé :
+Fichiers modifiés :
+Tests exécutés :
+Résultats :
+Doctor :
+Health :
+Sync Validate :
+Risques :
+Prochaine tâche unique :
+
+
+---
+
+⚠️ 26. Avertissement
+
+Le Dossier Maître contient une vision complète et ambitieuse.
+
+Le développement doit cependant rester progressif :
+
+une seule tâche ;
+
+une seule intégration pilote ;
+
+une validation complète ;
+
+un commit atomique ;
+
+puis seulement la tâche suivante.
+
+
+La priorité immédiate reste le code réel actuellement ouvert dans le dépôt.
+
+Il ne faut pas interrompre la phase active pour commencer toutes les intégrations futures.
+
+
+---
+
+✅ 27. Principe final
+
+Mister_SIGMA pourra intégrer Home Assistant, ESPHome, n8n, Notion, VPS Sigma, VS Code, Acode, HealthClora et d’autres services.
+
+Ces intégrations devront être ajoutées progressivement, sous forme de composants indépendants, configurables, sécurisés, testés et documentés.
+
+Le Dossier Maître représente la vision et la mémoire technique.
+
+Le dépôt Git, le code, les tests et les diagnostics représentent la vérité opérationnelle.
+
+

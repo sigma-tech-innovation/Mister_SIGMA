@@ -1,0 +1,34 @@
+SIGMA FORCE - MASTER BACKLOG v1.0 (OFFICIAL)
+
+STATUS - Foundation: COMPLETED - Architecture: LOCKED - Methodology:
+LOCKED - Development: READY
+
+WORKFLOW IDEA -> ANALYZE -> DESIGN -> BUILD -> TEST -> VALIDATE ->
+DOCUMENT -> SYNC -> RELEASE -> MONITOR -> IMPROVE
+
+DEVELOPMENT RULES 1. One TASK at a time. 2. Never start TASK N+1 before
+TASK N is validated. 3. One source of truth. 4. Reuse before creating.
+5. Documentation is mandatory. 6. Automate repetitive work with Platinum
+Scripts. 7. Code must be modular and reusable. 8. No architecture
+changes during an active TASK. 9. DB00 remains the Master Index. 10.
+SIGMA FORCE is the governing reference.
+
+EPICS EPIC-01 MISTER SIGMA ESP32 EPIC-02 SIGMA Desktop EPIC-03 SIGMA
+Core EPIC-04 PostgreSQL EPIC-05 Notion EPIC-06 PowerShell Platinum
+EPIC-07 WSL EPIC-08 Linux EPIC-09 Android EPIC-10 Termux EPIC-11
+Raspberry Pi EPIC-12 Cloud / VPS EPIC-13 Artificial Intelligence EPIC-14
+Laboratory EPIC-15 Documentation EPIC-16 Testing & QA EPIC-17 Deployment
+EPIC-18 Monitoring EPIC-19 Cybersecurity EPIC-20 Business &
+Administration
+
+OBJECT CATEGORIES ASSET OBJECT ACTION PLATFORM AUTOMATION DATA PROJECT
+
+TASK LIFECYCLE Analyze Develop Test Validate Document Synchronize Close
+
+VALIDATION Only “OK” closes a TASK.
+
+LONG-TERM GOAL Reusable engineering platform for: ESP32, Windows, Linux,
+WSL, Android, Termux, Raspberry Pi, Cloud/VPS Integrated with DB00-DB15,
+PostgreSQL, Notion, Platinum Scripts, AI, Documentation and Monitoring.
+
+MOTTO Write once. Reuse everywhere.
