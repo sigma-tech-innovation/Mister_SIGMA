@@ -102,6 +102,19 @@ class Node:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class NodeEndpoint:
+    node_id: str
+    protocol: str
+    host: str
+    port: int
+    priority: int
+    security: dict = field(default_factory=dict)
+    status: str = "declared"
+
+    def as_dict(self):
+        return asdict(self)
+
 
 class NodeRepository:
 
@@ -220,6 +233,53 @@ class NodeNetworkManager:
             metadata=dict(metadata or {}),
         )
 
+
+    def new_endpoint(
+        self,
+        *,
+        node_id,
+        protocol,
+        host,
+        port,
+        priority,
+        security,
+        status,
+    ):
+        node_id = str(node_id).strip()
+        protocol = str(protocol).strip().lower()
+        host = str(host).strip()
+        status = str(status).strip().lower()
+
+        if not node_id:
+            raise InvalidNodeError("Invalid node_id")
+
+        if not protocol:
+            raise InvalidNodeError("Invalid protocol")
+
+        if not host:
+            raise InvalidNodeError("Invalid host")
+
+        if not status:
+            raise InvalidNodeError("Invalid status")
+
+        if type(port) is not int or not (1 <= port <= 65535):
+            raise InvalidNodeError("Invalid port")
+
+        if type(priority) is not int or priority < 0:
+            raise InvalidNodeError("Invalid priority")
+
+        if not isinstance(security, dict):
+            raise InvalidNodeError("Invalid security")
+
+        return NodeEndpoint(
+            node_id=node_id,
+            protocol=protocol,
+            host=host,
+            port=port,
+            priority=priority,
+            security=dict(security),
+            status=status,
+        )
 
     def create_node(self, node):
         return self.repository.create(node)

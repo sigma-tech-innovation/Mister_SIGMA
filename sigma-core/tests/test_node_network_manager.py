@@ -260,5 +260,169 @@ class NodeContractsTests(unittest.TestCase):
 
 
 
+    def test_new_endpoint(self):
+        endpoint = self.manager.new_endpoint(
+            node_id="NODE-E",
+            protocol="https",
+            host="node-e.local",
+            port=8443,
+            priority=10,
+            security={"tls": True},
+            status="declared",
+        )
+
+        self.assertEqual(
+            endpoint.as_dict(),
+            {
+                "node_id": "NODE-E",
+                "protocol": "https",
+                "host": "node-e.local",
+                "port": 8443,
+                "priority": 10,
+                "security": {"tls": True},
+                "status": "declared",
+            },
+        )
+
+    def test_new_endpoint_normalizes_declarative_fields(self):
+        endpoint = self.manager.new_endpoint(
+            node_id=" NODE-E ",
+            protocol=" HTTPS ",
+            host=" node-e.local ",
+            port=443,
+            priority=0,
+            security={},
+            status=" DECLARED ",
+        )
+
+        self.assertEqual(endpoint.node_id, "NODE-E")
+        self.assertEqual(endpoint.protocol, "https")
+        self.assertEqual(endpoint.host, "node-e.local")
+        self.assertEqual(endpoint.status, "declared")
+
+    def test_new_endpoint_rejects_invalid_port(self):
+        for invalid_port in (
+            0,
+            65536,
+            "443",
+            True,
+        ):
+            with self.subTest(port=invalid_port):
+                with self.assertRaises(
+                    node_module.InvalidNodeError
+                ):
+                    self.manager.new_endpoint(
+                        node_id="NODE-E",
+                        protocol="https",
+                        host="node-e.local",
+                        port=invalid_port,
+                        priority=0,
+                        security={},
+                        status="declared",
+                    )
+
+    def test_new_endpoint_rejects_invalid_priority(self):
+        for invalid_priority in (
+            -1,
+            1.5,
+            True,
+        ):
+            with self.subTest(
+                priority=invalid_priority
+            ):
+                with self.assertRaises(
+                    node_module.InvalidNodeError
+                ):
+                    self.manager.new_endpoint(
+                        node_id="NODE-E",
+                        protocol="https",
+                        host="node-e.local",
+                        port=443,
+                        priority=invalid_priority,
+                        security={},
+                        status="declared",
+                    )
+
+    def test_new_endpoint_rejects_missing_required_fields(self):
+        invalid_values = (
+            {
+                "node_id": "",
+                "protocol": "https",
+                "host": "node-e.local",
+                "status": "declared",
+            },
+            {
+                "node_id": "NODE-E",
+                "protocol": "",
+                "host": "node-e.local",
+                "status": "declared",
+            },
+            {
+                "node_id": "NODE-E",
+                "protocol": "https",
+                "host": "",
+                "status": "declared",
+            },
+            {
+                "node_id": "NODE-E",
+                "protocol": "https",
+                "host": "node-e.local",
+                "status": "",
+            },
+        )
+
+        for values in invalid_values:
+            with self.subTest(values=values):
+                with self.assertRaises(
+                    node_module.InvalidNodeError
+                ):
+                    self.manager.new_endpoint(
+                        port=443,
+                        priority=0,
+                        security={},
+                        **values,
+                    )
+
+    def test_new_endpoint_requires_security_mapping(self):
+        with self.assertRaises(
+            node_module.InvalidNodeError
+        ):
+            self.manager.new_endpoint(
+                node_id="NODE-E",
+                protocol="https",
+                host="node-e.local",
+                port=443,
+                priority=0,
+                security=["tls"],
+                status="declared",
+            )
+
+    def test_new_endpoint_copies_security_parameters(self):
+        security = {
+            "tls": True,
+            "mode": "declared",
+        }
+
+        endpoint = self.manager.new_endpoint(
+            node_id="NODE-E",
+            protocol="https",
+            host="node-e.local",
+            port=443,
+            priority=0,
+            security=security,
+            status="declared",
+        )
+
+        security["tls"] = False
+
+        self.assertEqual(
+            endpoint.security,
+            {
+                "tls": True,
+                "mode": "declared",
+            },
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
