@@ -644,5 +644,10 @@ class NodeContractsTests(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self.manager.validate_duplicate_link_ids()
 
+
+    def test_validate_rejects_duplicate_zone_ids(self):
+        with self.assertRaises(NotImplementedError):
+            self.manager.validate_duplicate_zone_ids()
+
 if __name__ == "__main__":
     unittest.main()
