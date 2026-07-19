@@ -120,8 +120,8 @@ Chaque sujet possède un document propriétaire :
 
 ## 🚦 État actif
 
-- Branche : `feature/SIG-07-node-network-manager`
-- Commit de référence : `ee97a7c`
+- Branche : `feature/SIG-07B-node-network-endpoints`
+- Commit de référence : `203d932`
 - Phase technique active : `07A`
 - Manager : `NodeNetworkManager`
 - Priorité immédiate : terminer la documentation et la synchronisation

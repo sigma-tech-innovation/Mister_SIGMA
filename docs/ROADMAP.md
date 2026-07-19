@@ -12,8 +12,8 @@
 
 | Élément | État |
 |---|---|
-| Branche | `feature/SIG-07-node-network-manager` |
-| Commit de référence documentaire | `ee97a7c` |
+| Branche | `feature/SIG-07B-node-network-endpoints` |
+| Commit de référence documentaire | `203d932` |
 | Phase technique active | `07A — NodeNetworkManager` |
 | Sous-tâche technique active | `7A.3b` |
 | État de la sous-tâche | temporairement suspendue |

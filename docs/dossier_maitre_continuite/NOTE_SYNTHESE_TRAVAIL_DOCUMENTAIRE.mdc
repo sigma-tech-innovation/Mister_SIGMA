@@ -3,7 +3,7 @@
 ## Statut
 
 - Projet : Mister_SIGMA
-- Branche de référence : `feature/SIG-07-node-network-manager`
+- Branche de référence : `feature/SIG-07B-node-network-endpoints`
 - Phase réelle active : **Phase 7A — NodeNetworkManager**
 - Structure documentaire : **40 parties complètes**
 - Nature des phases 7B à 10 : **architecture cible et feuille de route**
@@ -192,7 +192,7 @@ Les parties futures du dossier servent de feuille de route. Elles ne doivent jam
 Au moment de cette note, le développement doit reprendre depuis l’état réel observé dans le dépôt :
 
 - menus après le splashscreen en cours de développement ;
-- branche active : `feature/SIG-07-node-network-manager` ;
+- branche active : `feature/SIG-07B-node-network-endpoints` ;
 - phase active : **Phase 7A — NodeNetworkManager** ;
 - sous-tâche de référence : **7A.3b** ;
 - point d’inspection actuel : `sigma-core/managers/node_network_manager.py` ;
@@ -286,7 +286,7 @@ Elles ne doivent jamais être considérées comme une preuve que les fonctionnal
 Au moment de cette note, le développement doit reprendre depuis l’état réellement observé dans le dépôt :
 
 - **Projet :** Mister_SIGMA
-- **Branche active :** `feature/SIG-07-node-network-manager`
+- **Branche active :** `feature/SIG-07B-node-network-endpoints`
 - **Interface en cours :** menus après le splashscreen
 - **Phase active :** Phase 7A — NodeNetworkManager
 - **Sous-tâche de référence :** 7A.3b

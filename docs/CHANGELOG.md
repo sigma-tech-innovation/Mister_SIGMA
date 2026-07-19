@@ -37,8 +37,8 @@ git tag
 
 ### État de référence
 
-- branche observée : `feature/SIG-07-node-network-manager` ;
-- commit observé : `ee97a7c` ;
+- branche observée : `feature/SIG-07B-node-network-endpoints` ;
+- commit observé : `203d932` ;
 - version affichée par la CLI : `1.1.0` ;
 - phase active : `7A` ;
 - sous-étape technique `7A.3b` temporairement suspendue pendant la
