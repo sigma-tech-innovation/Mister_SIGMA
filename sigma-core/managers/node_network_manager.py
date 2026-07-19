@@ -515,6 +515,13 @@ class NodeNetworkManager:
         raise NotImplementedError
 
 
+
+    def validate_duplicate_region_ids(
+        self,
+    ):
+        raise NotImplementedError
+
+
     def create_node(self, node):
         return self.repository.create(node)
 
