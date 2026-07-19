@@ -13,7 +13,7 @@
 | Élément | État |
 |---|---|
 | Branche | `feature/SIG-07B-node-network-endpoints` |
-| Commit de référence documentaire | `203d932` |
+| Commit de référence documentaire | `b0d9970` |
 | Phase technique active | `07A — NodeNetworkManager` |
 | Sous-tâche technique active | `7A.3b` |
 | État de la sous-tâche | temporairement suspendue |
@@ -43,7 +43,7 @@ sigma-core/managers/node_network_manager.py
 sigma-core/tests/test_node_network_manager.py
 ```
 
-`NodeNetworkManager` n’est toutefois pas encore chargé, instancié ou enregistré par `SigmaEngine`.
+`NodeNetworkManager` est présent dans le dépôt, possède ses tests dédiés et est instancié par `SigmaEngine`. Les développements restants concernent les fonctionnalités non encore implémentées de la phase 7A.
 
 ### Portée restante déclarée
 
@@ -256,10 +256,10 @@ Fonctions envisagées :
 ## 11. Dépendances entre les phases
 
 ```text
-Documentation et synchronisation
+Documentation validée
             |
             v
-Reprise de 7A.3b
+Reprise de la phase 7A
             |
             v
 Validation complète de 7A
