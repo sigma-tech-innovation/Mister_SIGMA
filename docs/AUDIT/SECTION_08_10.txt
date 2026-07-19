@@ -1,0 +1,72 @@
+## 8. Phase 8 — ReplicationManager
+
+> **Statut :** cible future non implémentée.
+
+Objectif général : propager des unités versionnées de manière fiable, idempotente et traçable.
+
+Fonctions envisagées :
+
+- réplication idempotente ;
+- traitement par lots ;
+- curseurs ;
+- accusés de réception ;
+- push, pull ou mode hybride ;
+- reprise après interruption ;
+- détection des doublons.
+
+### Prérequis
+
+- phase 07 entièrement validée ;
+- modèle réseau stable ;
+- stratégie de versionnement définie.
+
+---
+
+## 9. Phase 9 — ConflictManager
+
+> **Statut :** cible future non implémentée.
+
+Objectif général : détecter les écritures concurrentes et appliquer une politique explicite et déterministe.
+
+Fonctions envisagées :
+
+- détection des versions concurrentes ;
+- classification des conflits ;
+- conservation des versions candidates ;
+- résolution déterministe ;
+- résolution automatique ou manuelle ;
+- audit complet.
+
+### Prérequis
+
+- phase 8 terminée ;
+- réplication versionnée validée ;
+- règles de résolution formalisées.
+
+---
+
+## 10. Phase 10 — SynchronizationEngine
+
+> **Statut :** cible future non implémentée.
+
+Objectif général : orchestrer la réplication, les conflits, le fonctionnement hors ligne, la reprise et la convergence globale.
+
+Fonctions envisagées :
+
+- orchestration de la réplication ;
+- synchronisation bidirectionnelle ;
+- fonctionnement hors ligne ;
+- checkpoints ;
+- résolution des conflits ;
+- reprise après interruption ;
+- convergence ;
+- rapports de synchronisation.
+
+### Prérequis
+
+- phases 8 et 9 terminées ;
+- réplication et gestion des conflits validées ;
+- observabilité et reprise définies.
+
+---
+

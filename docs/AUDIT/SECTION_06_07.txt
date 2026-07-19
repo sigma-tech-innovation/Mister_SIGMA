@@ -1,0 +1,43 @@
+## 6. Phase 7E — Tests réseau et résilience
+
+> **Statut :** cible future non implémentée.
+
+Objectifs prévus :
+
+- tests de topologie ;
+- tests de heartbeat ;
+- tests TLS et mTLS ;
+- tests de routage ;
+- tests de partitions réseau ;
+- tests de reprise ;
+- tests de résilience ;
+- vérification des comportements dégradés.
+
+### Prérequis
+
+- phases 7A à 7D terminées ;
+- interfaces de test stabilisées ;
+- scénarios réseau reproductibles.
+
+---
+
+## 7. Phase 7F — Validation finale de la phase 07
+
+> **Statut :** cible future non commencée.
+
+La phase 07 ne pourra être considérée comme terminée qu’après :
+
+- compilation réussie ;
+- tests ciblés au vert ;
+- suite complète au vert ;
+- Doctor : OK ;
+- Health : OK ;
+- Sync Validate : prêt ;
+- `git diff --check` sans erreur ;
+- revue du diff ;
+- documentation actualisée ;
+- commit atomique ;
+- fusion validée.
+
+---
+
