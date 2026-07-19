@@ -654,5 +654,10 @@ class NodeContractsTests(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self.manager.validate_duplicate_region_ids()
 
+
+    def test_validate_rejects_duplicate_capability_ids(self):
+        with self.assertRaises(NotImplementedError):
+            self.manager.validate_duplicate_capability_ids()
+
 if __name__ == "__main__":
     unittest.main()
