@@ -659,5 +659,10 @@ class NodeContractsTests(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self.manager.validate_duplicate_capability_ids()
 
+
+    def test_validate_rejects_orphan_link_references(self):
+        with self.assertRaises(NotImplementedError):
+            self.manager.validate_orphan_link_references()
+
 if __name__ == "__main__":
     unittest.main()

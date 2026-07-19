@@ -523,6 +523,13 @@ class NodeNetworkManager:
 
 
 
+
+    def validate_orphan_link_references(
+        self,
+    ):
+        raise NotImplementedError
+
+
     def validate_duplicate_capability_ids(
         self,
     ):
