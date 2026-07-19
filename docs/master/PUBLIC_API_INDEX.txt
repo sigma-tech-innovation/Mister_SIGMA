@@ -1,0 +1,308 @@
+        def run(*args):
+    def _http_request(
+    def _initialize(self):
+    def add(self, name, value):
+    def api(self):
+    def archive(self, workspace_id):
+    def as_dict(self):
+    def audit_records(self):
+    def authenticate(
+    def authentication(self):
+    def authorization(self):
+    def available_backends(self):
+    def backend(self):
+    def backend_name(self):
+    def backup(self, filename):
+    def backup_source(self):
+    def can(self, action, resource, role=None):
+    def can_authenticate(self, record):
+    def change_password(
+    def config(self):
+    def configuration(self):
+    def configure(
+    def configured_backend(self):
+    def connect(self):
+    def context(self):
+    def count(self):
+    def count(self, *parts):
+    def create(self, *parts, content=None, directory=False):
+    def create(self, data):
+    def create(self, device):
+    def create(self, key, value):
+    def create(self, node):
+    def create(self, package):
+    def create(self, plugin):
+    def create(self, project):
+    def create(self, registry):
+    def create(self, release):
+    def create(self, session):
+    def create(self, template):
+    def create_backend(self, name):
+    def create_device(
+    def create_node(self, node):
+    def create_record(self, data):
+    def create_session(self, session):
+    def current(self):
+    def data_provider(self):
+    def database(self):
+    def database_config(self):
+    def database_url(self):
+    def db(self):
+    def decode_bytes(self, value):
+    def default_policy(self):
+    def defaults(self):
+    def delete(self, *parts):
+    def delete(self, device_id):
+    def delete(self, key):
+    def delete(self, name):
+    def delete(self, node_id):
+    def delete(self, organization_id):
+    def delete(self, package_id):
+    def delete(self, project_id):
+    def delete(self, registry_id):
+    def delete(self, release_id):
+    def delete(self, session_id):
+    def delete(self, template_id):
+    def delete_secret(self, credential_id):
+    def derive_password_key(
+    def device(self):
+    def disable(
+    def disable(self, name):
+    def disable_all(self):
+    def disable_by_id(self, plugin_id):
+    def disabled(self):
+    def disconnect(self, node_id):
+    def discover(self):
+    def driver_available(self):
+    def emit(self, name, *args, **kwargs):
+    def emit_event(
+    def enable(self, name):
+    def enable_all(self):
+    def enable_by_id(self, plugin_id):
+    def enabled(self):
+    def encode_bytes(self, value):
+    def endpoints(self):
+    def ensure_identity(self):
+    def error(self, message):
+    def event(self):
+    def events(self):
+    def exists(self):
+    def exists(self, *parts):
+    def exists(self, credential_id):
+    def exists(self, device_id):
+    def exists(self, membership_id):
+    def exists(self, name):
+    def exists(self, node_id):
+    def exists(self, organization_id):
+    def exists(self, package_id):
+    def exists(self, project_id):
+    def exists(self, registry_id):
+    def exists(self, release_id):
+    def exists(self, session_id):
+    def exists(self, template_id):
+    def exists(self, user_id):
+    def exists_record(self, workspace_id):
+    def export_file(self, filename):
+    def find(
+    def find_by_capability(
+    def find_by_endpoint(
+    def find_by_region(
+    def find_by_zone(
+    def find_incoming_links(
+    def find_outgoing_links(
+    def format_datetime(self, value):
+    def get(self, credential_id):
+    def get(self, device_id):
+    def get(self, key, default=None):
+    def get(self, membership_id):
+    def get(self, name):
+    def get(self, node_id):
+    def get(self, organization_id):
+    def get(self, package_id):
+    def get(self, project_id):
+    def get(self, registry_id):
+    def get(self, release_id):
+    def get(self, session_id):
+    def get(self, template_id):
+    def get(self, user_id):
+    def get(self, workspace_id):
+    def get_by_email(self, email):
+    def get_by_slug(self, slug):
+    def get_by_user(
+    def get_by_user(self, user_id):
+    def get_by_username(self, username):
+    def get_by_workspace(self, workspace_id):
+    def get_secret(self, credential_id):
+    def git(self):
+    def global_context(self):
+    def has_permission(self, permission, role=None):
+    def hash_password(
+    def headers(self):
+    def identity(self):
+    def import_file(self, filename):
+    def info(self):
+    def info(self, message):
+    def initialize(self):
+    def install(self, plugin):
+    def installation_id(self):
+    def is_active(self, record):
+    def is_expired(
+    def list(self):
+    def list(self, *parts):
+    def list_audit(
+    def list_resources(self):
+    def load(self):
+    def load(self, name):
+    def load_source(self):
+    def local_config(self):
+    def local_config_migration(self):
+    def local_context(self):
+    def logger(self):
+    def machine_id(self):
+    def maintenance(self, node_id):
+    def manager(self, name):
+    def mark_synced(self, timestamp=None):
+    def membership(self):
+    def migrate(
+    def migrate(self, dry_run=True):
+    def missing(self):
+    def names(self):
+    def new_capability(
+    def new_device(
+    def new_endpoint(
+    def new_link(
+    def new_node(
+    def new_record(
+    def new_region(
+    def new_session(
+    def new_topology_snapshot(
+    def new_zone(
+    def next_id(self):
+    def node_id(self):
+    def nodes(self):
+    def normalize_slug(self, value):
+    def normalize_state(self, value):
+    def normalize_status(self, value):
+    def normalize_type(self, value):
+    def now(self):
+    def now_utc(self):
+    def on(self, name, callback):
+    def organization(self):
+    def organization_id(self):
+    def packages(self):
+    def parse_datetime(self, value):
+    def password_policy(self):
+    def path(self, *parts):
+    def path(self, name):
+    def permissions(self, role=None):
+    def plan(self):
+    def plugin(self):
+    def plugin_id(self, name):
+    def preview(self):
+    def projects(self):
+    def projects_dir(self):
+    def public_record(self, record):
+    def pull(self, name, resource=None):
+    def pull(self, resource):
+    def pull(self, resource=None):
+    def push(
+    def push(self, resource, records):
+    def reconnect(self, node_id):
+    def record_audit(
+    def records(self):
+    def register(
+    def register(self, name, provider):
+    def register(self, name, service):
+    def register(self, node):
+    def registry(self):
+    def releases(self):
+    def reload(self, name):
+    def reload_all(self):
+    def rename(self, old_name, new_name):
+    def renew(
+    def replace(self, device):
+    def replace(self, node):
+    def replace(self, session):
+    def request(
+    def require(self, permission, role=None):
+    def resolve_root(self, engine):
+    def restore(self, filename):
+    def revoke(
+    def revoke(self, credential_id):
+    def role(self):
+    def role_exists(self, role):
+    def roles(self):
+    def root(self):
+    def sanitize_audit_details(self, value):
+    def save(self):
+    def save(self, data):
+    def save(self, name, data):
+    def save_audit_records(self, records):
+    def save_records(self, records):
+    def save_secret(
+    def save_secret_records(self, records):
+    def search(self, keyword):
+    def secret_records(self):
+    def service(self):
+    def session(self):
+    def set(self, key, value):
+    def set_backend(self, backend):
+    def set_backend(self, name):
+    def set_password(
+    def set_status(
+    def set_url(self, url):
+    def slug_exists(self, slug):
+    def snapshot(self):
+    def state_exists(self, value):
+    def status(self, name):
+    def switch_backend(
+    def sync(self):
+    def task(self):
+    def templates(self):
+    def touch(
+    def trust(self, device_id):
+    def type_exists(self, value):
+    def uninstall(self, name):
+    def unload(self, name):
+    def unregister(self, name):
+    def update(
+    def update(self, *parts, content=None, **fields):
+    def update(self, key, value):
+    def update(self, name, **fields):
+    def update(self, node_id, **fields):
+    def update(self, organization_id, **fields):
+    def update(self, package_id, **fields):
+    def update(self, project_id, **fields):
+    def update(self, registry_id, **fields):
+    def update(self, release_id, **fields):
+    def update(self, template_id, **fields):
+    def update_record(
+    def update_state(
+    def url(self):
+    def user(self):
+    def user_id(self):
+    def valid(self):
+    def validate(self):
+    def validate(self, name):
+    def validate_duplicate_capability_ids(
+    def validate_duplicate_endpoint_ids(
+    def validate_duplicate_link_ids(
+    def validate_duplicate_node_ids(
+    def validate_duplicate_region_ids(
+    def validate_duplicate_zone_ids(
+    def validate_orphan_link_references(
+    def validate_password(self, password):
+    def validate_policy(self, policy):
+    def validate_record(self, membership):
+    def validate_record(self, organization):
+    def validate_record(self, record):
+    def validate_record(self, user):
+    def validate_record(self, workspace):
+    def validate_session(self, session):
+    def verify_password(
+    def verify_password_hash(
+    def version(self, name):
+    def warning(self, message):
+    def workspace(self):
+    def workspace_id(self):
+def load_module(name, relative_path):
