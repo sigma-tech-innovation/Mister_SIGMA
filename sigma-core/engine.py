@@ -88,6 +88,11 @@ Sync = load(
     "sigma-core/managers/sync_manager.py"
 )
 
+NodeNetwork = load(
+    "node_network_manager",
+    "sigma-core/managers/node_network_manager.py"
+)
+
 class SigmaEngine:
 
     def __init__(self):
@@ -139,6 +144,7 @@ class SigmaEngine:
         self.task = Task.TaskManager(self)
         self.plugin = Plugin.PluginManager(self)
         self.sync = Sync.SyncManager(self)
+        self.node_network = NodeNetwork.NodeNetworkManager(self)
 
         self.managers = {
             "database": self.database,
@@ -171,6 +177,7 @@ class SigmaEngine:
             "task": self.task,
             "plugin": self.plugin,
             "sync": self.sync,
+            "node_network": self.node_network,
         }
 
     def manager(self, name):
