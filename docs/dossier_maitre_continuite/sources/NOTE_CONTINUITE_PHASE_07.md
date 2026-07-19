@@ -6,9 +6,12 @@ Cette note complète le Guide technique maître et résume l’état du projet :
 - 🚧 Phase 07 — `NodeNetworkManager` en cours.
 - ✅ Repository, modèle `Node`, politique réseau et cycle de vie de base implémentés.
 - ⚠️ Incident corrigé : interdiction des remplacements globaux ; utilisation obligatoire de `grep` et `sed` avant tout patch.
-- 🧩 Phase 7A restant à compléter : endpoints, capacités, zones et topologie.
+- ✅ Contrats Phase 7A déjà ajoutés : NodeEndpoint, NodeCapability, NodeLink, Zone, Region, TopologySnapshot.
+- ✅ Contrats de recherche ajoutés : zone, région, capacité, endpoint, liens entrants et sortants.
+- ✅ Contrats de validation ajoutés : duplicate node, endpoint, link, zone, region, capability et orphan link references.
+- 📋 Étape restante : implémentation effective de ces validations après synchronisation documentaire.
 - ⏸️ Sous-tâche technique active : `7A.3b`, temporairement suspendue.
-- 📚 Priorité immédiate : terminer la documentation et la synchronisation.
+- 📚 Priorité immédiate : revue documentaire et synchronisation avec l'état réel du dépôt.
 - ✅ Reprise de `7A.3b` uniquement après validation complète de l’ensemble documentaire.
 - 🧭 Portée technique autorisée à la reprise : topologie statique de la phase 7A.
 - ⛔ Ne commencer la phase 7B qu’après validation complète de la phase 7A.

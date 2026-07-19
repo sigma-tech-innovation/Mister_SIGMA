@@ -1,0 +1,17 @@
+## 1. État actif
+
+| Élément | État |
+|---|---|
+| Branche | `feature/SIG-07B-node-network-endpoints` |
+| Commit de référence documentaire | `203d932` |
+| Phase technique active | `07A — NodeNetworkManager` |
+| Sous-tâche technique active | `7A.3b` |
+| État de la sous-tâche | temporairement suspendue |
+| Priorité immédiate | documentation, synchronisation et validation documentaire |
+| Reprise autorisée | après validation complète de l’ensemble documentaire |
+| Phase suivante interdite | `7B` avant validation complète de `7A` |
+
+La suspension de `7A.3b` ne signifie pas que la phase 7A est abandonnée. Elle conserve son statut de tâche technique active et devra reprendre depuis le code et les tests réellement présents.
+
+---
+

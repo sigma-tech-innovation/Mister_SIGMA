@@ -424,5 +424,245 @@ class NodeContractsTests(unittest.TestCase):
         )
 
 
+
+    def test_new_capability(self):
+        capability = self.manager.new_capability(
+            name="telemetry",
+            version="1.0",
+            state="declared",
+            metadata={"format": "json"},
+        )
+
+        self.assertEqual(capability.name, "telemetry")
+        self.assertEqual(capability.version, "1.0")
+        self.assertEqual(capability.state, "declared")
+        self.assertEqual(
+            capability.metadata,
+            {"format": "json"},
+        )
+
+    def test_new_capability_copies_metadata(self):
+        metadata = {"encoding": "utf-8"}
+
+        capability = self.manager.new_capability(
+            name="logging",
+            version="2.1",
+            state="declared",
+            metadata=metadata,
+        )
+
+        metadata["encoding"] = "binary"
+
+        self.assertEqual(
+            capability.metadata,
+            {"encoding": "utf-8"},
+        )
+
+
+    def test_new_link(self):
+        link = self.manager.new_link(
+            source_node="node-a",
+            destination_node="node-b",
+            logical_cost=10,
+            latency=5,
+            priority=100,
+            status="declared",
+            metadata={"medium": "ethernet"},
+        )
+
+        self.assertEqual(link.source_node, "node-a")
+        self.assertEqual(link.destination_node, "node-b")
+        self.assertEqual(link.logical_cost, 10)
+        self.assertEqual(link.latency, 5)
+        self.assertEqual(link.priority, 100)
+        self.assertEqual(link.status, "declared")
+        self.assertEqual(link.metadata, {"medium": "ethernet"})
+
+    def test_new_link_copies_metadata(self):
+        metadata = {"type": "fiber"}
+
+        link = self.manager.new_link(
+            source_node="A",
+            destination_node="B",
+            logical_cost=1,
+            latency=0,
+            priority=1,
+            metadata=metadata,
+        )
+
+        metadata["type"] = "wifi"
+
+        self.assertEqual(
+            link.metadata,
+            {"type": "fiber"},
+        )
+
+
+    def test_new_zone(self):
+        zone = self.manager.new_zone(
+            name="Zone-A",
+            kind="logical",
+            metadata={"site": "Tangier"},
+        )
+
+        self.assertEqual(zone.name, "Zone-A")
+        self.assertEqual(zone.kind, "logical")
+        self.assertEqual(
+            zone.metadata,
+            {"site": "Tangier"},
+        )
+
+    def test_new_zone_copies_metadata(self):
+        metadata = {"country": "Morocco"}
+
+        zone = self.manager.new_zone(
+            name="Zone-B",
+            kind="geographic",
+            metadata=metadata,
+        )
+
+        metadata["country"] = "France"
+
+        self.assertEqual(
+            zone.metadata,
+            {"country": "Morocco"},
+        )
+
+
+    def test_new_region(self):
+        region = self.manager.new_region(
+            name="North",
+            metadata={"country": "Morocco"},
+        )
+
+        self.assertEqual(region.name, "North")
+        self.assertEqual(
+            region.metadata,
+            {"country": "Morocco"},
+        )
+
+    def test_new_region_copies_metadata(self):
+        metadata = {"continent": "Africa"}
+
+        region = self.manager.new_region(
+            name="North",
+            metadata=metadata,
+        )
+
+        metadata["continent"] = "Europe"
+
+        self.assertEqual(
+            region.metadata,
+            {"continent": "Africa"},
+        )
+
+
+    def test_new_topology_snapshot(self):
+        snapshot = self.manager.new_topology_snapshot(
+            nodes=["N1", "N2"],
+            links=["L1"],
+            metadata={"version": 1},
+        )
+
+        self.assertEqual(snapshot.nodes, ["N1", "N2"])
+        self.assertEqual(snapshot.links, ["L1"])
+        self.assertEqual(snapshot.metadata, {"version": 1})
+
+    def test_new_topology_snapshot_copies_data(self):
+        nodes = ["N1"]
+        links = ["L1"]
+        metadata = {"v": 1}
+
+        snapshot = self.manager.new_topology_snapshot(
+            nodes=nodes,
+            links=links,
+            metadata=metadata,
+        )
+
+        nodes.append("N2")
+        links.append("L2")
+        metadata["v"] = 2
+
+        self.assertEqual(snapshot.nodes, ["N1"])
+        self.assertEqual(snapshot.links, ["L1"])
+        self.assertEqual(snapshot.metadata, {"v": 1})
+
+
+    def test_find_by_zone(self):
+        self.assertEqual(
+            self.manager.find_by_zone("Production"),
+            [],
+        )
+
+
+    def test_find_by_region(self):
+        self.assertEqual(
+            self.manager.find_by_region("North"),
+            [],
+        )
+
+
+    def test_find_by_capability(self):
+        self.assertEqual(
+            self.manager.find_by_capability("mqtt"),
+            [],
+        )
+
+
+    def test_find_by_endpoint(self):
+        self.assertEqual(
+            self.manager.find_by_endpoint("api"),
+            [],
+        )
+
+
+    def test_find_incoming_links(self):
+        self.assertEqual(
+            self.manager.find_incoming_links("node-1"),
+            [],
+        )
+
+
+    def test_find_outgoing_links(self):
+        self.assertEqual(
+            self.manager.find_outgoing_links("node-1"),
+            [],
+        )
+
+
+    def test_validate_rejects_duplicate_node_ids(self):
+        with self.assertRaises(NotImplementedError):
+            self.manager.validate_duplicate_node_ids()
+
+
+    def test_validate_rejects_duplicate_endpoint_ids(self):
+        with self.assertRaises(NotImplementedError):
+            self.manager.validate_duplicate_endpoint_ids()
+
+
+    def test_validate_rejects_duplicate_link_ids(self):
+        with self.assertRaises(NotImplementedError):
+            self.manager.validate_duplicate_link_ids()
+
+
+    def test_validate_rejects_duplicate_zone_ids(self):
+        with self.assertRaises(NotImplementedError):
+            self.manager.validate_duplicate_zone_ids()
+
+
+    def test_validate_rejects_duplicate_region_ids(self):
+        with self.assertRaises(NotImplementedError):
+            self.manager.validate_duplicate_region_ids()
+
+
+    def test_validate_rejects_duplicate_capability_ids(self):
+        with self.assertRaises(NotImplementedError):
+            self.manager.validate_duplicate_capability_ids()
+
+
+    def test_validate_rejects_orphan_link_references(self):
+        with self.assertRaises(NotImplementedError):
+            self.manager.validate_orphan_link_references()
+
 if __name__ == "__main__":
     unittest.main()

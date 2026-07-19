@@ -1,0 +1,46 @@
+## 2. Phase 7A — Modèle et topologie statique
+
+### Éléments actuellement établis
+
+La note opérationnelle de phase confirme comme implémentés :
+
+- le repository ;
+- le modèle `Node` ;
+- la politique réseau ;
+- le cycle de vie de base.
+
+Le module et ses tests dédiés existent :
+
+```text
+sigma-core/managers/node_network_manager.py
+sigma-core/tests/test_node_network_manager.py
+```
+
+`NodeNetworkManager` n’est toutefois pas encore chargé, instancié ou enregistré par `SigmaEngine`.
+
+### Portée restante déclarée
+
+Les éléments restant à compléter dans la phase 7A sont :
+
+- les endpoints ;
+- les capacités ;
+- les zones et régions ;
+- la topologie statique ;
+- les liens entre nœuds ;
+- les snapshots de topologie ;
+- la recherche par zone ou capacité.
+
+### Prochaine reprise technique
+
+Après validation documentaire :
+
+1. inspecter le code réel de `NodeNetworkManager` ;
+2. inspecter ses tests ;
+3. confirmer la portée exacte de `7A.3b` ;
+4. appliquer un seul changement cohérent ;
+5. exécuter les validations techniques ;
+6. actualiser la note opérationnelle ;
+7. committer uniquement après validation complète.
+
+---
+

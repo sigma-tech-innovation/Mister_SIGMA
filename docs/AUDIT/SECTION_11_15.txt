@@ -1,0 +1,92 @@
+## 11. Dépendances entre les phases
+
+```text
+Documentation et synchronisation
+            |
+            v
+Reprise de 7A.3b
+            |
+            v
+Validation complète de 7A
+            |
+            v
+7B -> 7C -> 7D -> 7E -> 7F
+                         |
+                         v
+                    Phase 8
+                         |
+                         v
+                    Phase 9
+                         |
+                         v
+                    Phase 10
+```
+
+Aucune phase future ne doit commencer avant validation complète de ses prérequis.
+
+---
+
+## 12. Interfaces et plateformes
+
+Les interfaces ne définissent pas l’architecture métier.
+
+Les options possibles comprennent :
+
+- CLI ;
+- API ;
+- interface web ;
+- application mobile ;
+- interface embarquée ;
+- autres adaptateurs futurs.
+
+Un écran, une résolution, un contrôleur, un ESP32 ou un ESP32 CYD ne constitue pas une exigence obligatoire du noyau.
+
+Les contraintes correspondantes sont gouvernées par [`UX-002`](governance/REGLES_CANONIQUES.md#%EF%B8%8F-ux-002--ind%C3%A9pendance-du-mat%C3%A9riel-et-des-interfaces).
+
+---
+
+## 13. Intégrations externes
+
+Les services suivants appartiennent à la vision d’écosystème, mais leur mention ne prouve pas leur intégration au dépôt :
+
+- GitHub ;
+- VPS ;
+- Notion ;
+- n8n ;
+- Google Drive ;
+- Gmail ;
+- Docker Desktop ;
+- Home Assistant ;
+- ESPHome ;
+- Mosquitto.
+
+Leur statut doit être démontré par du code, une configuration, un test ou un rapport d’exécution.
+
+---
+
+## 14. Sources documentaires
+
+| Sujet | Document propriétaire |
+|---|---|
+| État opérationnel immédiat | [`NOTE_CONTINUITE_PHASE_07.md`](dossier_maitre_continuite/sources/NOTE_CONTINUITE_PHASE_07.md) |
+| Architecture synthétique | [`ARCHITECTURE.md`](architecture/ARCHITECTURE.md) |
+| Règles canoniques | [`REGLES_CANONIQUES.md`](governance/REGLES_CANONIQUES.md) |
+| Traçabilité des 40 sources | [`REGISTRE_TRACABILITE_40_PARTIES.md`](dossier_maitre_continuite/REGISTRE_TRACABILITE_40_PARTIES.md) |
+| Synthèse documentaire | [`NOTE_SYNTHESE_TRAVAIL_DOCUMENTAIRE.md`](dossier_maitre_continuite/NOTE_SYNTHESE_TRAVAIL_DOCUMENTAIRE.md) |
+| Procédures détaillées | `dossier_maitre_continuite/sources/GUIDE_TECHNIQUE_MAITRE.docx` |
+| Preuves d’implémentation | code, tests et rapports validés |
+
+---
+
+## 15. Règles de mise à jour
+
+Cette roadmap doit être mise à jour uniquement lorsqu’un des événements suivants survient :
+
+- changement de phase active ;
+- validation ou clôture d’une phase ;
+- modification des dépendances ;
+- ajout ou retrait d’une cible future ;
+- décision architecturale acceptée ;
+- preuve nouvelle modifiant le statut réel.
+
+Une fonctionnalité planifiée ne doit jamais être marquée comme terminée sans preuve vérifiable.

@@ -120,11 +120,11 @@ Chaque sujet possède un document propriétaire :
 
 ## 🚦 État actif
 
-- Branche : `feature/SIG-07-node-network-manager`
-- Commit de référence : `ee97a7c`
+- Branche : `feature/SIG-07C-documentation-sync`
+- Commit de référence : `7cf3fe0`
 - Phase technique active : `07A`
 - Manager : `NodeNetworkManager`
-- Priorité immédiate : terminer la documentation et la synchronisation
+- Priorité immédiate : revue documentaire et synchronisation avec l'état réel du dépôt
 - Validation requise : valider l’ensemble documentaire avant la reprise technique
 - Sous-tâche technique suspendue : `7A.3b`
 - Portée technique à reprendre ensuite : topologie statique de la phase 7A

@@ -1,0 +1,16 @@
+docs/master/MANAGER_CLASSES.txt
+docs/master/MANAGER_LIST.txt
+docs/master/MANAGER_METHODS.txt
+docs/master/MANAGER_TABLE.md
+docs/master/MASTER_COMPONENTS.md
+docs/master/MASTER_DEPENDENCIES.md
+docs/master/MASTER_DOCUMENT_MAP.md
+docs/master/MASTER_GLOSSARY.md
+docs/master/MASTER_IMPLEMENTATION_STATUS.md
+docs/master/MASTER_INDEX.md
+docs/master/MASTER_MANIFEST.txt
+docs/master/MASTER_RELEASE_PROCESS.md
+docs/master/MASTER_TEST_MATRIX.md
+docs/master/PROJECT_FILE_TREE.txt
+docs/master/PUBLIC_API_INDEX.txt
+docs/master/TEST_LIST.txt

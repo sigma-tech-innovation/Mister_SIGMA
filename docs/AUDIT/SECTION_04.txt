@@ -1,0 +1,22 @@
+## 4. Phase 7C — Sécurité du transport
+
+> **Statut :** cible future non implémentée.
+
+Objectifs prévus :
+
+- TLS ;
+- mTLS ;
+- certificats ;
+- identité cryptographique des nœuds ;
+- rotation des clés ;
+- révocation ;
+- politique de confiance explicite.
+
+### Prérequis
+
+- phase 7B terminée ;
+- découverte et heartbeat validés ;
+- modèle d’identité réseau stabilisé.
+
+---
+

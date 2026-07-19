@@ -3,7 +3,7 @@
 ## Statut
 
 - Projet : Mister_SIGMA
-- Branche de référence : `feature/SIG-07-node-network-manager`
+- Branche de référence : `feature/SIG-07B-node-network-endpoints`
 - Phase réelle active : **Phase 7A — NodeNetworkManager**
 - Sous-tâche technique active : **`7A.3b`, temporairement suspendue**
 - Priorité immédiate : **documentation, synchronisation et validation documentaire**
@@ -192,7 +192,7 @@ les tests et la note de phase active.
 
 - la phase active confirmée est la phase `07A` ;
 - la portée autorisée est la topologie statique ;
-- le commit de référence est `ee97a7c` ;
+- le commit de référence est `203d932` ;
 - les opérations de cycle de vie sont déjà présentes et testées ;
 - la sous-tâche technique active reste `7A.3b`, temporairement suspendue pendant la documentation et la synchronisation ;
 - les menus après le splashscreen ne sont pas prouvés dans le dépôt actuel ;
@@ -218,8 +218,8 @@ Le Dossier Maître de Continuité décrit l’architecture cible complète de Mi
 
 Le développement réel continue depuis l’état vérifié du dépôt :
 
-- branche active : `feature/SIG-07-node-network-manager` ;
-- commit de référence : `ee97a7c` ;
+- branche active : `feature/SIG-07B-node-network-endpoints` ;
+- commit de référence : `203d932` ;
 - phase active : `07A` ;
 - manager actif : `NodeNetworkManager` ;
 - opérations de cycle de vie déjà implémentées et testées ;
@@ -237,8 +237,8 @@ Elles ne doivent jamais être considérées comme une preuve que les fonctionnal
 Au moment de cette note, le développement doit reprendre depuis l’état réellement observé dans le dépôt :
 
 - **Projet :** Mister_SIGMA
-- **Branche active :** `feature/SIG-07-node-network-manager`
-- **Commit de référence :** `ee97a7c`
+- **Branche active :** `feature/SIG-07B-node-network-endpoints`
+- **Commit de référence :** `203d932`
 - **Phase active :** Phase 7A — NodeNetworkManager
 - **Portée autorisée :** topologie statique
 - **Fichier inspecté :** `sigma-core/managers/node_network_manager.py`

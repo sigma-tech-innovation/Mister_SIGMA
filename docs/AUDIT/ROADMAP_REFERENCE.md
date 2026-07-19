@@ -12,12 +12,12 @@
 
 | Élément | État |
 |---|---|
-| Branche | `feature/SIG-07C-documentation-sync` |
-| Commit de référence documentaire | `7cf3fe0` |
+| Branche | `feature/SIG-07B-node-network-endpoints` |
+| Commit de référence documentaire | `203d932` |
 | Phase technique active | `07A — NodeNetworkManager` |
 | Sous-tâche technique active | `7A.3b` |
 | État de la sous-tâche | temporairement suspendue |
-| Priorité immédiate | revue documentaire et synchronisation avec l'état réel du dépôt |
+| Priorité immédiate | documentation, synchronisation et validation documentaire |
 | Reprise autorisée | après validation complète de l’ensemble documentaire |
 | Phase suivante interdite | `7B` avant validation complète de `7A` |
 
@@ -43,7 +43,7 @@ sigma-core/managers/node_network_manager.py
 sigma-core/tests/test_node_network_manager.py
 ```
 
-`NodeNetworkManager` est présent dans le dépôt, possède ses tests dédiés et est instancié par `SigmaEngine`. Les développements restants concernent les fonctionnalités non encore implémentées de la phase 7A.
+`NodeNetworkManager` n’est toutefois pas encore chargé, instancié ou enregistré par `SigmaEngine`.
 
 ### Portée restante déclarée
 
@@ -256,10 +256,10 @@ Fonctions envisagées :
 ## 11. Dépendances entre les phases
 
 ```text
-Documentation validée
+Documentation et synchronisation
             |
             v
-Reprise de la phase 7A
+Reprise de 7A.3b
             |
             v
 Validation complète de 7A

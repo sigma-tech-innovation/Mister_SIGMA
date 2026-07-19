@@ -1,0 +1,23 @@
+## 5. Phase 7D — Routage réseau
+
+> **Statut :** cible future non implémentée.
+
+Objectifs prévus :
+
+- sélection déterministe des chemins ;
+- coûts ;
+- latence ;
+- priorité ;
+- mécanismes de repli ;
+- routage multi-saut ;
+- détection des cycles ;
+- cache avec invalidation.
+
+### Prérequis
+
+- phase 7C terminée ;
+- transport sécurisé ;
+- topologie dynamique fiable.
+
+---
+

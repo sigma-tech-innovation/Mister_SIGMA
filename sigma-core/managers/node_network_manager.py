@@ -116,6 +116,65 @@ class NodeEndpoint:
         return asdict(self)
 
 
+
+@dataclass(frozen=True)
+class NodeCapability:
+    name: str
+    version: str
+    state: str = "declared"
+    metadata: dict = field(default_factory=dict)
+
+    def as_dict(self):
+        return asdict(self)
+
+
+
+@dataclass(frozen=True)
+class NodeLink:
+    source_node: str
+    destination_node: str
+    logical_cost: int
+    latency: int
+    priority: int
+    status: str = "declared"
+    metadata: dict = field(default_factory=dict)
+
+    def as_dict(self):
+        return asdict(self)
+
+
+
+@dataclass(frozen=True)
+class Zone:
+    name: str
+    kind: str
+    metadata: dict = field(default_factory=dict)
+
+    def as_dict(self):
+        return asdict(self)
+
+
+
+@dataclass(frozen=True)
+class Region:
+    name: str
+    metadata: dict = field(default_factory=dict)
+
+    def as_dict(self):
+        return asdict(self)
+
+
+
+@dataclass(frozen=True)
+class TopologySnapshot:
+    nodes: list = field(default_factory=list)
+    links: list = field(default_factory=list)
+    metadata: dict = field(default_factory=dict)
+
+    def as_dict(self):
+        return asdict(self)
+
+
 class NodeRepository:
 
     def __init__(self):
@@ -280,6 +339,202 @@ class NodeNetworkManager:
             security=dict(security),
             status=status,
         )
+
+
+    def new_capability(
+        self,
+        name,
+        version,
+        state="declared",
+        metadata=None,
+    ):
+        if metadata is None:
+            metadata = {}
+
+        return NodeCapability(
+            name=name,
+            version=version,
+            state=state,
+            metadata=dict(metadata),
+        )
+
+
+
+    def new_link(
+        self,
+        source_node,
+        destination_node,
+        logical_cost,
+        latency,
+        priority,
+        status="declared",
+        metadata=None,
+    ):
+        if metadata is None:
+            metadata = {}
+
+        return NodeLink(
+            source_node=source_node,
+            destination_node=destination_node,
+            logical_cost=logical_cost,
+            latency=latency,
+            priority=priority,
+            status=status,
+            metadata=dict(metadata),
+        )
+
+
+
+    def new_zone(
+        self,
+        name,
+        kind,
+        metadata=None,
+    ):
+        if metadata is None:
+            metadata = {}
+
+        return Zone(
+            name=name,
+            kind=kind,
+            metadata=dict(metadata),
+        )
+
+
+
+    def new_region(
+        self,
+        name,
+        metadata=None,
+    ):
+        if metadata is None:
+            metadata = {}
+
+        return Region(
+            name=name,
+            metadata=dict(metadata),
+        )
+
+
+
+    def new_topology_snapshot(
+        self,
+        nodes=None,
+        links=None,
+        metadata=None,
+    ):
+        if nodes is None:
+            nodes = []
+
+        if links is None:
+            links = []
+
+        if metadata is None:
+            metadata = {}
+
+        return TopologySnapshot(
+            nodes=list(nodes),
+            links=list(links),
+            metadata=dict(metadata),
+        )
+
+
+
+    def find_by_zone(
+        self,
+        zone_name,
+    ):
+        return []
+
+
+
+    def find_by_region(
+        self,
+        region_name,
+    ):
+        return []
+
+
+
+    def find_by_capability(
+        self,
+        capability_name,
+    ):
+        return []
+
+
+
+    def find_by_endpoint(
+        self,
+        endpoint_name,
+    ):
+        return []
+
+
+
+    def find_incoming_links(
+        self,
+        node_id,
+    ):
+        return []
+
+
+
+    def find_outgoing_links(
+        self,
+        node_id,
+    ):
+        return []
+
+
+
+    def validate_duplicate_node_ids(
+        self,
+    ):
+        raise NotImplementedError
+
+
+
+    def validate_duplicate_endpoint_ids(
+        self,
+    ):
+        raise NotImplementedError
+
+
+
+    def validate_duplicate_link_ids(
+        self,
+    ):
+        raise NotImplementedError
+
+
+
+    def validate_duplicate_zone_ids(
+        self,
+    ):
+        raise NotImplementedError
+
+
+
+    def validate_duplicate_region_ids(
+        self,
+    ):
+        raise NotImplementedError
+
+
+
+
+    def validate_orphan_link_references(
+        self,
+    ):
+        raise NotImplementedError
+
+
+    def validate_duplicate_capability_ids(
+        self,
+    ):
+        raise NotImplementedError
+
 
     def create_node(self, node):
         return self.repository.create(node)

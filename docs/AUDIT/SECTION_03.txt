@@ -1,0 +1,22 @@
+## 3. Phase 7B — Découverte et heartbeat
+
+> **Statut :** cible future non implémentée.
+
+Objectifs prévus :
+
+- découverte des nœuds ;
+- heartbeat ;
+- TTL ;
+- expiration ;
+- transitions d’état ;
+- états `UNKNOWN`, `HEALTHY`, `DEGRADED`, `UNREACHABLE`, `DISABLED` et `REVOKED`.
+
+### Prérequis
+
+- phase 7A terminée ;
+- topologie statique validée ;
+- tests 7A au vert ;
+- documentation 7A à jour.
+
+---
+

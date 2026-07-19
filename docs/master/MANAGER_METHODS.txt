@@ -1,0 +1,549 @@
+sigma-core/managers/api_manager.py:    def endpoints(self):
+sigma-core/managers/api_manager.py:    def exists(self):
+sigma-core/managers/api_manager.py:    def info(self):
+sigma-core/managers/base_manager.py:    def __init__(self, engine):
+sigma-core/managers/base_manager.py:    def root(self):
+sigma-core/managers/base_manager.py:    def db(self):
+sigma-core/managers/base_manager.py:    def projects_dir(self):
+sigma-core/managers/base_manager.py:    def config(self):
+sigma-core/managers/base_manager.py:    def database_config(self):
+sigma-core/managers/base_manager.py:    def data_provider(self):
+sigma-core/managers/base_manager.py:    def local_config(self):
+sigma-core/managers/base_manager.py:    def local_config_migration(self):
+sigma-core/managers/base_manager.py:    def identity(self):
+sigma-core/managers/base_manager.py:    def context(self):
+sigma-core/managers/base_manager.py:    def authorization(self):
+sigma-core/managers/base_manager.py:    def organization(self):
+sigma-core/managers/base_manager.py:    def user(self):
+sigma-core/managers/base_manager.py:    def membership(self):
+sigma-core/managers/base_manager.py:    def session(self):
+sigma-core/managers/base_manager.py:    def device(self):
+sigma-core/managers/base_manager.py:    def authentication(self):
+sigma-core/managers/base_manager.py:    def workspace(self):
+sigma-core/managers/base_manager.py:    def logger(self):
+sigma-core/managers/base_manager.py:    def service(self):
+sigma-core/managers/base_manager.py:    def event(self):
+sigma-core/managers/base_manager.py:    def task(self):
+sigma-core/managers/base_manager.py:    def plugin(self):
+sigma-core/managers/base_manager.py:    def registry(self):
+sigma-core/managers/base_manager.py:    def database(self):
+sigma-core/managers/base_manager.py:    def projects(self):
+sigma-core/managers/base_manager.py:    def nodes(self):
+sigma-core/managers/base_manager.py:    def packages(self):
+sigma-core/managers/base_manager.py:    def templates(self):
+sigma-core/managers/base_manager.py:    def releases(self):
+sigma-core/managers/base_manager.py:    def api(self):
+sigma-core/managers/base_manager.py:    def sync(self):
+sigma-core/managers/base_manager.py:    def manager(self, name):
+sigma-core/managers/config_manager.py:    def __init__(self, engine):
+sigma-core/managers/config_manager.py:    def exists(self):
+sigma-core/managers/config_manager.py:    def load(self):
+sigma-core/managers/config_manager.py:    def validate(self):
+sigma-core/managers/config_manager.py:    def save(self, data):
+sigma-core/managers/config_manager.py:    def get(self, key, default=None):
+sigma-core/managers/config_manager.py:    def set(self, key, value):
+sigma-core/managers/config_manager.py:    def list(self):
+sigma-core/managers/config_manager.py:    def count(self):
+sigma-core/managers/config_manager.py:    def create(self, key, value):
+sigma-core/managers/config_manager.py:    def update(self, key, value):
+sigma-core/managers/config_manager.py:    def delete(self, key):
+sigma-core/managers/config_manager.py:    def ensure_identity(self):
+sigma-core/managers/database_manager.py:def load_module(name, relative_path):
+sigma-core/managers/database_manager.py:    def __init__(self, engine):
+sigma-core/managers/database_manager.py:    def resolve_root(self, engine):
+sigma-core/managers/database_manager.py:    def configured_backend(self):
+sigma-core/managers/database_manager.py:    def database_url(self):
+sigma-core/managers/database_manager.py:    def create_backend(self, name):
+sigma-core/managers/database_manager.py:    def available_backends(self):
+sigma-core/managers/database_manager.py:    def set_backend(self, name):
+sigma-core/managers/database_manager.py:    def migrate(
+sigma-core/managers/database_manager.py:    def switch_backend(
+sigma-core/managers/database_manager.py:    def backend_name(self):
+sigma-core/managers/database_manager.py:    def load(self, name):
+sigma-core/managers/database_manager.py:    def save(self, name, data):
+sigma-core/managers/database_manager.py:    def exists(self, name):
+sigma-core/managers/database_manager.py:    def delete(self, name):
+sigma-core/managers/database_manager.py:    def list(self):
+sigma-core/managers/database_manager.py:    def validate(self):
+sigma-core/managers/database_manager.py:    def snapshot(self):
+sigma-core/managers/node_manager.py:    def records(self):
+sigma-core/managers/node_manager.py:    def list(self):
+sigma-core/managers/node_manager.py:    def next_id(self):
+sigma-core/managers/node_manager.py:    def get(self, node_id):
+sigma-core/managers/node_manager.py:    def exists(self, node_id):
+sigma-core/managers/node_manager.py:    def create(self, node):
+sigma-core/managers/node_manager.py:    def update(self, node_id, **fields):
+sigma-core/managers/node_manager.py:    def delete(self, node_id):
+sigma-core/managers/node_manager.py:    def count(self):
+sigma-core/managers/identity_manager.py:    def __init__(self, engine):
+sigma-core/managers/identity_manager.py:    def info(self):
+sigma-core/managers/identity_manager.py:    def validate(self):
+sigma-core/managers/identity_manager.py:    def organization_id(self):
+sigma-core/managers/identity_manager.py:    def user_id(self):
+sigma-core/managers/identity_manager.py:    def workspace_id(self):
+sigma-core/managers/identity_manager.py:    def installation_id(self):
+sigma-core/managers/identity_manager.py:    def machine_id(self):
+sigma-core/managers/identity_manager.py:    def node_id(self):
+sigma-core/managers/package_manager.py:    def records(self):
+sigma-core/managers/package_manager.py:    def list(self):
+sigma-core/managers/package_manager.py:    def next_id(self):
+sigma-core/managers/package_manager.py:    def get(self, package_id):
+sigma-core/managers/package_manager.py:    def exists(self, package_id):
+sigma-core/managers/package_manager.py:    def create(self, package):
+sigma-core/managers/package_manager.py:    def update(self, package_id, **fields):
+sigma-core/managers/package_manager.py:    def delete(self, package_id):
+sigma-core/managers/package_manager.py:    def count(self):
+sigma-core/managers/project_manager.py:    def __init__(self, engine):
+sigma-core/managers/project_manager.py:    def list(self):
+sigma-core/managers/project_manager.py:    def records(self):
+sigma-core/managers/project_manager.py:    def next_id(self):
+sigma-core/managers/project_manager.py:    def get(self, project_id):
+sigma-core/managers/project_manager.py:    def exists(self, project_id):
+sigma-core/managers/project_manager.py:    def create(self, project):
+sigma-core/managers/project_manager.py:    def update(self, project_id, **fields):
+sigma-core/managers/project_manager.py:    def delete(self, project_id):
+sigma-core/managers/project_manager.py:    def count(self):
+sigma-core/managers/event_manager.py:    def __init__(self, engine):
+sigma-core/managers/event_manager.py:    def on(self, name, callback):
+sigma-core/managers/event_manager.py:    def emit(self, name, *args, **kwargs):
+sigma-core/managers/event_manager.py:    def events(self):
+sigma-core/managers/plugin_manager.py:    def list(self):
+sigma-core/managers/plugin_manager.py:    def get(self, name):
+sigma-core/managers/plugin_manager.py:    def exists(self, name):
+sigma-core/managers/plugin_manager.py:    def validate(self, name):
+sigma-core/managers/plugin_manager.py:    def install(self, plugin):
+sigma-core/managers/plugin_manager.py:    def create(self, plugin):
+sigma-core/managers/plugin_manager.py:    def delete(self, name):
+sigma-core/managers/plugin_manager.py:    def enable(self, name):
+sigma-core/managers/plugin_manager.py:    def disable(self, name):
+sigma-core/managers/plugin_manager.py:    def export_file(self, filename):
+sigma-core/managers/plugin_manager.py:    def import_file(self, filename):
+sigma-core/managers/plugin_manager.py:    def backup(self, filename):
+sigma-core/managers/plugin_manager.py:    def restore(self, filename):
+sigma-core/managers/plugin_manager.py:    def count(self):
+sigma-core/managers/plugin_manager.py:    def search(self, keyword):
+sigma-core/managers/plugin_manager.py:    def rename(self, old_name, new_name):
+sigma-core/managers/plugin_manager.py:    def update(self, name, **fields):
+sigma-core/managers/plugin_manager.py:    def names(self):
+sigma-core/managers/plugin_manager.py:    def enabled(self):
+sigma-core/managers/plugin_manager.py:    def disabled(self):
+sigma-core/managers/plugin_manager.py:    def uninstall(self, name):
+sigma-core/managers/plugin_manager.py:    def save(self):
+sigma-core/managers/plugin_manager.py:    def load(self):
+sigma-core/managers/plugin_manager.py:    def unload(self, name):
+sigma-core/managers/plugin_manager.py:    def status(self, name):
+sigma-core/managers/plugin_manager.py:    def version(self, name):
+sigma-core/managers/plugin_manager.py:    def plugin_id(self, name):
+sigma-core/managers/plugin_manager.py:    def reload(self, name):
+sigma-core/managers/plugin_manager.py:    def reload_all(self):
+sigma-core/managers/plugin_manager.py:    def enable_all(self):
+sigma-core/managers/plugin_manager.py:    def disable_all(self):
+sigma-core/managers/plugin_manager.py:    def enable_by_id(self, plugin_id):
+sigma-core/managers/plugin_manager.py:    def disable_by_id(self, plugin_id):
+sigma-core/managers/plugin_manager.py:    def discover(self):
+sigma-core/managers/registry_manager.py:    def records(self):
+sigma-core/managers/registry_manager.py:    def list(self):
+sigma-core/managers/registry_manager.py:    def next_id(self):
+sigma-core/managers/registry_manager.py:    def get(self, registry_id):
+sigma-core/managers/registry_manager.py:    def exists(self, registry_id):
+sigma-core/managers/registry_manager.py:    def create(self, registry):
+sigma-core/managers/registry_manager.py:    def update(self, registry_id, **fields):
+sigma-core/managers/registry_manager.py:    def delete(self, registry_id):
+sigma-core/managers/registry_manager.py:    def count(self):
+sigma-core/managers/release_manager.py:    def records(self):
+sigma-core/managers/release_manager.py:    def list(self):
+sigma-core/managers/release_manager.py:    def next_id(self):
+sigma-core/managers/release_manager.py:    def get(self, release_id):
+sigma-core/managers/release_manager.py:    def exists(self, release_id):
+sigma-core/managers/release_manager.py:    def create(self, release):
+sigma-core/managers/release_manager.py:    def update(self, release_id, **fields):
+sigma-core/managers/release_manager.py:    def delete(self, release_id):
+sigma-core/managers/release_manager.py:    def count(self):
+sigma-core/managers/template_manager.py:    def records(self):
+sigma-core/managers/template_manager.py:    def list(self):
+sigma-core/managers/template_manager.py:    def next_id(self):
+sigma-core/managers/template_manager.py:    def get(self, template_id):
+sigma-core/managers/template_manager.py:    def exists(self, template_id):
+sigma-core/managers/template_manager.py:    def create(self, template):
+sigma-core/managers/template_manager.py:    def update(self, template_id, **fields):
+sigma-core/managers/template_manager.py:    def delete(self, template_id):
+sigma-core/managers/template_manager.py:    def count(self):
+sigma-core/managers/service_manager.py:    def __init__(self, engine):
+sigma-core/managers/service_manager.py:    def register(self, name, service):
+sigma-core/managers/service_manager.py:    def get(self, name):
+sigma-core/managers/service_manager.py:    def list(self):
+sigma-core/managers/workspace_manager.py:    def __init__(self, engine):
+sigma-core/managers/workspace_manager.py:    def root(self):
+sigma-core/managers/workspace_manager.py:    def path(self, *parts):
+sigma-core/managers/workspace_manager.py:    def exists(self, *parts):
+sigma-core/managers/workspace_manager.py:    def list(self, *parts):
+sigma-core/managers/workspace_manager.py:    def count(self, *parts):
+sigma-core/managers/workspace_manager.py:    def create(self, *parts, content=None, directory=False):
+sigma-core/managers/workspace_manager.py:    def update(self, *parts, content=None, **fields):
+sigma-core/managers/workspace_manager.py:    def delete(self, *parts):
+sigma-core/managers/workspace_manager.py:    def records(self):
+sigma-core/managers/workspace_manager.py:    def save_records(self, records):
+sigma-core/managers/workspace_manager.py:    def normalize_slug(self, value):
+sigma-core/managers/workspace_manager.py:    def next_id(self):
+sigma-core/managers/workspace_manager.py:    def get(self, workspace_id):
+sigma-core/managers/workspace_manager.py:    def get_by_slug(self, slug):
+sigma-core/managers/workspace_manager.py:    def exists_record(self, workspace_id):
+sigma-core/managers/workspace_manager.py:    def validate_record(self, workspace):
+sigma-core/managers/workspace_manager.py:    def create_record(self, data):
+sigma-core/managers/workspace_manager.py:    def update_record(
+sigma-core/managers/workspace_manager.py:    def create_record(self, data):
+sigma-core/managers/workspace_manager.py:    def update_record(
+sigma-core/managers/workspace_manager.py:    def archive(self, workspace_id):
+sigma-core/managers/workspace_manager.py:    def current(self):
+sigma-core/managers/workspace_manager.py:    def validate(self):
+sigma-core/managers/workspace_manager.py:    def snapshot(self):
+sigma-core/managers/local_config_manager.py:    def __init__(self, engine):
+sigma-core/managers/local_config_manager.py:    def exists(self):
+sigma-core/managers/local_config_manager.py:    def load(self):
+sigma-core/managers/local_config_manager.py:    def save(self, data):
+sigma-core/managers/local_config_manager.py:    def get(self, key, default=None):
+sigma-core/managers/local_config_manager.py:    def set(self, key, value):
+sigma-core/managers/local_config_manager.py:    def list(self):
+sigma-core/managers/local_config_manager.py:    def count(self):
+sigma-core/managers/local_config_manager.py:    def create(self, key, value):
+sigma-core/managers/local_config_manager.py:    def update(self, key, value):
+sigma-core/managers/local_config_manager.py:    def delete(self, key):
+sigma-core/managers/local_config_manager.py:    def defaults(self):
+sigma-core/managers/local_config_manager.py:    def ensure_identity(self):
+sigma-core/managers/local_config_manager.py:    def installation_id(self):
+sigma-core/managers/local_config_manager.py:    def machine_id(self):
+sigma-core/managers/local_config_manager.py:    def node_id(self):
+sigma-core/managers/local_config_migration_manager.py:    def __init__(self, engine):
+sigma-core/managers/local_config_migration_manager.py:    def load_source(self):
+sigma-core/managers/local_config_migration_manager.py:    def preview(self):
+sigma-core/managers/local_config_migration_manager.py:    def backup_source(self):
+sigma-core/managers/local_config_migration_manager.py:    def migrate(self, dry_run=True):
+sigma-core/managers/logger_manager.py:    def __init__(self, engine):
+sigma-core/managers/logger_manager.py:    def info(self, message):
+sigma-core/managers/logger_manager.py:    def warning(self, message):
+sigma-core/managers/logger_manager.py:    def error(self, message):
+sigma-core/managers/task_manager.py:    def __init__(self, engine):
+sigma-core/managers/task_manager.py:    def add(self, name, value):
+sigma-core/managers/task_manager.py:    def get(self, name):
+sigma-core/managers/task_manager.py:    def list(self):
+sigma-core/managers/sync_manager.py:    def __init__(self, engine):
+sigma-core/managers/sync_manager.py:    def configuration(self):
+sigma-core/managers/sync_manager.py:    def git(self):
+sigma-core/managers/sync_manager.py:        def run(*args):
+sigma-core/managers/sync_manager.py:    def identity(self):
+sigma-core/managers/sync_manager.py:    def snapshot(self):
+sigma-core/managers/sync_manager.py:    def validate(self):
+sigma-core/managers/sync_manager.py:    def plan(self):
+sigma-core/managers/sync_manager.py:    def mark_synced(self, timestamp=None):
+sigma-core/managers/context_manager.py:    def __init__(self, engine):
+sigma-core/managers/context_manager.py:    def global_context(self):
+sigma-core/managers/context_manager.py:    def local_context(self):
+sigma-core/managers/context_manager.py:    def current(self):
+sigma-core/managers/context_manager.py:    def get(self, key, default=None):
+sigma-core/managers/context_manager.py:    def identity(self):
+sigma-core/managers/context_manager.py:    def missing(self):
+sigma-core/managers/context_manager.py:    def valid(self):
+sigma-core/managers/context_manager.py:    def validate(self):
+sigma-core/managers/context_manager.py:    def organization_id(self):
+sigma-core/managers/context_manager.py:    def user_id(self):
+sigma-core/managers/context_manager.py:    def workspace_id(self):
+sigma-core/managers/context_manager.py:    def installation_id(self):
+sigma-core/managers/context_manager.py:    def machine_id(self):
+sigma-core/managers/context_manager.py:    def node_id(self):
+sigma-core/managers/authorization_manager.py:    def __init__(self, engine):
+sigma-core/managers/authorization_manager.py:    def role(self):
+sigma-core/managers/authorization_manager.py:    def roles(self):
+sigma-core/managers/authorization_manager.py:    def role_exists(self, role):
+sigma-core/managers/authorization_manager.py:    def permissions(self, role=None):
+sigma-core/managers/authorization_manager.py:    def has_permission(self, permission, role=None):
+sigma-core/managers/authorization_manager.py:    def require(self, permission, role=None):
+sigma-core/managers/authorization_manager.py:    def can(self, action, resource, role=None):
+sigma-core/managers/authorization_manager.py:    def validate(self):
+sigma-core/managers/authorization_manager.py:    def snapshot(self):
+sigma-core/managers/organization_manager.py:    def __init__(self, engine):
+sigma-core/managers/organization_manager.py:    def records(self):
+sigma-core/managers/organization_manager.py:    def list(self):
+sigma-core/managers/organization_manager.py:    def count(self):
+sigma-core/managers/organization_manager.py:    def get(self, organization_id):
+sigma-core/managers/organization_manager.py:    def get_by_slug(self, slug):
+sigma-core/managers/organization_manager.py:    def exists(self, organization_id):
+sigma-core/managers/organization_manager.py:    def slug_exists(self, slug):
+sigma-core/managers/organization_manager.py:    def normalize_slug(self, value):
+sigma-core/managers/organization_manager.py:    def next_id(self):
+sigma-core/managers/organization_manager.py:    def validate_record(self, organization):
+sigma-core/managers/organization_manager.py:    def create(self, data):
+sigma-core/managers/organization_manager.py:    def update(self, organization_id, **fields):
+sigma-core/managers/organization_manager.py:    def set_status(
+sigma-core/managers/organization_manager.py:    def delete(self, organization_id):
+sigma-core/managers/organization_manager.py:    def current(self):
+sigma-core/managers/organization_manager.py:    def validate(self):
+sigma-core/managers/organization_manager.py:    def snapshot(self):
+sigma-core/managers/user_manager.py:    def __init__(self, engine):
+sigma-core/managers/user_manager.py:    def records(self):
+sigma-core/managers/user_manager.py:    def save_records(self, records):
+sigma-core/managers/user_manager.py:    def list(self):
+sigma-core/managers/user_manager.py:    def count(self):
+sigma-core/managers/user_manager.py:    def next_id(self):
+sigma-core/managers/user_manager.py:    def get(self, user_id):
+sigma-core/managers/user_manager.py:    def exists(self, user_id):
+sigma-core/managers/user_manager.py:    def get_by_email(self, email):
+sigma-core/managers/user_manager.py:    def get_by_username(self, username):
+sigma-core/managers/user_manager.py:    def validate_record(self, user):
+sigma-core/managers/user_manager.py:    def create(self, data):
+sigma-core/managers/user_manager.py:    def update(
+sigma-core/managers/user_manager.py:    def validate(self):
+sigma-core/managers/user_manager.py:    def snapshot(self):
+sigma-core/managers/membership_manager.py:    def __init__(self, engine):
+sigma-core/managers/membership_manager.py:    def records(self):
+sigma-core/managers/membership_manager.py:    def save_records(self, records):
+sigma-core/managers/membership_manager.py:    def list(self):
+sigma-core/managers/membership_manager.py:    def count(self):
+sigma-core/managers/membership_manager.py:    def next_id(self):
+sigma-core/managers/membership_manager.py:    def get(self, membership_id):
+sigma-core/managers/membership_manager.py:    def exists(self, membership_id):
+sigma-core/managers/membership_manager.py:    def validate_record(self, membership):
+sigma-core/managers/membership_manager.py:    def get_by_user(self, user_id):
+sigma-core/managers/membership_manager.py:    def get_by_workspace(self, workspace_id):
+sigma-core/managers/membership_manager.py:    def create(self, data):
+sigma-core/managers/membership_manager.py:    def update(
+sigma-core/managers/membership_manager.py:    def validate(self):
+sigma-core/managers/membership_manager.py:    def snapshot(self):
+sigma-core/managers/database_backends/base_backend.py:    def load(self, name):
+sigma-core/managers/database_backends/base_backend.py:    def save(self, name, data):
+sigma-core/managers/database_backends/base_backend.py:    def exists(self, name):
+sigma-core/managers/database_backends/base_backend.py:    def delete(self, name):
+sigma-core/managers/database_backends/base_backend.py:    def list(self):
+sigma-core/managers/database_backends/json_backend.py:    def __init__(self, root):
+sigma-core/managers/database_backends/json_backend.py:    def path(self, name):
+sigma-core/managers/database_backends/json_backend.py:    def load(self, name):
+sigma-core/managers/database_backends/json_backend.py:    def save(self, name, data):
+sigma-core/managers/database_backends/json_backend.py:    def exists(self, name):
+sigma-core/managers/database_backends/json_backend.py:    def delete(self, name):
+sigma-core/managers/database_backends/json_backend.py:    def list(self):
+sigma-core/managers/database_backends/sqlite_backend.py:    def __init__(self, root):
+sigma-core/managers/database_backends/sqlite_backend.py:    def connect(self):
+sigma-core/managers/database_backends/sqlite_backend.py:    def _initialize(self):
+sigma-core/managers/database_backends/sqlite_backend.py:    def load(self, name):
+sigma-core/managers/database_backends/sqlite_backend.py:    def save(self, name, data):
+sigma-core/managers/database_backends/sqlite_backend.py:    def exists(self, name):
+sigma-core/managers/database_backends/sqlite_backend.py:    def delete(self, name):
+sigma-core/managers/database_backends/sqlite_backend.py:    def list(self):
+sigma-core/managers/database_backends/postgres_backend.py:    def __init__(
+sigma-core/managers/database_backends/postgres_backend.py:    def driver_available(self):
+sigma-core/managers/database_backends/postgres_backend.py:    def connect(self):
+sigma-core/managers/database_backends/postgres_backend.py:    def initialize(self):
+sigma-core/managers/database_backends/postgres_backend.py:    def load(self, name):
+sigma-core/managers/database_backends/postgres_backend.py:    def save(self, name, data):
+sigma-core/managers/database_backends/postgres_backend.py:    def exists(self, name):
+sigma-core/managers/database_backends/postgres_backend.py:    def delete(self, name):
+sigma-core/managers/database_backends/postgres_backend.py:    def list(self):
+sigma-core/managers/database_config_manager.py:    def __init__(self, engine):
+sigma-core/managers/database_config_manager.py:    def backend(self):
+sigma-core/managers/database_config_manager.py:    def url(self):
+sigma-core/managers/database_config_manager.py:    def validate(self):
+sigma-core/managers/database_config_manager.py:    def configure(
+sigma-core/managers/database_config_manager.py:    def set_backend(self, backend):
+sigma-core/managers/database_config_manager.py:    def set_url(self, url):
+sigma-core/managers/database_config_manager.py:    def snapshot(self):
+sigma-core/managers/data_providers/base_provider.py:    def configuration(self):
+sigma-core/managers/data_providers/base_provider.py:    def validate(self):
+sigma-core/managers/data_providers/base_provider.py:    def list_resources(self):
+sigma-core/managers/data_providers/base_provider.py:    def pull(self, resource):
+sigma-core/managers/data_providers/base_provider.py:    def push(self, resource, records):
+sigma-core/managers/data_providers/base_provider.py:    def snapshot(self):
+sigma-core/managers/data_providers/notion_provider.py:    def __init__(
+sigma-core/managers/data_providers/notion_provider.py:    def configuration(self):
+sigma-core/managers/data_providers/notion_provider.py:    def validate(self):
+sigma-core/managers/data_providers/notion_provider.py:    def headers(self):
+sigma-core/managers/data_providers/notion_provider.py:    def _http_request(
+sigma-core/managers/data_providers/notion_provider.py:    def request(
+sigma-core/managers/data_providers/notion_provider.py:    def list_resources(self):
+sigma-core/managers/data_providers/notion_provider.py:    def pull(self, resource=None):
+sigma-core/managers/data_providers/notion_provider.py:    def push(
+sigma-core/managers/data_providers/notion_provider.py:    def snapshot(self):
+sigma-core/managers/data_provider_manager.py:    def __init__(self, engine):
+sigma-core/managers/data_provider_manager.py:    def register(self, name, provider):
+sigma-core/managers/data_provider_manager.py:    def unregister(self, name):
+sigma-core/managers/data_provider_manager.py:    def get(self, name):
+sigma-core/managers/data_provider_manager.py:    def pull(self, name, resource=None):
+sigma-core/managers/data_provider_manager.py:    def push(
+sigma-core/managers/data_provider_manager.py:    def exists(self, name):
+sigma-core/managers/data_provider_manager.py:    def list(self):
+sigma-core/managers/data_provider_manager.py:    def count(self):
+sigma-core/managers/data_provider_manager.py:    def validate(self):
+sigma-core/managers/data_provider_manager.py:    def snapshot(self):
+sigma-core/managers/authentication_manager.py:    def __init__(
+sigma-core/managers/authentication_manager.py:    def as_dict(self):
+sigma-core/managers/authentication_manager.py:    def __init__(self, engine):
+sigma-core/managers/authentication_manager.py:    def records(self):
+sigma-core/managers/authentication_manager.py:    def save_records(self, records):
+sigma-core/managers/authentication_manager.py:    def secret_records(self):
+sigma-core/managers/authentication_manager.py:    def save_secret_records(self, records):
+sigma-core/managers/authentication_manager.py:    def audit_records(self):
+sigma-core/managers/authentication_manager.py:    def save_audit_records(self, records):
+sigma-core/managers/authentication_manager.py:    def list_audit(
+sigma-core/managers/authentication_manager.py:    def list(self):
+sigma-core/managers/authentication_manager.py:    def count(self):
+sigma-core/managers/authentication_manager.py:    def next_id(self):
+sigma-core/managers/authentication_manager.py:    def normalize_type(self, value):
+sigma-core/managers/authentication_manager.py:    def normalize_status(self, value):
+sigma-core/managers/authentication_manager.py:    def password_policy(self):
+sigma-core/managers/authentication_manager.py:    def validate_password(self, password):
+sigma-core/managers/authentication_manager.py:    def encode_bytes(self, value):
+sigma-core/managers/authentication_manager.py:    def decode_bytes(self, value):
+sigma-core/managers/authentication_manager.py:    def derive_password_key(
+sigma-core/managers/authentication_manager.py:    def hash_password(
+sigma-core/managers/authentication_manager.py:    def verify_password_hash(
+sigma-core/managers/authentication_manager.py:    def get_secret(self, credential_id):
+sigma-core/managers/authentication_manager.py:    def save_secret(
+sigma-core/managers/authentication_manager.py:    def delete_secret(self, credential_id):
+sigma-core/managers/authentication_manager.py:    def sanitize_audit_details(self, value):
+sigma-core/managers/authentication_manager.py:    def record_audit(
+sigma-core/managers/authentication_manager.py:    def new_record(
+sigma-core/managers/authentication_manager.py:    def validate_record(self, record):
+sigma-core/managers/authentication_manager.py:    def public_record(self, record):
+sigma-core/managers/authentication_manager.py:    def get(self, credential_id):
+sigma-core/managers/authentication_manager.py:    def get_by_user(
+sigma-core/managers/authentication_manager.py:    def exists(self, credential_id):
+sigma-core/managers/authentication_manager.py:    def create(self, data):
+sigma-core/managers/authentication_manager.py:    def update(
+sigma-core/managers/authentication_manager.py:    def set_password(
+sigma-core/managers/authentication_manager.py:    def verify_password(
+sigma-core/managers/authentication_manager.py:    def authenticate(
+sigma-core/managers/authentication_manager.py:    def change_password(
+sigma-core/managers/authentication_manager.py:    def revoke(self, credential_id):
+sigma-core/managers/authentication_manager.py:    def is_active(self, record):
+sigma-core/managers/authentication_manager.py:    def can_authenticate(self, record):
+sigma-core/managers/authentication_manager.py:    def validate(self):
+sigma-core/managers/authentication_manager.py:    def snapshot(self):
+sigma-core/managers/session_manager.py:    def __init__(
+sigma-core/managers/session_manager.py:    def as_dict(self):
+sigma-core/managers/session_manager.py:    def validate(self):
+sigma-core/managers/session_manager.py:    def as_dict(self):
+sigma-core/managers/session_manager.py:    def as_dict(self):
+sigma-core/managers/session_manager.py:    def as_dict(self):
+sigma-core/managers/session_manager.py:    def __init__(self):
+sigma-core/managers/session_manager.py:    def create(self, session):
+sigma-core/managers/session_manager.py:    def get(self, session_id):
+sigma-core/managers/session_manager.py:    def exists(self, session_id):
+sigma-core/managers/session_manager.py:    def delete(self, session_id):
+sigma-core/managers/session_manager.py:    def list(self):
+sigma-core/managers/session_manager.py:    def count(self):
+sigma-core/managers/session_manager.py:    def find(
+sigma-core/managers/session_manager.py:    def replace(self, session):
+sigma-core/managers/session_manager.py:    def __init__(self, engine):
+sigma-core/managers/session_manager.py:    def create_session(self, session):
+sigma-core/managers/session_manager.py:    def get(self, session_id):
+sigma-core/managers/session_manager.py:    def exists(self, session_id):
+sigma-core/managers/session_manager.py:    def list(self):
+sigma-core/managers/session_manager.py:    def count(self):
+sigma-core/managers/session_manager.py:    def delete(self, session_id):
+sigma-core/managers/session_manager.py:    def find(
+sigma-core/managers/session_manager.py:    def normalize_state(self, value):
+sigma-core/managers/session_manager.py:    def now_utc(self):
+sigma-core/managers/session_manager.py:    def format_datetime(self, value):
+sigma-core/managers/session_manager.py:    def parse_datetime(self, value):
+sigma-core/managers/session_manager.py:    def default_policy(self):
+sigma-core/managers/session_manager.py:    def validate_policy(self, policy):
+sigma-core/managers/session_manager.py:    def new_session(
+sigma-core/managers/session_manager.py:    def validate_session(self, session):
+sigma-core/managers/session_manager.py:    def touch(
+sigma-core/managers/session_manager.py:    def revoke(
+sigma-core/managers/session_manager.py:    def renew(
+sigma-core/managers/session_manager.py:    def is_expired(
+sigma-core/managers/session_manager.py:    def state_exists(self, value):
+sigma-core/managers/session_manager.py:    def validate(self):
+sigma-core/managers/session_manager.py:    def snapshot(self):
+sigma-core/managers/device_manager.py:    def __init__(
+sigma-core/managers/device_manager.py:    def as_dict(self):
+sigma-core/managers/device_manager.py:    def as_dict(self):
+sigma-core/managers/device_manager.py:    def validate(self):
+sigma-core/managers/device_manager.py:    def as_dict(self):
+sigma-core/managers/device_manager.py:    def __init__(self):
+sigma-core/managers/device_manager.py:    def create(self, device):
+sigma-core/managers/device_manager.py:    def get(self, device_id):
+sigma-core/managers/device_manager.py:    def exists(self, device_id):
+sigma-core/managers/device_manager.py:    def delete(self, device_id):
+sigma-core/managers/device_manager.py:    def list(self):
+sigma-core/managers/device_manager.py:    def count(self):
+sigma-core/managers/device_manager.py:    def find(
+sigma-core/managers/device_manager.py:    def replace(self, device):
+sigma-core/managers/device_manager.py:    def __init__(self, engine):
+sigma-core/managers/device_manager.py:    def now(self):
+sigma-core/managers/device_manager.py:    def default_policy(self):
+sigma-core/managers/device_manager.py:    def new_device(
+sigma-core/managers/device_manager.py:    def create_device(
+sigma-core/managers/device_manager.py:    def get(self, device_id):
+sigma-core/managers/device_manager.py:    def exists(self, device_id):
+sigma-core/managers/device_manager.py:    def list(self):
+sigma-core/managers/device_manager.py:    def count(self):
+sigma-core/managers/device_manager.py:    def delete(self, device_id):
+sigma-core/managers/device_manager.py:    def find(
+sigma-core/managers/device_manager.py:    def emit_event(
+sigma-core/managers/device_manager.py:    def register(
+sigma-core/managers/device_manager.py:    def update_state(
+sigma-core/managers/device_manager.py:    def trust(self, device_id):
+sigma-core/managers/device_manager.py:    def disable(
+sigma-core/managers/device_manager.py:    def revoke(
+sigma-core/managers/device_manager.py:    def normalize_state(self, value):
+sigma-core/managers/device_manager.py:    def normalize_type(self, value):
+sigma-core/managers/device_manager.py:    def state_exists(self, value):
+sigma-core/managers/device_manager.py:    def type_exists(self, value):
+sigma-core/managers/device_manager.py:    def validate(self):
+sigma-core/managers/device_manager.py:    def snapshot(self):
+sigma-core/managers/node_network_manager.py:    def __init__(self, message, *, details=None):
+sigma-core/managers/node_network_manager.py:    def as_dict(self):
+sigma-core/managers/node_network_manager.py:    def as_dict(self):
+sigma-core/managers/node_network_manager.py:    def validate(self):
+sigma-core/managers/node_network_manager.py:    def as_dict(self):
+sigma-core/managers/node_network_manager.py:    def as_dict(self):
+sigma-core/managers/node_network_manager.py:    def as_dict(self):
+sigma-core/managers/node_network_manager.py:    def as_dict(self):
+sigma-core/managers/node_network_manager.py:    def as_dict(self):
+sigma-core/managers/node_network_manager.py:    def as_dict(self):
+sigma-core/managers/node_network_manager.py:    def as_dict(self):
+sigma-core/managers/node_network_manager.py:    def __init__(self):
+sigma-core/managers/node_network_manager.py:    def create(self, node):
+sigma-core/managers/node_network_manager.py:    def get(self, node_id):
+sigma-core/managers/node_network_manager.py:    def exists(self, node_id):
+sigma-core/managers/node_network_manager.py:    def replace(self, node):
+sigma-core/managers/node_network_manager.py:    def delete(self, node_id):
+sigma-core/managers/node_network_manager.py:    def list(self):
+sigma-core/managers/node_network_manager.py:    def count(self):
+sigma-core/managers/node_network_manager.py:    def find(
+sigma-core/managers/node_network_manager.py:    def __init__(self, engine):
+sigma-core/managers/node_network_manager.py:    def now(self):
+sigma-core/managers/node_network_manager.py:    def default_policy(self):
+sigma-core/managers/node_network_manager.py:    def new_node(
+sigma-core/managers/node_network_manager.py:    def new_endpoint(
+sigma-core/managers/node_network_manager.py:    def new_capability(
+sigma-core/managers/node_network_manager.py:    def new_link(
+sigma-core/managers/node_network_manager.py:    def new_zone(
+sigma-core/managers/node_network_manager.py:    def new_region(
+sigma-core/managers/node_network_manager.py:    def new_topology_snapshot(
+sigma-core/managers/node_network_manager.py:    def find_by_zone(
+sigma-core/managers/node_network_manager.py:    def find_by_region(
+sigma-core/managers/node_network_manager.py:    def find_by_capability(
+sigma-core/managers/node_network_manager.py:    def find_by_endpoint(
+sigma-core/managers/node_network_manager.py:    def find_incoming_links(
+sigma-core/managers/node_network_manager.py:    def find_outgoing_links(
+sigma-core/managers/node_network_manager.py:    def validate_duplicate_node_ids(
+sigma-core/managers/node_network_manager.py:    def validate_duplicate_endpoint_ids(
+sigma-core/managers/node_network_manager.py:    def validate_duplicate_link_ids(
+sigma-core/managers/node_network_manager.py:    def validate_duplicate_zone_ids(
+sigma-core/managers/node_network_manager.py:    def validate_duplicate_region_ids(
+sigma-core/managers/node_network_manager.py:    def validate_orphan_link_references(
+sigma-core/managers/node_network_manager.py:    def validate_duplicate_capability_ids(
+sigma-core/managers/node_network_manager.py:    def create_node(self, node):
+sigma-core/managers/node_network_manager.py:    def get(self, node_id):
+sigma-core/managers/node_network_manager.py:    def exists(self, node_id):
+sigma-core/managers/node_network_manager.py:    def list(self):
+sigma-core/managers/node_network_manager.py:    def count(self):
+sigma-core/managers/node_network_manager.py:    def delete(self, node_id):
+sigma-core/managers/node_network_manager.py:    def find(
+sigma-core/managers/node_network_manager.py:    def register(self, node):
+sigma-core/managers/node_network_manager.py:    def disconnect(self, node_id):
+sigma-core/managers/node_network_manager.py:    def maintenance(self, node_id):
+sigma-core/managers/node_network_manager.py:    def reconnect(self, node_id):
+sigma-core/managers/node_network_manager.py:    def validate(self):
+sigma-core/managers/node_network_manager.py:    def snapshot(self):

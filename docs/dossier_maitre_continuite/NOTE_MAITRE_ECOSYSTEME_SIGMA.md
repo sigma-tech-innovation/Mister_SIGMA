@@ -2,8 +2,8 @@
 
 > **Statut documentaire :** référence consolidée
 > **État observé :** 15 juillet 2026
-> **Branche active observée :** `feature/SIG-07-node-network-manager`
-> **Commit observé :** `ee97a7c` — `feat(node): add node lifecycle operations`
+> **Branche active observée :** `feature/SIG-07B-node-network-endpoints`
+> **Commit observé :** `203d932` — `docs(phase-07): update continuity note`
 
 ---
 
@@ -152,8 +152,8 @@ Les remplacements globaux sur des ancres ambiguës sont interdits.
 
 | Élément | Valeur observée |
 |---|---|
-| Branche | `feature/SIG-07-node-network-manager` |
-| Commit | `ee97a7c` |
+| Branche | `feature/SIG-07B-node-network-endpoints` |
+| Commit | `203d932` |
 | Dernier jalon | opérations de cycle de vie des nœuds |
 | Working tree | documentation non suivie dans `docs/dossier_maitre_continuite/` |
 

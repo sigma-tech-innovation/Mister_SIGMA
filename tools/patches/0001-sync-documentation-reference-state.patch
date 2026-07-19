@@ -1,0 +1,134 @@
+--- a/docs/CHANGELOG.md
++++ b/docs/CHANGELOG.md
+@@ -37,8 +37,8 @@
+ 
+ ### État de référence
+ 
+-- branche observée : `feature/SIG-07-node-network-manager` ;
+-- commit observé : `ee97a7c` ;
++- branche observée : `feature/SIG-07B-node-network-endpoints` ;
++- commit observé : `203d932` ;
+ - version affichée par la CLI : `1.1.0` ;
+ - phase active : `7A` ;
+ - sous-étape technique `7A.3b` temporairement suspendue pendant la
+--- a/docs/INDEX.md
++++ b/docs/INDEX.md
+@@ -120,8 +120,8 @@
+ 
+ ## 🚦 État actif
+ 
+-- Branche : `feature/SIG-07-node-network-manager`
+-- Commit de référence : `ee97a7c`
++- Branche : `feature/SIG-07B-node-network-endpoints`
++- Commit de référence : `203d932`
+ - Phase technique active : `07A`
+ - Manager : `NodeNetworkManager`
+ - Priorité immédiate : terminer la documentation et la synchronisation
+--- a/docs/ROADMAP.md
++++ b/docs/ROADMAP.md
+@@ -12,8 +12,8 @@
+ 
+ | Élément | État |
+ |---|---|
+-| Branche | `feature/SIG-07-node-network-manager` |
+-| Commit de référence documentaire | `ee97a7c` |
++| Branche | `feature/SIG-07B-node-network-endpoints` |
++| Commit de référence documentaire | `203d932` |
+ | Phase technique active | `07A — NodeNetworkManager` |
+ | Sous-tâche technique active | `7A.3b` |
+ | État de la sous-tâche | temporairement suspendue |
+--- a/docs/dossier_maitre_continuite/NOTE_MAITRE_ECOSYSTEME_SIGMA.md
++++ b/docs/dossier_maitre_continuite/NOTE_MAITRE_ECOSYSTEME_SIGMA.md
+@@ -2,8 +2,8 @@
+ 
+ > **Statut documentaire :** référence consolidée
+ > **État observé :** 15 juillet 2026
+-> **Branche active observée :** `feature/SIG-07-node-network-manager`
+-> **Commit observé :** `ee97a7c` — `feat(node): add node lifecycle operations`
++> **Branche active observée :** `feature/SIG-07B-node-network-endpoints`
++> **Commit observé :** `203d932` — `docs(phase-07): update continuity note`
+ 
+ ---
+ 
+@@ -152,8 +152,8 @@
+ 
+ | Élément | Valeur observée |
+ |---|---|
+-| Branche | `feature/SIG-07-node-network-manager` |
+-| Commit | `ee97a7c` |
++| Branche | `feature/SIG-07B-node-network-endpoints` |
++| Commit | `203d932` |
+ | Dernier jalon | opérations de cycle de vie des nœuds |
+ | Working tree | documentation non suivie dans `docs/dossier_maitre_continuite/` |
+ 
+--- a/docs/dossier_maitre_continuite/NOTE_SYNTHESE_TRAVAIL_DOCUMENTAIRE.md
++++ b/docs/dossier_maitre_continuite/NOTE_SYNTHESE_TRAVAIL_DOCUMENTAIRE.md
+@@ -3,7 +3,7 @@
+ ## Statut
+ 
+ - Projet : Mister_SIGMA
+-- Branche de référence : `feature/SIG-07-node-network-manager`
++- Branche de référence : `feature/SIG-07B-node-network-endpoints`
+ - Phase réelle active : **Phase 7A — NodeNetworkManager**
+ - Sous-tâche technique active : **`7A.3b`, temporairement suspendue**
+ - Priorité immédiate : **documentation, synchronisation et validation documentaire**
+@@ -192,7 +192,7 @@
+ 
+ - la phase active confirmée est la phase `07A` ;
+ - la portée autorisée est la topologie statique ;
+-- le commit de référence est `ee97a7c` ;
++- le commit de référence est `203d932` ;
+ - les opérations de cycle de vie sont déjà présentes et testées ;
+ - la sous-tâche technique active reste `7A.3b`, temporairement suspendue pendant la documentation et la synchronisation ;
+ - les menus après le splashscreen ne sont pas prouvés dans le dépôt actuel ;
+@@ -218,8 +218,8 @@
+ 
+ Le développement réel continue depuis l’état vérifié du dépôt :
+ 
+-- branche active : `feature/SIG-07-node-network-manager` ;
+-- commit de référence : `ee97a7c` ;
++- branche active : `feature/SIG-07B-node-network-endpoints` ;
++- commit de référence : `203d932` ;
+ - phase active : `07A` ;
+ - manager actif : `NodeNetworkManager` ;
+ - opérations de cycle de vie déjà implémentées et testées ;
+@@ -237,8 +237,8 @@
+ Au moment de cette note, le développement doit reprendre depuis l’état réellement observé dans le dépôt :
+ 
+ - **Projet :** Mister_SIGMA
+-- **Branche active :** `feature/SIG-07-node-network-manager`
+-- **Commit de référence :** `ee97a7c`
++- **Branche active :** `feature/SIG-07B-node-network-endpoints`
++- **Commit de référence :** `203d932`
+ - **Phase active :** Phase 7A — NodeNetworkManager
+ - **Portée autorisée :** topologie statique
+ - **Fichier inspecté :** `sigma-core/managers/node_network_manager.py`
+--- a/docs/dossier_maitre_continuite/NOTE_SYNTHESE_TRAVAIL_DOCUMENTAIRE.mdc
++++ b/docs/dossier_maitre_continuite/NOTE_SYNTHESE_TRAVAIL_DOCUMENTAIRE.mdc
+@@ -3,7 +3,7 @@
+ ## Statut
+ 
+ - Projet : Mister_SIGMA
+-- Branche de référence : `feature/SIG-07-node-network-manager`
++- Branche de référence : `feature/SIG-07B-node-network-endpoints`
+ - Phase réelle active : **Phase 7A — NodeNetworkManager**
+ - Structure documentaire : **40 parties complètes**
+ - Nature des phases 7B à 10 : **architecture cible et feuille de route**
+@@ -192,7 +192,7 @@
+ Au moment de cette note, le développement doit reprendre depuis l’état réel observé dans le dépôt :
+ 
+ - menus après le splashscreen en cours de développement ;
+-- branche active : `feature/SIG-07-node-network-manager` ;
++- branche active : `feature/SIG-07B-node-network-endpoints` ;
+ - phase active : **Phase 7A — NodeNetworkManager** ;
+ - sous-tâche de référence : **7A.3b** ;
+ - point d’inspection actuel : `sigma-core/managers/node_network_manager.py` ;
+@@ -286,7 +286,7 @@
+ Au moment de cette note, le développement doit reprendre depuis l’état réellement observé dans le dépôt :
+ 
+ - **Projet :** Mister_SIGMA
+-- **Branche active :** `feature/SIG-07-node-network-manager`
++- **Branche active :** `feature/SIG-07B-node-network-endpoints`
+ - **Interface en cours :** menus après le splashscreen
+ - **Phase active :** Phase 7A — NodeNetworkManager
+ - **Sous-tâche de référence :** 7A.3b
