@@ -12,12 +12,12 @@
 
 | Élément | État |
 |---|---|
-| Branche | `feature/SIG-07B-node-network-endpoints` |
-| Commit de référence documentaire | `b0d9970` |
+| Branche | `feature/SIG-07C-documentation-sync` |
+| Commit de référence documentaire | `7cf3fe0` |
 | Phase technique active | `07A — NodeNetworkManager` |
 | Sous-tâche technique active | `7A.3b` |
 | État de la sous-tâche | temporairement suspendue |
-| Priorité immédiate | documentation, synchronisation et validation documentaire |
+| Priorité immédiate | revue documentaire et synchronisation avec l'état réel du dépôt |
 | Reprise autorisée | après validation complète de l’ensemble documentaire |
 | Phase suivante interdite | `7B` avant validation complète de `7A` |
 

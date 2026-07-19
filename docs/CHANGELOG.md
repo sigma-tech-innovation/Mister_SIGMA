@@ -37,8 +37,8 @@ git tag
 
 ### État de référence
 
-- branche observée : `feature/SIG-07B-node-network-endpoints` ;
-- commit observé : `203d932` ;
+- branche observée : `feature/SIG-07C-documentation-sync` ;
+- commit observé : `7cf3fe0` ;
 - version affichée par la CLI : `1.1.0` ;
 - phase active : `7A` ;
 - sous-étape technique `7A.3b` temporairement suspendue pendant la
@@ -429,5 +429,5 @@ Toute mise à jour de ce journal doit :
 9. conserver Git comme historique détaillé ;
 10. actualiser les points d’entrée documentaires associés.
 
-Le nombre de commits observé au moment de la synchronisation était de `281`.
+Le nombre de commits observé dépend de l'état du dépôt au moment de la consultation.
 Ce nombre est un instantané, pas un identifiant de version.
