@@ -134,7 +134,7 @@ class NodeContractsTests(unittest.TestCase):
             state=state,
         )
 
-        return self.manager.create_node(node)
+        return self.manager.register(node)
 
     def test_manager_repository_empty(self):
         self.assertEqual(

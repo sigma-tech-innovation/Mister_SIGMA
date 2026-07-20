@@ -660,9 +660,6 @@ class NodeNetworkManager:
             self.publish("node.recovered")
 
         return heartbeat
-    def create_node(self, node):
-        return self.repository.create(node)
-
     def get(self, node_id):
         return self.repository.get(str(node_id).strip())
 
