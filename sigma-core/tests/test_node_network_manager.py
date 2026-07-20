@@ -711,7 +711,7 @@ class HeartbeatContractsTests(unittest.TestCase):
         )
 
     def test_new_heartbeat(self):
-        heartbeat = self.manager.new_heartbeat(
+        heartbeat = self.manager.heartbeat(
             node_id="NODE-1",
         )
 
@@ -759,7 +759,7 @@ class HeartbeatContractsTests(unittest.TestCase):
                 node_id="",
             )
     def test_new_heartbeat_records_timestamp(self):
-        heartbeat = self.manager.new_heartbeat(
+        heartbeat = self.manager.heartbeat(
             node_id="NODE-1",
         )
 
@@ -878,7 +878,7 @@ class HeartbeatTTLContractsTests(unittest.TestCase):
 
 
     def test_new_heartbeat_is_registered(self):
-        heartbeat = self.manager.new_heartbeat(
+        heartbeat = self.manager.heartbeat(
             node_id="NODE-1",
         )
 
@@ -1043,7 +1043,7 @@ class HeartbeatTTLContractsTests(unittest.TestCase):
 
         self.manager.expire_heartbeats()
 
-        self.manager.new_heartbeat(
+        self.manager.heartbeat(
             node_id="NODE-RECOVER",
         )
 
@@ -1097,7 +1097,7 @@ class HeartbeatTTLContractsTests(unittest.TestCase):
 
         self.manager.expire_heartbeats()
 
-        self.manager.new_heartbeat(
+        self.manager.heartbeat(
             node_id="NODE-RECOVER-EVENT",
         )
 

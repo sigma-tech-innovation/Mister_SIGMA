@@ -397,29 +397,11 @@ class NodeNetworkManager:
         if not node_id:
             raise InvalidNodeError("Invalid node_id")
 
-        heartbeat = Heartbeat(
+        return Heartbeat(
             node_id=node_id,
             occurred_at=self.now(),
             health=NodeHealth.HEALTHY.value,
         )
-
-
-        self._heartbeats[node_id] = heartbeat
-
-        node = self.repository.get(node_id)
-
-        if node is not None:
-            self.repository.replace(
-                replace(
-                    node,
-                    health=NodeHealth.HEALTHY.value,
-                    updated_at=self.now(),
-                )
-            )
-
-            self.publish("node.recovered")
-
-        return heartbeat
 
 
     def expire_heartbeats(self):
@@ -656,9 +638,28 @@ class NodeNetworkManager:
         *,
         node_id,
     ):
-        return self.new_heartbeat(
+        node_id = str(node_id).strip()
+
+        heartbeat = self.new_heartbeat(
             node_id=node_id,
         )
+
+        self._heartbeats[node_id] = heartbeat
+
+        node = self.repository.get(node_id)
+
+        if node is not None:
+            self.repository.replace(
+                replace(
+                    node,
+                    health=NodeHealth.HEALTHY.value,
+                    updated_at=self.now(),
+                )
+            )
+
+            self.publish("node.recovered")
+
+        return heartbeat
     def create_node(self, node):
         return self.repository.create(node)
 
