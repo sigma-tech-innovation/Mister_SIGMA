@@ -39,7 +39,6 @@
     def create(self, template):
     def create_backend(self, name):
     def create_device(
-    def create_node(self, node):
     def create_record(self, data):
     def create_session(self, session):
     def current(self):

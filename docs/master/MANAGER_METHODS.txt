@@ -534,7 +534,6 @@ sigma-core/managers/node_network_manager.py:    def validate_duplicate_zone_ids(
 sigma-core/managers/node_network_manager.py:    def validate_duplicate_region_ids(
 sigma-core/managers/node_network_manager.py:    def validate_orphan_link_references(
 sigma-core/managers/node_network_manager.py:    def validate_duplicate_capability_ids(
-sigma-core/managers/node_network_manager.py:    def create_node(self, node):
 sigma-core/managers/node_network_manager.py:    def get(self, node_id):
 sigma-core/managers/node_network_manager.py:    def exists(self, node_id):
 sigma-core/managers/node_network_manager.py:    def list(self):
