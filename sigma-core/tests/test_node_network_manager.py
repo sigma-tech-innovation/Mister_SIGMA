@@ -725,6 +725,39 @@ class HeartbeatContractsTests(unittest.TestCase):
             "healthy",
         )
 
+
+    def test_heartbeat(self):
+        heartbeat = self.manager.heartbeat(
+            node_id="NODE-1",
+        )
+
+        self.assertEqual(
+            heartbeat.node_id,
+            "NODE-1",
+        )
+
+        self.assertEqual(
+            heartbeat.health,
+            "healthy",
+        )
+
+    def test_heartbeat_records_timestamp(self):
+        heartbeat = self.manager.heartbeat(
+            node_id="NODE-1",
+        )
+
+        self.assertEqual(
+            heartbeat.occurred_at,
+            "2026-07-20T13:40:00+00:00",
+        )
+
+    def test_heartbeat_rejects_empty_node_id(self):
+        with self.assertRaises(
+            node_module.InvalidNodeError,
+        ):
+            self.manager.heartbeat(
+                node_id="",
+            )
     def test_new_heartbeat_records_timestamp(self):
         heartbeat = self.manager.new_heartbeat(
             node_id="NODE-1",
