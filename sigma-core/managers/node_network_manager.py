@@ -650,6 +650,15 @@ class NodeNetworkManager:
         raise NotImplementedError
 
 
+
+    def heartbeat(
+        self,
+        *,
+        node_id,
+    ):
+        return self.new_heartbeat(
+            node_id=node_id,
+        )
     def create_node(self, node):
         return self.repository.create(node)
 
