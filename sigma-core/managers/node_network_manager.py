@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field, replace
 from enum import Enum
 
 
@@ -39,6 +39,15 @@ class NodeState(str, Enum):
     MAINTENANCE = "maintenance"
 
 
+class NodeHealth(str, Enum):
+    UNKNOWN = "unknown"
+    HEALTHY = "healthy"
+    DEGRADED = "degraded"
+    UNREACHABLE = "unreachable"
+    DISABLED = "disabled"
+    REVOKED = "revoked"
+
+
 class NodeRole(str, Enum):
     CORE = "core"
     EDGE = "edge"
@@ -52,6 +61,12 @@ class NodeEvent:
     occurred_at: str
     details: dict
     event_type: str
+    severity: str = "INFO"
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+
+    def __post_init__(self):
+        if self.occurred_at is None:
+            object.__setattr__(self, "occurred_at", time.time())
 
     def as_dict(self):
         return asdict(self)
@@ -69,8 +84,9 @@ class NodeDisconnected(NodeEvent):
 
 
 
+import time
+import uuid
 from datetime import datetime
-from dataclasses import field
 
 
 @dataclass(frozen=True)
@@ -78,12 +94,14 @@ class NodeNetworkPolicy:
     allow_cluster_join: bool = True
     allow_remote_management: bool = True
     require_tls: bool = False
+    heartbeat_ttl_seconds: int = 30
 
 
 
     def validate(self):
         return {
             "valid": True,
+            "heartbeat_ttl_seconds": self.heartbeat_ttl_seconds,
             "errors": [],
         }
 @dataclass(frozen=True)
@@ -96,6 +114,7 @@ class Node:
     created_at: str
     updated_at: str
     metadata: dict = field(default_factory=dict)
+    health: str = NodeHealth.UNKNOWN.value
     version: int = 1
 
     def as_dict(self):
@@ -115,6 +134,16 @@ class NodeEndpoint:
     def as_dict(self):
         return asdict(self)
 
+
+
+@dataclass(frozen=True)
+class Heartbeat:
+    node_id: str
+    occurred_at: str
+    health: str = NodeHealth.HEALTHY.value
+
+    def as_dict(self):
+        return asdict(self)
 
 
 @dataclass(frozen=True)
@@ -179,6 +208,7 @@ class NodeRepository:
 
     def __init__(self):
         self._nodes = {}
+        self._heartbeats = {}
 
     def create(self, node):
         if node.id in self._nodes:
@@ -260,12 +290,27 @@ class NodeNetworkManager:
     def __init__(self, engine):
         self.engine = engine
         self.repository = NodeRepository()
+        self.policy = self.default_policy()
 
+        self._heartbeats = {}
+        self.events = []
+        self._subscribers = []
     def now(self):
         if hasattr(self.engine, "now"):
             return self.engine.now()
         return datetime.utcnow().isoformat()
 
+
+    def publish(self, event):
+        self.events.append(event)
+
+        for subscriber in self._subscribers:
+            subscriber(event)
+
+        return event
+    def subscribe(self, callback):
+        self._subscribers.append(callback)
+        return callback
     def default_policy(self):
         return NodeNetworkPolicy()
 
@@ -287,6 +332,7 @@ class NodeNetworkManager:
             state=str(state).strip().lower(),
             hostname=str(hostname),
             address=str(address),
+            health=NodeHealth.UNKNOWN.value,
             created_at=now,
             updated_at=now,
             metadata=dict(metadata or {}),
@@ -339,6 +385,74 @@ class NodeNetworkManager:
             security=dict(security),
             status=status,
         )
+
+
+    def new_heartbeat(
+        self,
+        *,
+        node_id,
+    ):
+        node_id = str(node_id).strip()
+
+        if not node_id:
+            raise InvalidNodeError("Invalid node_id")
+
+        heartbeat = Heartbeat(
+            node_id=node_id,
+            occurred_at=self.now(),
+            health=NodeHealth.HEALTHY.value,
+        )
+
+
+        self._heartbeats[node_id] = heartbeat
+
+        node = self.repository.get(node_id)
+
+        if node is not None:
+            self.repository.replace(
+                replace(
+                    node,
+                    health=NodeHealth.HEALTHY.value,
+                    updated_at=self.now(),
+                )
+            )
+
+            self.events.append("node.recovered")
+
+        return heartbeat
+
+
+    def expire_heartbeats(self):
+        """Expire les heartbeats selon la politique TTL."""
+        expired = []
+
+        now = datetime.fromisoformat(self.now())
+        ttl = self.policy.heartbeat_ttl_seconds
+
+        for node_id, heartbeat in self._heartbeats.items():
+            occurred_at = datetime.fromisoformat(
+                heartbeat.occurred_at,
+            )
+
+            age_seconds = (now - occurred_at).total_seconds()
+
+            if age_seconds > ttl:
+                node = self.repository.get(node_id)
+
+                if node is not None:
+                    self.repository.replace(
+                        replace(
+                            node,
+                            health=NodeHealth.UNREACHABLE.value,
+                        )
+                    )
+
+                    self.events.append("node.unreachable")
+                expired.append(node_id)
+
+        return expired
+
+        return []
 
 
     def new_capability(

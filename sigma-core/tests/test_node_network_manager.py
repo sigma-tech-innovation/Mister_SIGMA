@@ -56,6 +56,7 @@ class NodeContractsTests(unittest.TestCase):
         self.assertEqual(node.id, "NODE-1")
         self.assertEqual(node.role, "core")
         self.assertEqual(node.state, "online")
+        self.assertEqual(node.health, "unknown")
         self.assertEqual(node.version, 1)
 
     def test_node_as_dict(self):
@@ -664,5 +665,525 @@ class NodeContractsTests(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self.manager.validate_orphan_link_references()
 
+
+class NodeHealthContractsTests(unittest.TestCase):
+
+    def test_node_health_values(self):
+        self.assertEqual(
+            node_module.NodeHealth.UNKNOWN.value,
+            "unknown",
+        )
+
+        self.assertEqual(
+            node_module.NodeHealth.HEALTHY.value,
+            "healthy",
+        )
+
+        self.assertEqual(
+            node_module.NodeHealth.DEGRADED.value,
+            "degraded",
+        )
+
+        self.assertEqual(
+            node_module.NodeHealth.UNREACHABLE.value,
+            "unreachable",
+        )
+
+        self.assertEqual(
+            node_module.NodeHealth.DISABLED.value,
+            "disabled",
+        )
+
+        self.assertEqual(
+            node_module.NodeHealth.REVOKED.value,
+            "revoked",
+        )
+
+
+
+class HeartbeatContractsTests(unittest.TestCase):
+
+    def setUp(self):
+        self.manager = node_module.NodeNetworkManager(
+            SimpleNamespace(
+                now=lambda: "2026-07-20T13:40:00+00:00"
+            )
+        )
+
+    def test_new_heartbeat(self):
+        heartbeat = self.manager.new_heartbeat(
+            node_id="NODE-1",
+        )
+
+        self.assertEqual(
+            heartbeat.node_id,
+            "NODE-1",
+        )
+
+        self.assertEqual(
+            heartbeat.health,
+            "healthy",
+        )
+
+    def test_new_heartbeat_records_timestamp(self):
+        heartbeat = self.manager.new_heartbeat(
+            node_id="NODE-1",
+        )
+
+        self.assertEqual(
+            heartbeat.occurred_at,
+            "2026-07-20T13:40:00+00:00",
+        )
+
+    def test_new_heartbeat_rejects_empty_node_id(self):
+        with self.assertRaises(
+            node_module.InvalidNodeError,
+        ):
+            self.manager.new_heartbeat(
+                node_id="",
+            )
+
+
+    def test_node_defaults_to_unknown_health(self):
+        node = self.manager.new_node(
+            node_id="NODE-1",
+            role="worker",
+        )
+
+        self.assertEqual(
+            node.health,
+            node_module.NodeHealth.UNKNOWN.value,
+        )
+
+
+class TTLContractsTests(unittest.TestCase):
+
+    def setUp(self):
+        self.manager = node_module.NodeNetworkManager(
+            SimpleNamespace(
+                now=lambda: "2026-07-20T13:45:00+00:00"
+            )
+        )
+
+    def test_default_policy_has_positive_heartbeat_ttl(self):
+        policy = self.manager.default_policy()
+
+        self.assertGreater(
+            policy.heartbeat_ttl_seconds,
+            0,
+        )
+
+    def test_default_network_policy_ttl(self):
+        policy = self.manager.default_policy()
+
+        self.assertEqual(
+            policy.heartbeat_ttl_seconds,
+            30,
+        )
+
+    def test_default_policy_validate_includes_heartbeat_ttl(self):
+        policy = self.manager.default_policy()
+        result = policy.validate()
+
+        self.assertTrue(result["valid"])
+        self.assertIn(
+            "heartbeat_ttl_seconds",
+            result,
+        )
+        self.assertEqual(
+            result["heartbeat_ttl_seconds"],
+            30,
+        )
+
+
+
+class HeartbeatTTLContractsTests(unittest.TestCase):
+
+    def setUp(self):
+        self.manager = node_module.NodeNetworkManager(
+            SimpleNamespace(
+                now=lambda: "2026-07-20T13:45:00+00:00"
+            )
+        )
+
+    def test_manager_exposes_heartbeat_ttl(self):
+        policy = self.manager.default_policy()
+
+        self.assertEqual(
+            policy.heartbeat_ttl_seconds,
+            30,
+        )
+
+
+
+    def test_manager_has_expire_heartbeats(self):
+        self.assertTrue(
+            hasattr(
+                self.manager,
+                "expire_heartbeats",
+            )
+        )
+
+
+    def test_expire_heartbeats_returns_list(self):
+        expired = self.manager.expire_heartbeats()
+
+        self.assertIsInstance(
+            expired,
+            list,
+        )
+
+
+    def test_manager_has_heartbeat_registry(self):
+        self.assertTrue(
+            hasattr(
+                self.manager,
+                "_heartbeats",
+            )
+        )
+
+
+
+    def test_new_heartbeat_is_registered(self):
+        heartbeat = self.manager.new_heartbeat(
+            node_id="NODE-1",
+        )
+
+        self.assertIn(
+            "NODE-1",
+            self.manager._heartbeats,
+        )
+
+        self.assertIs(
+            self.manager._heartbeats["NODE-1"],
+            heartbeat,
+        )
+
+
+
+    def test_expire_heartbeats_empty_registry(self):
+        expired = self.manager.expire_heartbeats()
+
+        self.assertEqual(
+            expired,
+            [],
+        )
+
+
+
+    def test_fresh_heartbeat_is_not_expired(self):
+        self.manager.new_heartbeat(
+            node_id="NODE-1",
+        )
+
+        expired = self.manager.expire_heartbeats()
+
+        self.assertNotIn(
+            "NODE-1",
+            expired,
+        )
+
+
+
+    def test_expired_heartbeat_is_reported(self):
+        heartbeat = node_module.Heartbeat(
+            node_id="NODE-1",
+            occurred_at="2026-07-20T13:00:00+00:00",
+            health=node_module.NodeHealth.HEALTHY.value,
+        )
+
+        self.manager._heartbeats["NODE-1"] = heartbeat
+
+        expired = self.manager.expire_heartbeats()
+
+        self.assertIn(
+            "NODE-1",
+            expired,
+        )
+
+
+
+    def test_future_heartbeat_is_not_reported(self):
+        heartbeat = node_module.Heartbeat(
+            node_id="NODE-2",
+            occurred_at="2026-07-20T14:30:00+00:00",
+            health=node_module.NodeHealth.HEALTHY.value,
+        )
+
+        self.manager._heartbeats["NODE-2"] = heartbeat
+
+        expired = self.manager.expire_heartbeats()
+
+        self.assertNotIn(
+            "NODE-2",
+            expired,
+        )
+
+
+
+    def test_ttl_policy_expires_old_heartbeat(self):
+        self.manager.policy = node_module.NodeNetworkPolicy(
+            heartbeat_ttl_seconds=30,
+        )
+
+        heartbeat = node_module.Heartbeat(
+            node_id="NODE-TTL",
+            occurred_at="2026-07-20T13:00:00+00:00",
+            health=node_module.NodeHealth.HEALTHY.value,
+        )
+
+        self.manager._heartbeats["NODE-TTL"] = heartbeat
+
+        expired = self.manager.expire_heartbeats()
+
+        self.assertIn(
+            "NODE-TTL",
+            expired,
+        )
+
+
+
+    def test_large_ttl_keeps_old_heartbeat_alive(self):
+        self.manager.policy = node_module.NodeNetworkPolicy(
+            heartbeat_ttl_seconds=999999999,
+        )
+
+        heartbeat = node_module.Heartbeat(
+            node_id="NODE-LONG",
+            occurred_at="2026-07-20T13:00:00+00:00",
+            health=node_module.NodeHealth.HEALTHY.value,
+        )
+
+        self.manager._heartbeats["NODE-LONG"] = heartbeat
+
+        expired = self.manager.expire_heartbeats()
+
+        self.assertNotIn(
+            "NODE-LONG",
+            expired,
+        )
+
+
+
+    def test_expired_node_becomes_unreachable(self):
+        node = self.manager.new_node(
+            node_id="NODE-STATE",
+            role=node_module.NodeRole.WORKER.value,
+        )
+
+        self.manager.repository.create(node)
+
+        heartbeat = node_module.Heartbeat(
+            node_id="NODE-STATE",
+            occurred_at="2026-07-20T13:00:00+00:00",
+            health=node_module.NodeHealth.HEALTHY.value,
+        )
+
+        self.manager._heartbeats["NODE-STATE"] = heartbeat
+
+        self.manager.expire_heartbeats()
+
+        node = self.manager.repository.get("NODE-STATE")
+
+        self.assertEqual(
+            node.health,
+            node_module.NodeHealth.UNREACHABLE.value,
+        )
+
+
+
+    def test_new_heartbeat_recovers_node_health(self):
+        node = self.manager.new_node(
+            node_id="NODE-RECOVER",
+            role=node_module.NodeRole.WORKER.value,
+        )
+
+        self.manager.repository.create(node)
+
+        self.manager._heartbeats["NODE-RECOVER"] = (
+            node_module.Heartbeat(
+                node_id="NODE-RECOVER",
+                occurred_at="2026-07-20T13:00:00+00:00",
+                health=node_module.NodeHealth.HEALTHY.value,
+            )
+        )
+
+        self.manager.expire_heartbeats()
+
+        self.manager.new_heartbeat(
+            node_id="NODE-RECOVER",
+        )
+
+        node = self.manager.repository.get("NODE-RECOVER")
+
+        self.assertEqual(
+            node.health,
+            node_module.NodeHealth.HEALTHY.value,
+        )
+
+
+    def test_unreachable_node_emits_event(self):
+        node = self.manager.new_node(
+            node_id="NODE-EVENT",
+            role=node_module.NodeRole.WORKER.value,
+        )
+
+        self.manager.repository.create(node)
+
+        heartbeat = node_module.Heartbeat(
+            node_id="NODE-EVENT",
+            occurred_at="2026-07-20T13:00:00+00:00",
+            health=node_module.NodeHealth.HEALTHY.value,
+        )
+
+        self.manager._heartbeats["NODE-EVENT"] = heartbeat
+
+        self.manager.expire_heartbeats()
+
+        self.assertIn(
+            "node.unreachable",
+            self.manager.events,
+        )
+
+
+    def test_recovered_node_emits_event(self):
+        node = self.manager.new_node(
+            node_id="NODE-RECOVER-EVENT",
+            role=node_module.NodeRole.WORKER.value,
+        )
+
+        self.manager.repository.create(node)
+
+        self.manager._heartbeats["NODE-RECOVER-EVENT"] = (
+            node_module.Heartbeat(
+                node_id="NODE-RECOVER-EVENT",
+                occurred_at="2026-07-20T13:00:00+00:00",
+                health=node_module.NodeHealth.HEALTHY.value,
+            )
+        )
+
+        self.manager.expire_heartbeats()
+
+        self.manager.new_heartbeat(
+            node_id="NODE-RECOVER-EVENT",
+        )
+
+        self.assertIn(
+            "node.recovered",
+            self.manager.events,
+        )
+
+
+    def test_publish_adds_event_to_log(self):
+        self.manager.publish("node.test")
+
+        self.assertEqual(
+            self.manager.events[-1],
+            "node.test",
+        )
+
+
+    def test_publish_notifies_subscriber(self):
+        received = []
+
+        def subscriber(event):
+            received.append(event)
+
+        self.manager.subscribe(subscriber)
+        self.manager.publish("node.test")
+
+        self.assertEqual(
+            received,
+            ["node.test"],
+        )
+
+    def test_publish_structured_event(self):
+        received = []
+
+        def subscriber(event):
+            received.append(event)
+
+        event = {
+            "type": "node.test",
+            "node_id": "node-01",
+        }
+
+        self.manager.subscribe(subscriber)
+        self.manager.publish(event)
+
+        self.assertEqual(received[0]['type'], 'node.test')
+        self.assertEqual(received[0]['node_id'], 'node-01')
+
+
+    def test_node_event_to_dict(self):
+        NodeEvent = node_module.NodeEvent
+
+        event = NodeEvent(
+            event_type="node.test",
+            node_id="node-01",
+            occurred_at=0,
+            details={},
+        )
+
+        data = event.as_dict()
+
+        self.assertIsInstance(data.get("id"), str)
+        self.assertGreater(len(data["id"]), 10)
+
+        self.assertEqual(
+            {k: v for k, v in data.items() if k != "id"},
+            {
+                "event_type": "node.test",
+                "node_id": "node-01",
+                "occurred_at": 0,
+                "details": {},
+                "severity": "INFO",
+            },
+        )
+
+
+    def test_node_event_auto_timestamp(self):
+        NodeEvent = node_module.NodeEvent
+
+        event = NodeEvent(
+            event_type="node.test",
+            node_id="node-01",
+            occurred_at=None,
+            details={},
+        )
+
+        self.assertIsNotNone(event.occurred_at)
+        self.assertIsInstance(event.occurred_at, (int, float))
+
+
+    def test_node_event_default_severity(self):
+        NodeEvent = node_module.NodeEvent
+
+        event = NodeEvent(
+            event_type="node.test",
+            node_id="node-01",
+            occurred_at=0,
+            details={},
+        )
+
+        self.assertEqual(event.as_dict().get("severity"), "INFO")
+
+
+    def test_node_event_auto_uuid(self):
+        NodeEvent = node_module.NodeEvent
+
+        event = NodeEvent(
+            event_type="node.test",
+            node_id="node-01",
+            occurred_at=0,
+            details={},
+        )
+
+        self.assertIsNotNone(event.as_dict().get("id"))
+        self.assertIsInstance(event.as_dict().get("id"), str)
+        self.assertGreater(len(event.as_dict().get("id")), 10)
+
 if __name__ == "__main__":
     unittest.main()
+
+
