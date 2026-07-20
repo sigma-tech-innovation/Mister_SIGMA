@@ -1,10 +1,10 @@
 import json
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 
 class SQLiteBackend:
-
     def __init__(self, root):
         self.root = Path(root)
         self.path = self.root / "sigma.sqlite3"
@@ -15,22 +15,22 @@ class SQLiteBackend:
             parents=True,
             exist_ok=True
         )
-
         return sqlite3.connect(self.path)
 
     def _initialize(self):
-        with self.connect() as connection:
-            connection.execute(
-                """
-                CREATE TABLE IF NOT EXISTS sigma_records (
-                    name TEXT PRIMARY KEY,
-                    payload TEXT NOT NULL
+        with closing(self.connect()) as connection:
+            with connection:
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS sigma_records (
+                        name TEXT PRIMARY KEY,
+                        payload TEXT NOT NULL
+                    )
+                    """
                 )
-                """
-            )
 
     def load(self, name):
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             row = connection.execute(
                 """
                 SELECT payload
@@ -51,24 +51,25 @@ class SQLiteBackend:
             ensure_ascii=False
         )
 
-        with self.connect() as connection:
-            connection.execute(
-                """
-                INSERT INTO sigma_records (
-                    name,
-                    payload
+        with closing(self.connect()) as connection:
+            with connection:
+                connection.execute(
+                    """
+                    INSERT INTO sigma_records (
+                        name,
+                        payload
+                    )
+                    VALUES (?, ?)
+                    ON CONFLICT(name)
+                    DO UPDATE SET payload = excluded.payload
+                    """,
+                    (name, payload)
                 )
-                VALUES (?, ?)
-                ON CONFLICT(name)
-                DO UPDATE SET payload = excluded.payload
-                """,
-                (name, payload)
-            )
 
         return data
 
     def exists(self, name):
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             row = connection.execute(
                 """
                 SELECT 1
@@ -81,19 +82,20 @@ class SQLiteBackend:
         return row is not None
 
     def delete(self, name):
-        with self.connect() as connection:
-            cursor = connection.execute(
-                """
-                DELETE FROM sigma_records
-                WHERE name = ?
-                """,
-                (name,)
-            )
+        with closing(self.connect()) as connection:
+            with connection:
+                cursor = connection.execute(
+                    """
+                    DELETE FROM sigma_records
+                    WHERE name = ?
+                    """,
+                    (name,)
+                )
 
         return cursor.rowcount > 0
 
     def list(self):
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             rows = connection.execute(
                 """
                 SELECT name
