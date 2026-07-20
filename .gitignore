@@ -13,3 +13,6 @@ secrets.yaml
 sigma_export.json
 backups/sigma-db-*
 backups/
+*.bak
+*.bak2
+*.bak3
