@@ -417,7 +417,7 @@ class NodeNetworkManager:
                 )
             )
 
-            self.events.append("node.recovered")
+            self.publish("node.recovered")
 
         return heartbeat
 
@@ -447,7 +447,7 @@ class NodeNetworkManager:
                         )
                     )
 
-                    self.events.append("node.unreachable")
+                    self.publish("node.unreachable")
                 expired.append(node_id)
 
         return expired
