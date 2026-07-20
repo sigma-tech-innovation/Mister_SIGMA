@@ -290,10 +290,11 @@ class SessionsApiTests(unittest.TestCase):
             )
 
     def test_contract_creates_no_token(self):
-        module_source = open(
+        with open(
             "sigma-api/sessions.py",
             encoding="utf-8",
-        ).read()
+        ) as f:
+            module_source = f.read()
 
         compiled = compile(
             module_source,

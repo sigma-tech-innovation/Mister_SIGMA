@@ -451,10 +451,11 @@ class AuthenticationApiTests(
         )
 
     def test_api_creates_no_session_contract(self):
-        source = open(
+        with open(
             "sigma-api/auth.py",
             encoding="utf-8",
-        ).read()
+        ) as f:
+            source = f.read()
 
         self.assertNotIn(
             "session_manager",

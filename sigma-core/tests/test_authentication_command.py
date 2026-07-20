@@ -210,11 +210,12 @@ class AuthenticationCommandTests(
         )
 
     def test_cli_contract_has_no_password_argument(self):
-        source = open(
+        with open(
             "sigma-cli/sigma/commands/"
             "authentication.py",
             encoding="utf-8",
-        ).read()
+        ) as f:
+            source = f.read()
 
         self.assertNotIn(
             'args[1]',

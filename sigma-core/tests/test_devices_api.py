@@ -1,5 +1,6 @@
 import importlib.util
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -213,10 +214,7 @@ class DevicesApiTests(unittest.TestCase):
         names = {
             n.lower()
             for n in compile(
-                open(
-                    "sigma-api/devices.py",
-                    encoding="utf-8",
-                ).read(),
+                Path("sigma-api/devices.py").read_text(encoding="utf-8"),
                 "devices.py",
                 "exec",
             ).co_names
