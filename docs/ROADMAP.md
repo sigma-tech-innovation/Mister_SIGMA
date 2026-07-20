@@ -15,13 +15,13 @@
 | Branche | `feature/SIG-07C-documentation-sync` |
 | Commit de référence documentaire | `7cf3fe0` |
 | Phase technique active | `07A — NodeNetworkManager` |
-| Sous-tâche technique active | `7A.3b` |
-| État de la sous-tâche | temporairement suspendue |
-| Priorité immédiate | revue documentaire et synchronisation avec l'état réel du dépôt |
-| Reprise autorisée | après validation complète de l’ensemble documentaire |
-| Phase suivante interdite | `7B` avant validation complète de `7A` |
+| Sous-tâche technique active | clôture et validation finale de `7A` |
+| État de la sous-tâche | implémentation technique terminée, validation finale en cours |
+| Priorité immédiate | synchronisation documentaire et exécution des contrôles de clôture |
+| Reprise autorisée | validation documentaire et technique de la phase 7A |
+| Phase suivante interdite | `7B` avant clôture formelle de `7A` |
 
-La suspension de `7A.3b` ne signifie pas que la phase 7A est abandonnée. Elle conserve son statut de tâche technique active et devra reprendre depuis le code et les tests réellement présents.
+L’implémentation technique de la topologie statique de la phase 7A est présente dans le dépôt et couverte par les tests dédiés. La phase reste active uniquement pour sa synchronisation documentaire et ses contrôles formels de clôture.
 
 ---
 
@@ -43,11 +43,11 @@ sigma-core/managers/node_network_manager.py
 sigma-core/tests/test_node_network_manager.py
 ```
 
-`NodeNetworkManager` est présent dans le dépôt, possède ses tests dédiés et est instancié par `SigmaEngine`. Les développements restants concernent les fonctionnalités non encore implémentées de la phase 7A.
+`NodeNetworkManager` est présent dans le dépôt, possède ses tests dédiés et est instancié par `SigmaEngine`. L’audit du code et des tests confirme l’implémentation de la portée technique déclarée pour la phase 7A.
 
-### Portée restante déclarée
+### Portée technique implémentée
 
-Les éléments restant à compléter dans la phase 7A sont :
+Les éléments suivants sont présents et couverts par les tests dédiés :
 
 - les endpoints ;
 - les capacités ;
@@ -55,19 +55,21 @@ Les éléments restant à compléter dans la phase 7A sont :
 - la topologie statique ;
 - les liens entre nœuds ;
 - les snapshots de topologie ;
-- la recherche par zone ou capacité.
+- les recherches par zone, région, capacité et endpoint ;
+- les recherches de liens entrants et sortants ;
+- les validations des identifiants dupliqués ;
+- la validation des références de liens orphelines.
 
-### Prochaine reprise technique
+### Clôture restante
 
-Après validation documentaire :
+Avant d’ouvrir la phase 7B :
 
-1. inspecter le code réel de `NodeNetworkManager` ;
-2. inspecter ses tests ;
-3. confirmer la portée exacte de `7A.3b` ;
-4. appliquer un seul changement cohérent ;
-5. exécuter les validations techniques ;
-6. actualiser la note opérationnelle ;
-7. committer uniquement après validation complète.
+1. synchroniser la documentation canonique avec l’état réel du dépôt ;
+2. exécuter les validations techniques de clôture ;
+3. vérifier le diff documentaire ;
+4. actualiser la note opérationnelle ;
+5. committer uniquement après validation complète ;
+6. déclarer formellement la phase 7A terminée.
 
 ---
 
