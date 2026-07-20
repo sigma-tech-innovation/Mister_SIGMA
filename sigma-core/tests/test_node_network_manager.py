@@ -772,7 +772,7 @@ class HeartbeatContractsTests(unittest.TestCase):
         with self.assertRaises(
             node_module.InvalidNodeError,
         ):
-            self.manager.new_heartbeat(
+            self.manager.heartbeat(
                 node_id="",
             )
 
@@ -905,7 +905,7 @@ class HeartbeatTTLContractsTests(unittest.TestCase):
 
 
     def test_fresh_heartbeat_is_not_expired(self):
-        self.manager.new_heartbeat(
+        self.manager.heartbeat(
             node_id="NODE-1",
         )
 
