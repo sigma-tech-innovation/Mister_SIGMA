@@ -701,7 +701,7 @@ class NodeNetworkManager:
 
         return created
 
-    def disconnect(self, node_id):
+    def _update_node_state(self, node_id, state):
         node = self.get(node_id)
 
         if node is None:
@@ -713,7 +713,7 @@ class NodeNetworkManager:
         updated = Node(
             id=node.id,
             role=node.role,
-            state=NodeState.OFFLINE.value,
+            state=state,
             hostname=node.hostname,
             address=node.address,
             created_at=node.created_at,
@@ -724,54 +724,24 @@ class NodeNetworkManager:
 
         self.repository.replace(updated)
         return updated
+
+    def disconnect(self, node_id):
+        return self._update_node_state(
+            node_id,
+            NodeState.OFFLINE.value,
+        )
 
     def maintenance(self, node_id):
-        node = self.get(node_id)
-
-        if node is None:
-            raise NodeNotFoundError(
-                "Node not found",
-                details={"node_id": node_id},
-            )
-
-        updated = Node(
-            id=node.id,
-            role=node.role,
-            state=NodeState.MAINTENANCE.value,
-            hostname=node.hostname,
-            address=node.address,
-            created_at=node.created_at,
-            updated_at=self.now(),
-            metadata=dict(node.metadata),
-            version=node.version + 1,
+        return self._update_node_state(
+            node_id,
+            NodeState.MAINTENANCE.value,
         )
-
-        self.repository.replace(updated)
-        return updated
 
     def reconnect(self, node_id):
-        node = self.get(node_id)
-
-        if node is None:
-            raise NodeNotFoundError(
-                "Node not found",
-                details={"node_id": node_id},
-            )
-
-        updated = Node(
-            id=node.id,
-            role=node.role,
-            state=NodeState.ONLINE.value,
-            hostname=node.hostname,
-            address=node.address,
-            created_at=node.created_at,
-            updated_at=self.now(),
-            metadata=dict(node.metadata),
-            version=node.version + 1,
+        return self._update_node_state(
+            node_id,
+            NodeState.ONLINE.value,
         )
-
-        self.repository.replace(updated)
-        return updated
     def validate(self):
         return {
             "valid": True,
