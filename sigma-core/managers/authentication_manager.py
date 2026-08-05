@@ -1089,39 +1089,36 @@ class AuthenticationManager:
 
         return False
 
-    def authenticate(
+    def _record_authentication_failure(
         self,
-        credential_id,
-        password,
         *,
-        context=None,
+        credential,
+        reason,
+        safe_context,
     ):
-        selected_id = str(
-            credential_id or ""
-        ).strip()
-
-        credential = self.get(
-            selected_id
+        self.record_audit(
+            action="authenticate",
+            outcome="failure",
+            credential=credential,
+            details={
+                "reason": reason,
+                "context": safe_context,
+            },
         )
 
-        safe_context = (
-            self.sanitize_audit_details(
-                context or {}
-            )
-        )
-
+    def _validate_authentication_status(
+        self,
+        credential,
+        *,
+        credential_id,
+        safe_context,
+    ):
         if credential is None:
-            self.record_audit(
-                action="authenticate",
-                outcome="failure",
-                details={
-                    "reason": (
-                        "invalid_credential"
-                    ),
-                    "context": safe_context,
-                },
+            self._record_authentication_failure(
+                credential=None,
+                reason="invalid_credential",
+                safe_context=safe_context,
             )
-
             raise InvalidCredentialError(
                 "Invalid credential"
             )
@@ -1131,106 +1128,88 @@ class AuthenticationManager:
         )
 
         if status == "disabled":
-            self.record_audit(
-                action="authenticate",
-                outcome="failure",
+            self._record_authentication_failure(
                 credential=credential,
-                details={
-                    "reason": (
-                        "credential_disabled"
-                    ),
-                    "context": safe_context,
-                },
+                reason="credential_disabled",
+                safe_context=safe_context,
             )
-
             raise CredentialDisabledError(
                 "Credential is disabled",
                 details={
-                    "credential_id": selected_id,
+                    "credential_id": credential_id,
                 },
             )
 
         if status == "locked":
-            self.record_audit(
-                action="authenticate",
-                outcome="failure",
+            self._record_authentication_failure(
                 credential=credential,
-                details={
-                    "reason": (
-                        "credential_locked"
-                    ),
-                    "context": safe_context,
-                },
+                reason="credential_locked",
+                safe_context=safe_context,
             )
-
             raise CredentialLockedError(
                 "Credential is locked",
                 details={
-                    "credential_id": selected_id,
+                    "credential_id": credential_id,
                 },
             )
 
         if status != "active":
-            self.record_audit(
-                action="authenticate",
-                outcome="failure",
+            self._record_authentication_failure(
                 credential=credential,
-                details={
-                    "reason": (
-                        "invalid_credential"
-                    ),
-                    "context": safe_context,
-                },
+                reason="invalid_credential",
+                safe_context=safe_context,
             )
-
             raise InvalidCredentialError(
                 "Invalid credential"
             )
 
-        if not self.verify_password(
-            selected_id,
-            password,
-        ):
-            updated = self.get(
-                selected_id
-            )
+    def _handle_authentication_failure(
+        self,
+        *,
+        credential_id,
+        credential,
+        safe_context,
+    ):
+        updated = self.get(
+            credential_id
+        )
 
-            reason = (
-                "credential_locked"
-                if (
-                    updated is not None
-                    and updated.get("status")
-                    == "locked"
-                )
-                else "invalid_credential"
+        reason = (
+            "credential_locked"
+            if (
+                updated is not None
+                and updated.get("status")
+                == "locked"
             )
+            else "invalid_credential"
+        )
 
-            self.record_audit(
-                action="authenticate",
-                outcome="failure",
-                credential=(
-                    updated or credential
-                ),
+        self._record_authentication_failure(
+            credential=updated or credential,
+            reason=reason,
+            safe_context=safe_context,
+        )
+
+        if reason == "credential_locked":
+            raise CredentialLockedError(
+                "Credential is locked",
                 details={
-                    "reason": reason,
-                    "context": safe_context,
+                    "credential_id": credential_id,
                 },
             )
 
-            if reason == "credential_locked":
-                raise CredentialLockedError(
-                    "Credential is locked",
-                    details={
-                        "credential_id": selected_id,
-                    },
-                )
+        raise InvalidCredentialError(
+            "Invalid credential"
+        )
 
-            raise InvalidCredentialError(
-                "Invalid credential"
-            )
-
+    def _build_authentication_success(
+        self,
+        *,
+        credential_id,
+        safe_context,
+    ):
         authenticated = self.get(
-            selected_id
+            credential_id
         )
 
         audit = self.record_audit(
@@ -1265,6 +1244,48 @@ class AuthenticationManager:
             ),
             "audit_id": audit["id"],
         }
+
+    def authenticate(
+        self,
+        credential_id,
+        password,
+        *,
+        context=None,
+    ):
+        selected_id = str(
+            credential_id or ""
+        ).strip()
+
+        credential = self.get(
+            selected_id
+        )
+
+        safe_context = (
+            self.sanitize_audit_details(
+                context or {}
+            )
+        )
+
+        self._validate_authentication_status(
+            credential,
+            credential_id=selected_id,
+            safe_context=safe_context,
+        )
+
+        if not self.verify_password(
+            selected_id,
+            password,
+        ):
+            self._handle_authentication_failure(
+                credential_id=selected_id,
+                credential=credential,
+                safe_context=safe_context,
+            )
+
+        return self._build_authentication_success(
+            credential_id=selected_id,
+            safe_context=safe_context,
+        )
 
     def change_password(
         self,
