@@ -641,13 +641,7 @@ class SessionManager:
             "errors": errors,
         }
 
-
-    def touch(
-        self,
-        session,
-        *,
-        at=None,
-    ):
+    def _resolve_current_datetime(self, at):
         current = (
             at
             if at is not None
@@ -657,11 +651,35 @@ class SessionManager:
         if not hasattr(current, "tzinfo"):
             current = self.parse_datetime(current)
 
-        policy = self.default_policy()
+        return current
 
+    def _replace_session(self, session, changes):
         updated = Session(
             **{
                 **session.as_dict(),
+                **changes,
+            }
+        )
+
+        self.repository.replace(updated)
+        return updated
+
+
+    def touch(
+        self,
+        session,
+        *,
+        at=None,
+    ):
+        current = self._resolve_current_datetime(
+            at
+        )
+
+        policy = self.default_policy()
+
+        return self._replace_session(
+            session,
+            {
                 "updated_at": self.format_datetime(current),
                 "last_activity_at": self.format_datetime(current),
                 "idle_expires_at": self.format_datetime(
@@ -670,11 +688,8 @@ class SessionManager:
                     )
                 ),
                 "version": session.version + 1,
-            }
+            },
         )
-
-        self.repository.replace(updated)
-        return updated
 
     def revoke(
         self,
@@ -683,28 +698,20 @@ class SessionManager:
         reason="revoked",
         at=None,
     ):
-        current = (
+        current = self._resolve_current_datetime(
             at
-            if at is not None
-            else self.now_utc()
         )
 
-        if not hasattr(current, "tzinfo"):
-            current = self.parse_datetime(current)
-
-        revoked = Session(
-            **{
-                **session.as_dict(),
+        return self._replace_session(
+            session,
+            {
                 "state": SessionState.REVOKED.value,
                 "updated_at": self.format_datetime(current),
                 "revoked_at": self.format_datetime(current),
                 "revoked_reason": str(reason),
                 "version": session.version + 1,
-            }
+            },
         )
-
-        self.repository.replace(revoked)
-        return revoked
 
     def renew(
         self,
@@ -713,20 +720,15 @@ class SessionManager:
         policy=None,
         at=None,
     ):
-        current = (
+        current = self._resolve_current_datetime(
             at
-            if at is not None
-            else self.now_utc()
         )
-
-        if not hasattr(current, "tzinfo"):
-            current = self.parse_datetime(current)
 
         policy = policy or self.default_policy()
 
-        renewed = Session(
-            **{
-                **session.as_dict(),
+        return self._replace_session(
+            session,
+            {
                 "updated_at": self.format_datetime(current),
                 "last_activity_at": self.format_datetime(current),
                 "expires_at": self.format_datetime(
@@ -740,11 +742,8 @@ class SessionManager:
                     )
                 ),
                 "version": session.version + 1,
-            }
+            },
         )
-
-        self.repository.replace(renewed)
-        return renewed
 
     def is_expired(
         self,
